@@ -1,0 +1,3 @@
+class Lexicon {
+  // TO-DO
+}
