@@ -5,11 +5,13 @@ class DiscordTheme {
   static const Color primaryColorDarker = Color(0xFF4752c4);
   static const Color primaryColorDarkest = Color(0xFF313998);
 
-  static const Color backgroundColor = Color(0xFF313338);
-  static const Color backgroundColorDarker = Color(0xFF2b2d31);
-  static const Color backgroundColorDarkest = Color(0xFF232428);
+  static const Color backgroundColorLight = Color(0xFF313338);
+  static const Color backgroundColorDark = Color(0xFF2b2d31);
+  static const Color backgroundColorDarker = Color(0xFF232428);
+  static const Color backgroundColorDarkest = Color(0xFF1e1f22);
 
   static const Color white = Color(0xFFFFFFFF);
+  static const Color white2 = Color.fromARGB(255, 217, 220, 227);
   static const Color darkGray = Color(0xFF1e1f22);
   static const Color black = Color(0xFF111214);
 
@@ -35,7 +37,7 @@ class DiscordTheme {
         errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
         errorStyle: TextStyle(color: Colors.red),
       ),
-      dialogBackgroundColor: backgroundColor,
+      dialogBackgroundColor: backgroundColorLight,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
           splashFactory: NoSplash.splashFactory,
@@ -43,7 +45,7 @@ class DiscordTheme {
           backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
               if (states.contains(MaterialState.focused)) return primaryColorDarker;
               if (states.contains(MaterialState.pressed)) return primaryColorDarkest;
-              if (states.contains(MaterialState.disabled)) return backgroundColor;
+              if (states.contains(MaterialState.disabled)) return backgroundColorLight;
               return primaryColor;
             },
           ),
@@ -102,9 +104,9 @@ class DiscordTheme {
         onError: Color(0xFF601410),
         errorContainer: Color(0xFF8C1D18),
         onErrorContainer: Color(0xFFF9DEDC),
-        background: backgroundColor,
+        background: backgroundColorLight,
         onBackground: Color(0xFFE6E1E5),
-        surface: backgroundColor,
+        surface: backgroundColorLight,
         onSurface: Color(0xFFE6E1E5),
         surfaceVariant: Color(0xFF49454F),
         onSurfaceVariant: Color(0xFFCAC4D0),

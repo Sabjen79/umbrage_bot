@@ -107,8 +107,8 @@ class _ProfileWidgetState extends State<ProfileWidget> with SingleTickerProvider
               height: 160,
               decoration: BoxDecoration(
                 color: Color.lerp(
+                  DiscordTheme.backgroundColorDark,
                   DiscordTheme.backgroundColorDarker,
-                  DiscordTheme.backgroundColorDarkest,
                   _animation.value
                 ),
                 boxShadow: [

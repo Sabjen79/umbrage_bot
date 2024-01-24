@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:umbrage_bot/ui/discord_theme.dart';
+import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar.dart';
 import 'package:umbrage_bot/ui/util/window_close_handler.dart';
 
 class MainMenu extends StatefulWidget {
@@ -22,35 +24,19 @@ class _MainMenuState extends State<MainMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("dab"),
-        elevation: 5,
-      ),
       body: SafeArea(
-        child: Row(
-          children: <Widget>[
-            NavigationRail(
-              selectedIndex: _navIndex,
-              groupAlignment: -1,
-              elevation: 5,
-              onDestinationSelected: (int index) {
-                setState(() {
-                  _navIndex = index;
-                });
-              },
-              labelType: NavigationRailLabelType.selected,
-              destinations: const <NavigationRailDestination>[
-                NavigationRailDestination(
-                  icon: Icon(Icons.favorite),
-                  label: Text('Test'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.favorite),
-                  label: Text('Test'),
-                ),
-              ]
-            )
-          ],
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: const Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              Positioned(
+                left: 0,
+                child: SideBar(),
+              ),
+            ],
+          ),
         )
       ),
     );

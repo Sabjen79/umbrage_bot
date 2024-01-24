@@ -43,6 +43,7 @@ dependencies:
   flutter_window_close: ^1.0.0
   change_app_package_name: ^1.1.0
   path_provider: ^2.1.2
+  material_symbols_icons: ^4.2716.0
 
 dev_dependencies:
   flutter_test:

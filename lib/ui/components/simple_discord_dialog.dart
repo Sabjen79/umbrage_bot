@@ -48,7 +48,7 @@ class _SimpleDiscordDialogState extends State<SimpleDiscordDialog> {
           widget.content,
           Container(
             decoration: const BoxDecoration(
-              color: DiscordTheme.backgroundColorDarker,
+              color: DiscordTheme.backgroundColorDark,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(3),
                 bottomRight: Radius.circular(3)
