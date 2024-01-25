@@ -141,9 +141,10 @@ class _ProfileWidgetState extends State<ProfileWidget> with SingleTickerProvider
                       child: FittedBox(
                         child: Text(
                           widget.profile.getUsername(),
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
-                            fontSize: 16,
+                            fontSize: 14,
                           ),
                         ),
                       )

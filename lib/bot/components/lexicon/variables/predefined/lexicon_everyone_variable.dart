@@ -4,7 +4,7 @@ class LexiconEveryoneVariable extends LexiconVariable {
   LexiconEveryoneVariable() : super("everyone", "Mention everyone", "Appends @everyone to the message to notify all users");
 
   @override
-  String computeVariable() {
+  String getValue() {
     return "@everyone";
   }
 }

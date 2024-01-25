@@ -8,10 +8,8 @@ class LexiconCustomVariable extends LexiconVariable {
   LexiconCustomVariable(super.token, super.name, super.description, this.words);
 
   @override
-  String computeVariable() {
-    if(words.isEmpty) return "";
-
-    return words[Random().nextInt(words.length)];
+  String getValue() {
+    return words.isEmpty ? "" : words[Random().nextInt(words.length)];
   }
 
   void addWord(String word) {

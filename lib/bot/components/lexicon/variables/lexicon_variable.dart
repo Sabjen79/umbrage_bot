@@ -8,5 +8,5 @@ abstract class LexiconVariable {
 
   LexiconVariable(this.token, this.name, this.description, {this.color = Colors.grey});
 
-  String computeVariable();
+  String getValue();
 }

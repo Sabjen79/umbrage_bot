@@ -4,31 +4,24 @@ import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_vari
 import 'package:umbrage_bot/bot/util/bot_files.dart';
 
 class Lexicon {
-  final List<LexiconCustomVariable> customVariables;
+  final List<LexiconCustomVariable> customVariables = [];
 
   // Always remember to include all events in getAllEvents()!!!
   late final LexiconMentionEvent mentionEvent;
 
-  // Constructors
-  Lexicon._(this.customVariables);
-
-  static Future<Lexicon> create() async {
+  // Constructor
+  Lexicon() {
     final BotFiles files = BotFiles();
 
-    List<LexiconCustomVariable> variables = [];
     for(var file in files.getDir("lexicon/variables").listSync()) {
-      variables.add(
+      customVariables.add(
         files.loadLexiconVariable(
           file.path.split(RegExp(r'[/\\]+')).last // Splits path by '/' and '\'
         )
       );
     }
 
-    var lexicon = Lexicon._(variables);
-
-    lexicon.mentionEvent = LexiconMentionEvent(files.loadLexiconEventPhrases("mention_bot.txt"));
-
-    return lexicon;
+    mentionEvent = LexiconMentionEvent(this, files.loadLexiconEventPhrases("mention_bot.txt"));
   }
   //
 

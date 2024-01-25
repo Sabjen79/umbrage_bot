@@ -5,8 +5,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_variable.dart';
+import 'package:umbrage_bot/bot/util/filee.dart';
 
-class BotFiles {
+class BotFiles with filee {
   late String _botId;
   late Directory _mainDir;
 
@@ -58,9 +59,7 @@ class BotFiles {
     f.deleteSync();
   }
 
-  //===========================================================================================
-  // Lexicon
-  //===========================================================================================
+  // TO-DO: Implement mixins for different uses
 
   void saveLexiconVariable(LexiconCustomVariable v) {
     _lexiconSaveToFile([v.name, v.description, ...v.words], "variables", v.token);

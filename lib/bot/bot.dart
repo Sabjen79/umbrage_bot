@@ -1,5 +1,4 @@
 import 'package:nyxx/nyxx.dart';
-import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_mention_event.dart';
 import 'package:umbrage_bot/bot/components/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
@@ -37,7 +36,7 @@ class Bot {
 
     // Initializes BotFiles
     await BotFiles().initialize();
-    _instance.lexicon = await Lexicon.create();
+    _instance.lexicon = Lexicon();
 
     //The bot is set on 'Do Not Disturb' and cannot be changed because he is too exalted to be perturbed by commoners.
     _instance.client.updatePresence(PresenceBuilder(status: CurrentUserStatus.dnd, isAfk: false));
