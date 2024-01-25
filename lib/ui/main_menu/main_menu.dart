@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar.dart';
 import 'package:umbrage_bot/ui/util/window_close_handler.dart';
 
@@ -28,12 +27,32 @@ class _MainMenuState extends State<MainMenu> {
         child: SizedBox(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          child: const Stack(
+          child: Stack(
             alignment: Alignment.center,
             children: <Widget>[
               Positioned(
+                left: 60,
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 60,
+                  height: MediaQuery.of(context).size.height,
+                  child: <Widget>[
+                    const Text("Welcome!"),
+                    const Text("TIMERS"),
+                    const Text("Musick"),
+                    const Text("Phrases"),
+                    const Text("Settings")
+                  ][_navIndex],
+                ),
+              ),
+              Positioned(
                 left: 0,
-                child: SideBar(),
+                child: SideBar(
+                  onIndexChanged: (index) {
+                    setState(() {
+                      _navIndex = index;
+                    });
+                  },
+                ),
               ),
             ],
           ),

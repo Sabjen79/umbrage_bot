@@ -5,18 +5,21 @@ import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar_button.dart';
 
 class SideBar extends StatefulWidget {
-  const SideBar({super.key});
+  final Function(int) onIndexChanged;
+
+  const SideBar({required this.onIndexChanged, super.key});
 
   @override
   State<SideBar> createState() => _SideBarState();
 }
 
 class _SideBarState extends State<SideBar> {
-  int _activeIndex = -1;
+  int _activeIndex = 0;
 
   void setActiveButton(int index) {
     setState(() {
       _activeIndex = index;
+      widget.onIndexChanged(index);
     });
   }
 
