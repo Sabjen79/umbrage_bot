@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
+import 'package:umbrage_bot/ui/main_menu/main_menu_window.dart';
 import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar_button.dart';
 
 class SideBar extends StatefulWidget {
-  final Function(int) onIndexChanged;
+  static const double size = 60;
 
-  const SideBar({required this.onIndexChanged, super.key});
+  final Function(int) onButtonPressed;
+  final List<MainMenuWindow> windows;
+
+  const SideBar({required this.windows, required this.onButtonPressed, super.key});
 
   @override
   State<SideBar> createState() => _SideBarState();
@@ -19,7 +23,7 @@ class _SideBarState extends State<SideBar> {
   void setActiveButton(int index) {
     setState(() {
       _activeIndex = index;
-      widget.onIndexChanged(index);
+      widget.onButtonPressed(index);
     });
   }
 
@@ -28,11 +32,23 @@ class _SideBarState extends State<SideBar> {
     super.initState();
   }
 
+  Widget _sideBarButton(int index) {
+    var window = widget.windows[index];
+
+    return SideBarButton(
+      label: window.name,
+      icon: window.icon,
+      onTap: () { setActiveButton(index); },
+      isActive: _activeIndex == index,
+      child: window.icon == null ? Image.network(Bot().user.avatar.url.toString()) : null,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       color: DiscordTheme.backgroundColorDarkest,
-      width: 60,
+      width: SideBar.size,
       height: MediaQuery.of(context).size.height,
       child: Padding(
         padding: const EdgeInsets.only(top: 5),
@@ -40,12 +56,7 @@ class _SideBarState extends State<SideBar> {
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            SideBarButton(
-              label: Bot().user.username,
-              onTap: () { setActiveButton(0); },
-              isActive: _activeIndex == 0,
-              child: Image.network(Bot().user.avatar.url.toString()),
-            ),
+            _sideBarButton(0),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Container(
@@ -54,30 +65,15 @@ class _SideBarState extends State<SideBar> {
                 color: DiscordTheme.backgroundColorDark,
               ),
             ),
-            SideBarButton(
-              label: "Timers",
-              icon: Symbols.timer,
-              onTap: () { setActiveButton(1); },
-              isActive: _activeIndex == 1
-            ),
-            SideBarButton(
-              label: "Music",
-              icon: Symbols.music_note,
-              onTap: () { setActiveButton(2); },
-              isActive: _activeIndex == 2
-            ),
-            SideBarButton(
-              label: "Lexicon",
-              icon: Symbols.quick_phrases,
-              onTap: () { setActiveButton(3); },
-              isActive: _activeIndex == 3
-            ),
-            SideBarButton(
-              label: "Settings",
-              icon: Symbols.settings,
-              onTap: () { setActiveButton(4); },
-              isActive: _activeIndex == 4
-            ),
+            ...() {
+              var widgets = [];
+
+              for(int i = 1; i < widget.windows.length; i++) {
+                widgets.add(_sideBarButton(i));
+              }
+
+              return widgets;
+            }()
           ],
         ),
       )
