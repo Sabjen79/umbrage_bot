@@ -3,7 +3,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_menu.dart';
 import 'package:umbrage_bot/ui/main_menu/main_menu_window.dart';
-import 'package:umbrage_bot/ui/main_menu/side_bar/secondary_side_bar.dart';
+import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar.dart';
 import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar.dart';
 import 'package:umbrage_bot/ui/util/window_close_handler.dart';
 
@@ -23,6 +23,7 @@ class _MainMenuState extends State<MainMenu> {
 
   final List<MainMenuWindow> windows = [];
   int _sideBarIndex = 0;
+  int _secondarySideBarIndex = 0;
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _MainMenuState extends State<MainMenu> {
   void _sideBarButtonPressed(int newIndex) {
     setState(() {
       _sideBarIndex = newIndex;
+      _secondarySideBarIndex = 0;
     });
   }
 
@@ -65,7 +67,10 @@ class _MainMenuState extends State<MainMenu> {
               ),
               Positioned(
                 left: SideBar.size,
-                child: SecondarySideBar(windows[_sideBarIndex]),
+                child: SecondarySideBar(
+                  windows[_sideBarIndex],
+                  _secondarySideBarIndex
+                ),
               ),
               Positioned(
                 left: 0,

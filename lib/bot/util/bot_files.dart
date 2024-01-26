@@ -5,9 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_variable.dart';
-import 'package:umbrage_bot/bot/util/filee.dart';
 
-class BotFiles with filee {
+class BotFiles {
   late String _botId;
   late Directory _mainDir;
 

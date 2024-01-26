@@ -12,6 +12,8 @@ class DiscordTheme {
 
   static const Color white = Color(0xFFFFFFFF);
   static const Color white2 = Color.fromARGB(255, 217, 220, 227);
+  static const Color lightGray = Color.fromARGB(255, 147, 150, 162);
+  static const Color gray = Color(0xFF404249);
   static const Color darkGray = Color(0xFF1e1f22);
   static const Color black = Color(0xFF111214);
 
