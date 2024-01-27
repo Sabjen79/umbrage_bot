@@ -17,14 +17,14 @@ class _MainMenuState extends State<MainMenu> {
   //final MainMenuWindow musicWindow = MainMenuWindow("Music", Symbols.music_note); // TO-DO
   //final MainMenuWindow settingsWindow = MainMenuWindow("Settings", Symbols.settings); // TO-DO
 
-  final List<MainMenuWindow> windows = [];
+  final List<MainMenuWindow> _windows = [];
   int _sideBarIndex = 0;
 
   @override
   void initState() {
     super.initState();
 
-    windows.addAll([
+    _windows.addAll([
       BotProfileWindow(),
       LexiconWindow()
     ]);
@@ -40,7 +40,7 @@ class _MainMenuState extends State<MainMenu> {
 
   @override
   Widget build(BuildContext context) {
-    var activeWindow = windows[_sideBarIndex];
+    var activeWindow = _windows[_sideBarIndex];
 
     return Scaffold(
       body: SafeArea(
@@ -57,7 +57,7 @@ class _MainMenuState extends State<MainMenu> {
               Positioned(
                 left: 0,
                 child: SideBar(
-                  windows: windows,
+                  windows: _windows,
                   onButtonPressed: _sideBarButtonPressed
                 ),
               ),

@@ -35,11 +35,11 @@ class _SideBarState extends State<SideBar> {
     var window = widget.windows[index];
 
     return SideBarButton(
-      label: window.name,
-      icon: window.icon,
+      label: window.getName(),
+      icon: window.getIcon(),
       onTap: () { setActiveButton(index); },
       isActive: _activeIndex == index,
-      child: window.icon == null ? Image.network(Bot().user.avatar.url.toString()) : null,
+      child: window.getIcon() == null ? Image.network(Bot().user.avatar.url.toString()) : null,
     );
   }
 
