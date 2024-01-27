@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_menu.dart';
+import 'package:umbrage_bot/ui/main_menu/bot_profile/bot_profile_window.dart';
+import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_window.dart';
 import 'package:umbrage_bot/ui/main_menu/main_menu_window.dart';
-import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar.dart';
 import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar.dart';
 import 'package:umbrage_bot/ui/util/window_close_handler.dart';
 
@@ -15,21 +13,21 @@ class MainMenu extends StatefulWidget {
 }
 
 class _MainMenuState extends State<MainMenu> {
-  final MainMenuWindow profileWindow = MainMenuWindow(Bot().user.username, null);
-  final MainMenuWindow timerWindow = MainMenuWindow("Timers", Symbols.timer);
-  final MainMenuWindow musicWindow = MainMenuWindow("Music", Symbols.music_note);
-  final MainMenuWindow lexiconWindow = MainMenuWindow("Lexicon", Symbols.quick_phrases);
-  final MainMenuWindow settingsWindow = MainMenuWindow("Settings", Symbols.settings);
+  //final MainMenuWindow timerWindow = MainMenuWindow("Timers", Symbols.timer); // TO-DO
+  //final MainMenuWindow musicWindow = MainMenuWindow("Music", Symbols.music_note); // TO-DO
+  //final MainMenuWindow settingsWindow = MainMenuWindow("Settings", Symbols.settings); // TO-DO
 
   final List<MainMenuWindow> windows = [];
   int _sideBarIndex = 0;
-  int _secondarySideBarIndex = 0;
 
   @override
   void initState() {
     super.initState();
 
-    windows.addAll([profileWindow, timerWindow, musicWindow, lexiconWindow, settingsWindow]);
+    windows.addAll([
+      BotProfileWindow(),
+      LexiconWindow()
+    ]);
 
     WindowCloseHandler.init(context);
   }
@@ -37,12 +35,13 @@ class _MainMenuState extends State<MainMenu> {
   void _sideBarButtonPressed(int newIndex) {
     setState(() {
       _sideBarIndex = newIndex;
-      _secondarySideBarIndex = 0;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    var activeWindow = windows[_sideBarIndex];
+
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -52,25 +51,8 @@ class _MainMenuState extends State<MainMenu> {
             alignment: Alignment.center,
             children: <Widget>[
               Positioned(
-                left: SideBar.size + SecondarySideBar.size,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width - (SideBar.size + SecondarySideBar.size),
-                  height: MediaQuery.of(context).size.height,
-                  child: <Widget>[
-                    const Text("Welcome!"),
-                    const Text("TIMERS"),
-                    const Text("Musick"),
-                    const LexiconMenu(),
-                    const Text("Settings")
-                  ][_sideBarIndex],
-                ),
-              ),
-              Positioned(
                 left: SideBar.size,
-                child: SecondarySideBar(
-                  windows[_sideBarIndex],
-                  _secondarySideBarIndex
-                ),
+                child: activeWindow,
               ),
               Positioned(
                 left: 0,

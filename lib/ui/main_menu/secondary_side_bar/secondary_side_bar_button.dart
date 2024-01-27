@@ -3,11 +3,13 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 
 class SecondarySideBarButton extends StatefulWidget {
+  final String name;
   final bool isActive;
   final int index;
   final Function(int) onTap;
 
   const SecondarySideBarButton({
+    required this.name,
     required this.index,
     required this.onTap,
     this.isActive = false,
@@ -32,11 +34,13 @@ class _SecondarySideBarButtonState extends State<SecondarySideBarButton> {
       height: 25,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(5)),
-        color: Color.lerp(Colors.transparent, DiscordTheme.lightGray, hoverActiveValue())
+        color: Color.lerp(const Color(0x00404249), const Color(0xFF404249), hoverActiveValue())
       ),
       margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          widget.onTap(widget.index);
+        },
         onHover: (b) {
           setState(() {
             _hover = b;
@@ -60,7 +64,7 @@ class _SecondarySideBarButtonState extends State<SecondarySideBarButton> {
               left: 25,
               top: 1.2,
               child: Text(
-                "dab_channel",
+                widget.name,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.start,
                 style: TextStyle(

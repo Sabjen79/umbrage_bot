@@ -8,7 +8,8 @@ class SecondarySideBarCategory extends StatefulWidget {
   final String name;
   final List<SecondarySideBarButton> buttons;
 
-  const SecondarySideBarCategory(this.name, {
+  const SecondarySideBarCategory({
+    required this.name, 
     required this.buttons,
     super.key
   });
@@ -30,38 +31,30 @@ class _SecondarySideBarCategoryState extends State<SecondarySideBarCategory> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 15,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    const Positioned(
-                      left: 0,
-                      child: Icon(
-                        Symbols.keyboard_arrow_down,
-                        size: 10,
-                        opticalSize: 20,
-                        grade: 200,
-                        weight: 200,
-                        color: DiscordTheme.lightGray,
-                      ),
-                    ),
-                    Positioned(
-                      left: 10,
-                      top: -0.5,
-                      child: Text(
-                        widget.name,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: DiscordTheme.lightGray,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500
+              () {
+                if(widget.name == "") return Container();
+                return SizedBox(
+                  height: 16,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Positioned(
+                        left: 5,
+                        top: -0.5,
+                        child: Text(
+                          widget.name,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: DiscordTheme.lightGray,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    ],
+                  ),
+                );
+              }(),
               ...widget.buttons
             ],
           ),

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
-import 'package:umbrage_bot/ui/main_menu/main_menu_window.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar_category.dart';
 
 class SecondarySideBar extends StatefulWidget {
   static const double size = 190;
-  final MainMenuWindow currentWindow;
+  final String name;
+  final List<SecondarySideBarCategory> categories;
   final int activeButtonIndex;
 
-  const SecondarySideBar(this.currentWindow, this.activeButtonIndex, {super.key});
+  const SecondarySideBar({
+    required this.name, 
+    this.categories = const [],
+    this.activeButtonIndex = 0,
+    super.key
+  });
 
   @override
   State<SecondarySideBar> createState() => _SecondarySideBarState();
@@ -33,7 +38,7 @@ class _SecondarySideBarState extends State<SecondarySideBar> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               child: Text(
-                widget.currentWindow.name,
+                widget.name,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500
@@ -55,8 +60,7 @@ class _SecondarySideBarState extends State<SecondarySideBar> {
               ]
             ),
           ),
-          const SecondarySideBarCategory("CATEGORY 1", buttons: []),
-          const SecondarySideBarCategory("CATEGORY 2", buttons: []),
+          ...widget.categories
         ],
       ),
     );
