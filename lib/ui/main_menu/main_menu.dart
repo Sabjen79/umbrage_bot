@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/ui/main_menu/bot_profile/bot_profile_window.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_window.dart';
-import 'package:umbrage_bot/ui/main_menu/main_menu_window.dart';
+import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar.dart';
 import 'package:umbrage_bot/ui/util/window_close_handler.dart';
 
@@ -17,7 +17,7 @@ class _MainMenuState extends State<MainMenu> {
   //final MainMenuWindow musicWindow = MainMenuWindow("Music", Symbols.music_note); // TO-DO
   //final MainMenuWindow settingsWindow = MainMenuWindow("Settings", Symbols.settings); // TO-DO
 
-  final List<MainMenuWindow> _windows = [];
+  final List<MainWindow> _windows = [];
   int _sideBarIndex = 0;
 
   @override

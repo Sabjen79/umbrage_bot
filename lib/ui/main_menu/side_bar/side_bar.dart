@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
-import 'package:umbrage_bot/ui/main_menu/main_menu_window.dart';
+import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar_button.dart';
 
 class SideBar extends StatefulWidget {
   static const double size = 60;
 
   final Function(int) onButtonPressed;
-  final List<MainMenuWindow> windows;
+  final List<MainWindow> windows;
 
   const SideBar({required this.windows, required this.onButtonPressed, super.key});
 

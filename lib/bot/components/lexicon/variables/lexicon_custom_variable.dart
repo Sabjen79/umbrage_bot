@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_variable.dart';
-import 'package:umbrage_bot/bot/util/bot_files.dart';
+import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
 
 class LexiconCustomVariable extends LexiconVariable {
   List<String> words;

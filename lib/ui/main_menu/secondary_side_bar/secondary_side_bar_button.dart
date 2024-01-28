@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 
 class SecondarySideBarButton extends StatefulWidget {
   final String name;
   final bool isActive;
   final int index;
+  final IconData icon;
   final Function(int) onTap;
 
   const SecondarySideBarButton({
     required this.name,
     required this.index,
     required this.onTap,
+    required this.icon,
     this.isActive = false,
     super.key
   });
@@ -49,10 +50,10 @@ class _SecondarySideBarButtonState extends State<SecondarySideBarButton> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            const Positioned(
+            Positioned(
               left: 3,
               child: Icon(
-                Symbols.tag,
+                widget.icon,
                 size: 20,
                 opticalSize: 20,
                 grade: 200,
@@ -62,7 +63,7 @@ class _SecondarySideBarButtonState extends State<SecondarySideBarButton> {
             ),
             Positioned(
               left: 25,
-              top: 1.2,
+              top: 1.5,
               child: Text(
                 widget.name,
                 overflow: TextOverflow.ellipsis,

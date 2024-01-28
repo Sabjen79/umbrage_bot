@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar_button.dart';
@@ -19,7 +18,6 @@ class SecondarySideBarCategory extends StatefulWidget {
 }
 
 class _SecondarySideBarCategoryState extends State<SecondarySideBarCategory> {
-
   @override
   Widget build(BuildContext context) {
     return Padding(

@@ -1,9 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_mention_event.dart';
 import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_variable.dart';
-import 'package:umbrage_bot/bot/util/bot_files.dart';
+import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
 
-class Lexicon {
+class Lexicon with ChangeNotifier {
   final List<LexiconCustomVariable> customVariables = [];
 
   // Always remember to include all events in getAllEvents()!!!
@@ -44,9 +45,19 @@ class Lexicon {
   }
   //
 
+  void addCustomVariable(LexiconCustomVariable variable) {
+    customVariables.add(variable);
+    
+    // TO-DO
+
+    notifyListeners();
+  }
+
   void deleteCustomVariable(LexiconCustomVariable variable) {
     if(!customVariables.remove(variable)) return;
 
     BotFiles().deleteFile("lexicon/variables/${variable.token}.txt");
+
+    notifyListeners();
   }
 }
