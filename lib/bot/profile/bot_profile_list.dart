@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/util/result.dart';
 
@@ -85,5 +86,20 @@ class BotProfileList {
         return;
       }
     }    
+  }
+
+  // Only called after Bot is connected
+  Future<void> updateProfile(String token) async {
+    var newProfile = BotProfile.create(token, Bot().user.id.toString(), Bot().user.username, Bot().user.avatar.url.toString());
+    for(int i = 0; i < _profiles.length; i++) {
+      var oldProfile = _profiles[i];
+
+      if(oldProfile.getToken() == newProfile.getToken()) {
+        _profiles[i] = newProfile;
+      }
+    }
+
+    await saveProfiles();
+    return;
   }
 }

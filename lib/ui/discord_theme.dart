@@ -21,6 +21,10 @@ class DiscordTheme {
 
   static ThemeData get() {
     return ThemeData(
+      scrollbarTheme: ScrollbarThemeData(
+        thickness: const MaterialStatePropertyAll<double?>(3),
+        thumbColor: MaterialStatePropertyAll<Color?>(black.withOpacity(0.7)),
+      ),
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
       textSelectionTheme: const TextSelectionThemeData(
@@ -28,7 +32,7 @@ class DiscordTheme {
       ),
       inputDecorationTheme: const InputDecorationTheme(
         isDense: true,
-        contentPadding: EdgeInsets.symmetric(horizontal: 7, vertical: 12),
+        contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,
         fillColor: darkGray,
@@ -38,6 +42,8 @@ class DiscordTheme {
         focusedBorder: _noBorder,
         errorBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
         errorStyle: TextStyle(color: Colors.red),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        errorMaxLines: 2
       ),
       dialogBackgroundColor: backgroundColorLight,
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -47,7 +53,7 @@ class DiscordTheme {
           backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
               if (states.contains(MaterialState.focused)) return primaryColorDarker;
               if (states.contains(MaterialState.pressed)) return primaryColorDarkest;
-              if (states.contains(MaterialState.disabled)) return backgroundColorLight;
+              if (states.contains(MaterialState.disabled)) return backgroundColorDarker;
               return primaryColor;
             },
           ),

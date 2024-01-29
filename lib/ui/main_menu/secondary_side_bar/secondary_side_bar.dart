@@ -107,7 +107,11 @@ class _SecondarySideBarState extends State<SecondarySideBar> {
               ]
             ),
           ),
-          ...categories
+          Expanded(
+            child: ListView(
+              children: categories,
+            )
+          )
         ],
       ),
     );

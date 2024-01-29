@@ -4,7 +4,7 @@ import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_variable.da
 class LexiconCustomVariable extends LexiconVariable {
   List<String> words;
 
-  LexiconCustomVariable(super.token, super.name, super.description, this.words);
+  LexiconCustomVariable(super.keyword, super.name, super.description, super.color, this.words);
 
   @override
   String getValue() {

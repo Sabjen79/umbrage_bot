@@ -23,7 +23,7 @@ abstract class LexiconEvent {
     String phrase = _phrases[Random().nextInt(_phrases.length)];
 
     for(var v in [...variables, ...lexicon.getCustomVariables()]) {
-      phrase = phrase.replaceAll("\$${v.token}\$", v.getValue());
+      phrase = phrase.replaceAll("\$${v.keyword}\$", v.getValue());
     }
 
     return phrase;

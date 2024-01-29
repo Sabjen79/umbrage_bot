@@ -35,11 +35,6 @@ class _StartMenuState extends State<StartMenu> {
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   void connectBot(BotProfile profile) {
     setState(() {
       _connecting = true;

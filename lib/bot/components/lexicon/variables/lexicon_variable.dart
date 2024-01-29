@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
-
 abstract class LexiconVariable {
-  String token;
+  String keyword;
   String name;
   String description;
-  Color color;
+  String color;
 
-  LexiconVariable(this.token, this.name, this.description, {this.color = Colors.grey});
+  LexiconVariable(this.keyword, this.name, this.description, this.color);
 
   String getValue();
 }

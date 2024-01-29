@@ -63,7 +63,7 @@ class Lexicon with ChangeNotifier {
   void deleteCustomVariable(LexiconCustomVariable variable) {
     if(!_customVariables.remove(variable)) return;
 
-    BotFiles().deleteFile("lexicon/variables/${variable.token}.txt");
+    BotFiles().deleteFile("lexicon/variables/${variable.keyword}.txt");
 
     notifyListeners();
   }
@@ -72,20 +72,20 @@ class Lexicon with ChangeNotifier {
     int index = _customVariables.indexOf(oldVariable);
     _customVariables[index] = newVariable;
 
-    BotFiles().deleteFile("lexicon/variables/${oldVariable.token}.txt");
+    BotFiles().deleteFile("lexicon/variables/${oldVariable.keyword}.txt");
     _saveLexiconVariable(newVariable);
 
     notifyListeners();
   }
 
   void _saveLexiconVariable(LexiconCustomVariable v) {
-    _lexiconSaveToFile([v.name, v.description, ...v.words], "variables", v.token);
+    _lexiconSaveToFile([v.name, v.description, v.color, ...v.words], "variables", v.keyword);
   }
 
   LexiconCustomVariable _loadLexiconVariable(String filename) {
     var strings = _lexiconLoadFromFile("variables", filename);
 
-    return LexiconCustomVariable(filename.split('.')[0], strings[0], strings[1], strings.sublist(2));
+    return LexiconCustomVariable(filename.split('.')[0], strings[0], strings[1], strings[2], strings.sublist(3));
   }
 
   void _saveLexiconEvent(LexiconEvent p) {
@@ -99,7 +99,7 @@ class Lexicon with ChangeNotifier {
   //
 
   void _lexiconSaveToFile(List<String> strings, String folder, String filename) {
-    File f = File("${BotFiles().getDir("lexicon/$folder").path}/$filename");
+    File f = File("${BotFiles().getDir("lexicon/$folder").path}/$filename.txt");
 
     String newLine = Platform.lineTerminator;
     
@@ -123,8 +123,6 @@ class Lexicon with ChangeNotifier {
     List<String> strings = [];
 
     for(var line in f.readAsLinesSync()) {
-      if(line.isEmpty) continue;
-
       strings.add(line);
     }
 

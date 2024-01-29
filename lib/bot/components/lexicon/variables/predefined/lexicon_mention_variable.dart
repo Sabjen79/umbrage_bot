@@ -3,7 +3,7 @@ import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_variable.da
 import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_variable_secondary_value_mixin.dart';
 
 class LexiconMentionVariable extends LexiconVariable with LexiconVariableSecondaryValueMixin<PartialUser> {
-  LexiconMentionVariable(String description) : super("mention", "Mention", description);
+  LexiconMentionVariable(String description) : super("mention", "Mention", description, "FFFFFF");
     
   @override
   String getValue() {

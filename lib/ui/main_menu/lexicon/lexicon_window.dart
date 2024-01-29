@@ -22,7 +22,7 @@ class LexiconWindow extends MainWindow {
     windows.add(LexiconAddWindow());
     
     for(var v in variables) {
-      windows.add(EmptyMainSubWindow(v.token), "CUSTOM VARIABLES");
+      windows.add(EmptyMainSubWindow(v.keyword), "CUSTOM VARIABLES");
     }
 
     var events = lexicon.getAllEvents();
