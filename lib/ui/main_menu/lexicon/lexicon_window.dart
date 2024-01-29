@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_variable.dart';
+import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_add_window.dart';
 import 'package:umbrage_bot/ui/main_menu/main_sub_window.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 
@@ -9,45 +8,27 @@ class LexiconWindow extends MainWindow {
   LexiconWindow({super.key}) : super("Lexicon", Symbols.quick_phrases) {
     _resetWindows();
 
-    Bot().lexicon.addListener(_resetWindows);
+    Bot().lexicon.addListener(() {
+      _resetWindows();
+    });
   }
 
   void _resetWindows() {
     windows.clear();
+    var lexicon = Bot().lexicon;
 
-    var variables = Bot().lexicon.customVariables;
+    var variables = lexicon.getCustomVariables();
 
-    windows.add(MainSubWindow(
-      categoryName: "CUSTOM VARIABLES",
-      sideBarIcon: Symbols.add_circle,
-      name: "Add New Variable",
-      widget: Container()
-    ));
+    windows.add(LexiconAddWindow());
     
     for(var v in variables) {
-      windows.add(MainSubWindow(
-        categoryName: "CUSTOM VARIABLES", 
-        name: v.name,
-        widget: Container()
-      ));
+      windows.add(EmptyMainSubWindow(v.token), "CUSTOM VARIABLES");
     }
 
-    var events = Bot().lexicon.getAllEvents();
+    var events = lexicon.getAllEvents();
 
     for(var e in events) {
-      windows.add(
-        MainSubWindow(
-          categoryName: "EVENTS", 
-          name: e.name, 
-          sideBarIcon: Symbols.event,
-          widget: InkWell(
-            onTap: () {
-              Bot().lexicon.addCustomVariable(LexiconCustomVariable("test", "test", "test", []));
-            },
-            child: Container(width: 100, height: 100, color: Colors.red),
-          )
-        )
-      );
+      windows.add(EmptyMainSubWindow(e.name), "EVENTS");
     }
   }
 }

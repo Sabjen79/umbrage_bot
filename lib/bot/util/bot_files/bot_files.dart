@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/bot/util/bot_files/bot_files_lexicon.dart';
 
-class BotFiles with BotFilesLexicon {
+class BotFiles {
   late String _botId;
   late Directory _mainDir;
 

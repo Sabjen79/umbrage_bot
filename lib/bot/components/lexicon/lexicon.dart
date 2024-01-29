@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_mention_event.dart';
@@ -5,7 +7,7 @@ import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_vari
 import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
 
 class Lexicon with ChangeNotifier {
-  final List<LexiconCustomVariable> customVariables = [];
+  final List<LexiconCustomVariable> _customVariables = [];
 
   // Always remember to include all events in getAllEvents()!!!
   late final LexiconMentionEvent mentionEvent;
@@ -15,14 +17,14 @@ class Lexicon with ChangeNotifier {
     final BotFiles files = BotFiles();
 
     for(var file in files.getDir("lexicon/variables").listSync()) {
-      customVariables.add(
-        files.loadLexiconVariable(
+      _customVariables.add(
+        _loadLexiconVariable(
           file.path.split(RegExp(r'[/\\]+')).last // Splits path by '/' and '\'
         )
       );
     }
 
-    mentionEvent = LexiconMentionEvent(this, files.loadLexiconEventPhrases("mention_bot.txt"));
+    mentionEvent = LexiconMentionEvent(this, _loadLexiconEventPhrases("mention_bot.txt"));
   }
   //
 
@@ -43,21 +45,89 @@ class Lexicon with ChangeNotifier {
       mentionEvent
     ];
   }
-  //
+
+  // Custom Variables
+
+  List<LexiconCustomVariable> getCustomVariables() {
+    return _customVariables;
+  }
 
   void addCustomVariable(LexiconCustomVariable variable) {
-    customVariables.add(variable);
-    
-    // TO-DO
+    _customVariables.add(variable);
+
+    _saveLexiconVariable(variable);
 
     notifyListeners();
   }
 
   void deleteCustomVariable(LexiconCustomVariable variable) {
-    if(!customVariables.remove(variable)) return;
+    if(!_customVariables.remove(variable)) return;
 
     BotFiles().deleteFile("lexicon/variables/${variable.token}.txt");
 
     notifyListeners();
+  }
+
+  void updateCustomVariable(LexiconCustomVariable oldVariable, LexiconCustomVariable newVariable) {
+    int index = _customVariables.indexOf(oldVariable);
+    _customVariables[index] = newVariable;
+
+    BotFiles().deleteFile("lexicon/variables/${oldVariable.token}.txt");
+    _saveLexiconVariable(newVariable);
+
+    notifyListeners();
+  }
+
+  void _saveLexiconVariable(LexiconCustomVariable v) {
+    _lexiconSaveToFile([v.name, v.description, ...v.words], "variables", v.token);
+  }
+
+  LexiconCustomVariable _loadLexiconVariable(String filename) {
+    var strings = _lexiconLoadFromFile("variables", filename);
+
+    return LexiconCustomVariable(filename.split('.')[0], strings[0], strings[1], strings.sublist(2));
+  }
+
+  void _saveLexiconEvent(LexiconEvent p) {
+    _lexiconSaveToFile(p.getPhrases(), "events", p.filename);
+  }
+
+  List<String> _loadLexiconEventPhrases(String filename) {
+    return _lexiconLoadFromFile("events", filename);
+  }
+
+  //
+
+  void _lexiconSaveToFile(List<String> strings, String folder, String filename) {
+    File f = File("${BotFiles().getDir("lexicon/$folder").path}/$filename");
+
+    String newLine = Platform.lineTerminator;
+    
+    var buffer = StringBuffer("");
+
+    for(var s in strings) {
+      buffer.write("$s$newLine");
+    }
+
+    f.writeAsStringSync(buffer.toString());
+  }
+
+  List<String> _lexiconLoadFromFile(String folder, String filename) {
+    File f = File("${BotFiles().getDir("lexicon/$folder").path}/$filename");
+
+    if(!f.existsSync()) {
+      _lexiconSaveToFile([], folder, filename);
+      return [];
+    }
+
+    List<String> strings = [];
+
+    for(var line in f.readAsLinesSync()) {
+      if(line.isEmpty) continue;
+
+      strings.add(line);
+    }
+
+    return strings;
   }
 }

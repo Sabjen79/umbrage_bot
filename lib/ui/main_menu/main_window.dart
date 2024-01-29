@@ -43,7 +43,8 @@ class _MainWindowState extends State<MainWindow> {
 
   @override
   Widget build(BuildContext context) {
-    var windows = widget.windows.getList();
+    var windows = widget.windows;
+    var windowsList = widget.windows.getList();
 
     return SizedBox(
       width: MediaQuery.of(context).size.width - SideBar.size,
@@ -52,7 +53,7 @@ class _MainWindowState extends State<MainWindow> {
         alignment: Alignment.center,
         children: [
           () {
-            if(windows.length < 2) return Container();
+            if(windowsList.length < 2) return Container();
 
             return Positioned(
               left: 0,
@@ -69,8 +70,15 @@ class _MainWindowState extends State<MainWindow> {
             );
           }(),
           () {
-            if(windows.isEmpty) return Container();
-            return windows[_activeButtonIndex].widget;
+            if(windowsList.isEmpty) return Container();
+            return Positioned(
+              left: windowsList.length < 2 ? 0 : SecondarySideBar.size,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width - SideBar.size - (windowsList.length < 2 ? 0 : SecondarySideBar.size),
+                height: MediaQuery.of(context).size.height,
+                child: windowsList[_activeButtonIndex],
+              )
+            );
           }()
         ],
       )

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/main_sub_window.dart';
+import 'package:umbrage_bot/ui/main_menu/main_sub_window_list.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar_button.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar_category.dart';
 
 class SecondarySideBar extends StatefulWidget {
   static const double size = 190;
   final String name;
-  final List<MainSubWindow> windows;
+  final MainSubWindowList windows;
   final int activeButtonIndex;
   final Function(int) onButtonTapped;
 
@@ -25,74 +26,44 @@ class SecondarySideBar extends StatefulWidget {
 
 class _SecondarySideBarState extends State<SecondarySideBar> {
   List<SecondarySideBarCategory> categories = [];
-
-  void _validateCategories() {
-    var windows = widget.windows;
-    if(windows.isEmpty) return;
-
-    var checkedCategories = <String>[windows[0].categoryName];
-
-    for(int i = 1; i < windows.length; i++) {
-      var c1 = windows[i-1].categoryName;
-      var c2 = windows[i].categoryName;
-
-      if(c1 != c2) {
-        if(checkedCategories.contains(c2)) throw Exception("MainMenuSubWindows with the same category must be indexed consecutively");
-        checkedCategories.add(c2);
-      }
-    }
-
-    if(checkedCategories.indexOf("") > 0) throw Exception("MainMenuSubWindows with no category must be indexed before any other windows with a category");
-  }
+  int _buttonsIndex = 0;
 
   void _createCategories() {
-    var windows = widget.windows;
     var categories = <SecondarySideBarCategory>[];
-    var lastIndex = 0;
+    _buttonsIndex = 0;
 
-    for(int i = 0; i < windows.length; i++) {
-      var window = windows[i];
-      
-      if(i == windows.length-1 || window.categoryName != windows[i+1].categoryName) {
-        categories.add(
-          SecondarySideBarCategory(
-            name: window.categoryName,
-            buttons: _createButtons(lastIndex, i)
-          )
-        );
-        lastIndex = i+1;
-      }
+    for(var category in widget.windows.getMap().keys) {
+      categories.add(
+        SecondarySideBarCategory(
+          name: category,
+          buttons: _createButtons(widget.windows.getMap()[category] ?? []),
+        )
+      );
     }
 
     this.categories = categories;
   }
 
-  List<SecondarySideBarButton> _createButtons(int startIndex, int lastIndex) {
+  List<SecondarySideBarButton> _createButtons(List<MainSubWindow> windows) {
     var buttons = <SecondarySideBarButton>[];
 
-    for(int i = startIndex; i <= lastIndex; i++) {
-      var window = widget.windows[i];
-
+    for(var window in windows) {
       buttons.add(
         SecondarySideBarButton(
           name: window.name,
           icon: window.sideBarIcon,
-          index: i,
-          isActive: widget.activeButtonIndex == i,
+          index: _buttonsIndex,
+          isActive: widget.activeButtonIndex == _buttonsIndex,
           onTap: (index) {
-            widget.onButtonTapped(i);
+            widget.onButtonTapped(index);
           }
         )
       );
+
+      _buttonsIndex++;
     }
 
     return buttons;
-  }
-
-  @override
-  void initState() {
-    _validateCategories();
-    super.initState();
   }
 
   @override
