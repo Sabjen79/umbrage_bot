@@ -4,13 +4,11 @@ import 'package:umbrage_bot/ui/discord_theme.dart';
 class SecondarySideBarButton extends StatefulWidget {
   final String name;
   final bool isActive;
-  final int index;
   final IconData icon;
-  final Function(int) onTap;
+  final VoidCallback onTap;
 
   const SecondarySideBarButton({
     required this.name,
-    required this.index,
     required this.onTap,
     required this.icon,
     this.isActive = false,
@@ -40,7 +38,7 @@ class _SecondarySideBarButtonState extends State<SecondarySideBarButton> {
       margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       child: InkWell(
         onTap: () {
-          widget.onTap(widget.index);
+          widget.onTap();
         },
         onHover: (b) {
           setState(() {

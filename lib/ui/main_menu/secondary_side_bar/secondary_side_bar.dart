@@ -1,50 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
-import 'package:umbrage_bot/ui/main_menu/main_sub_window.dart';
-import 'package:umbrage_bot/ui/main_menu/main_sub_window_list.dart';
+import 'package:umbrage_bot/ui/main_menu/main_window.dart';
+import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar_button.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar_category.dart';
 
 class SecondarySideBar extends StatefulWidget {
   static const double size = 190;
-  final String name;
-  final MainSubWindowList windows;
-  final int activeButtonIndex;
-  final Function(int) onButtonTapped;
 
-  const SecondarySideBar({
-    required this.name,
-    required this.windows,
-    required this.onButtonTapped,
-    this.activeButtonIndex = 0,
-    super.key
-  });
+  const SecondarySideBar({super.key});
 
   @override
   State<SecondarySideBar> createState() => _SecondarySideBarState();
 }
 
 class _SecondarySideBarState extends State<SecondarySideBar> {
-  List<SecondarySideBarCategory> categories = [];
-  int _buttonsIndex = 0;
 
-  void _createCategories() {
-    var categories = <SecondarySideBarCategory>[];
-    _buttonsIndex = 0;
+  void _onRouteChanged() {
+    setState(() {});
+  }
 
-    for(var category in widget.windows.getMap().keys) {
+  @override
+  void initState() {
+    super.initState();
+    
+    MainMenuRouter().onRouteChanged(_onRouteChanged);
+  }
+
+  @override
+  void dispose() {
+    MainMenuRouter().removeListener(_onRouteChanged);
+
+    super.dispose();
+  }
+
+  List<SecondarySideBarCategory> _createCategories() {
+    List<SecondarySideBarCategory> categories = [];
+    Map<String, List<MainWindow>> categoryWindows = {"": []}; // Empty category is always first!
+
+    for(var window in MainMenuRouter().getActiveMainRoute().getWindows()) {
+      if(!categoryWindows.containsKey(window.category)) categoryWindows[window.category] = [];
+
+      categoryWindows[window.category]!.add(window);
+    }
+
+    for(var category in categoryWindows.keys) {
       categories.add(
         SecondarySideBarCategory(
           name: category,
-          buttons: _createButtons(widget.windows.getMap()[category] ?? []),
+          buttons: _createButtons(categoryWindows[category]!),
         )
       );
     }
 
-    this.categories = categories;
+    return categories;
   }
 
-  List<SecondarySideBarButton> _createButtons(List<MainSubWindow> windows) {
+  List<SecondarySideBarButton> _createButtons(List<MainWindow> windows) {
     var buttons = <SecondarySideBarButton>[];
 
     for(var window in windows) {
@@ -52,15 +64,12 @@ class _SecondarySideBarState extends State<SecondarySideBar> {
         SecondarySideBarButton(
           name: window.name,
           icon: window.sideBarIcon,
-          index: _buttonsIndex,
-          isActive: widget.activeButtonIndex == _buttonsIndex,
-          onTap: (index) {
-            widget.onButtonTapped(index);
+          isActive: MainMenuRouter().getActiveWindow() == window,
+          onTap: () {
+            MainMenuRouter().subRouteTo(window.route);
           }
         )
       );
-
-      _buttonsIndex++;
     }
 
     return buttons;
@@ -68,7 +77,7 @@ class _SecondarySideBarState extends State<SecondarySideBar> {
 
   @override
   Widget build(BuildContext context) {
-    _createCategories();
+    var categories = _createCategories();
 
     return Container(
       width: SecondarySideBar.size,
@@ -85,7 +94,7 @@ class _SecondarySideBarState extends State<SecondarySideBar> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               child: Text(
-                widget.name,
+                MainMenuRouter().getActiveMainRoute().name,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500

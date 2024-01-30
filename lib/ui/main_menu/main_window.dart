@@ -1,87 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:umbrage_bot/ui/main_menu/main_sub_window_list.dart';
-import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar.dart';
-import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 abstract class MainWindow extends StatefulWidget {
-  final String _name;
-  final IconData? _icon;
-  final MainSubWindowList windows = MainSubWindowList();
+  final String route;
+  final String category;
+  final String name;
+  final IconData sideBarIcon;
 
-  MainWindow(this._name, this._icon, {required super.key});
-
-  String getName() {
-    return _name;
-  }
-
-  IconData? getIcon() {
-    return _icon;
-  }
-
-  @override
-  State<MainWindow> createState() => _MainWindowState();
+  MainWindow({required this.route, required this.name, this.category = "", this.sideBarIcon = Symbols.tag, super.key});
 }
 
-class _MainWindowState extends State<MainWindow> {
-  int _activeButtonIndex = 0;
-
-  void _onListener() {
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    widget.windows.addListener(_onListener);
-    super.initState();
-  }
+// Don't use the below class unless you need unimplemented windows for testing, 
+// an empty widget should be stateless, but for convenience it is sufficient.
+// Also, it doesn't deserve its own file. After the project is done it will be deleted without mercy.
+class EmptyMainSubWindow extends MainWindow { 
+  EmptyMainSubWindow(String route, String category, String name, {super.key}) : super(route: route, category: category, name: name);
 
   @override
-  void dispose() {
-    widget.windows.removeListener(_onListener);
-    super.dispose();
-  }
+  State<EmptyMainSubWindow> createState() => _EmptyMainSubWindowState();
+}
 
+class _EmptyMainSubWindowState extends State<EmptyMainSubWindow> {
   @override
   Widget build(BuildContext context) {
-    var windows = widget.windows;
-    var windowsList = widget.windows.getList();
-
-    return SizedBox(
-      width: MediaQuery.of(context).size.width - SideBar.size,
-      height: MediaQuery.of(context).size.height,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          () {
-            if(windowsList.length < 2) return Container();
-
-            return Positioned(
-              left: 0,
-              child: SecondarySideBar(
-                name: widget.getName(),
-                windows: windows,
-                activeButtonIndex: _activeButtonIndex,
-                onButtonTapped: (index) {
-                  setState(() {
-                    _activeButtonIndex = index;
-                  });
-                },
-              ),
-            );
-          }(),
-          () {
-            if(windowsList.isEmpty) return Container();
-            return Positioned(
-              left: windowsList.length < 2 ? 0 : SecondarySideBar.size,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width - SideBar.size - (windowsList.length < 2 ? 0 : SecondarySideBar.size),
-                height: MediaQuery.of(context).size.height,
-                child: windowsList[_activeButtonIndex],
-              )
-            );
-          }()
-        ],
-      )
+    return const Center(
+      child: Text("Don't replace me 😭😭😭") // It cries at the thought of being just a useless class that will be replaced shortly.
     );
   }
 }

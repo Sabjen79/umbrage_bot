@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/ui/main_menu/bot_profile/bot_profile_window.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_window.dart';
-import 'package:umbrage_bot/ui/main_menu/main_window.dart';
+import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
+import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar.dart';
 import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar.dart';
 import 'package:umbrage_bot/ui/util/window_close_handler.dart';
 
@@ -17,31 +18,38 @@ class _MainMenuState extends State<MainMenu> {
   //final MainMenuWindow musicWindow = MainMenuWindow("Music", Symbols.music_note); // TO-DO
   //final MainMenuWindow settingsWindow = MainMenuWindow("Settings", Symbols.settings); // TO-DO
 
-  final List<MainWindow> _windows = [];
-  int _sideBarIndex = 0;
+  void _onRouteChanged() {
+    setState(() {
+      
+    });
+  }
 
   @override
   void initState() {
     super.initState();
 
-    _windows.addAll([
-      BotProfileWindow(),
-      LexiconWindow()
-    ]);
+    var router = MainMenuRouter();
+    router.addRoute(BotProfileWindow());
+    router.addRoute(LexiconWindow());
+
+    router.onRouteChanged(_onRouteChanged);
 
     WindowCloseHandler.init(context);
   }
 
-  void _sideBarButtonPressed(int newIndex) {
-    setState(() {
-      _sideBarIndex = newIndex;
-    });
+  @override
+  void dispose() {
+    MainMenuRouter().removeListener(_onRouteChanged);
+
+    super.dispose();
+  }
+
+  bool _shouldDrawSecondarySideBar() {
+    return MainMenuRouter().getActiveMainRoute().getWindowCount() > 1;
   }
 
   @override
   Widget build(BuildContext context) {
-    var activeWindow = _windows[_sideBarIndex];
-
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -51,15 +59,22 @@ class _MainMenuState extends State<MainMenu> {
             alignment: Alignment.center,
             children: <Widget>[
               Positioned(
-                left: SideBar.size,
-                child: activeWindow,
+                left: SideBar.size + (_shouldDrawSecondarySideBar() ? SecondarySideBar.size : 0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - SideBar.size - (_shouldDrawSecondarySideBar() ? SecondarySideBar.size : 0),
+                  height: MediaQuery.of(context).size.height,
+                  child: MainMenuRouter().getActiveWindow() ?? Container()
+                )
               ),
-              Positioned(
+              () {
+                return !_shouldDrawSecondarySideBar() ? Container() : const Positioned(
+                  left: SideBar.size,
+                  child: SecondarySideBar(),
+                );
+              }(),
+              const Positioned(
                 left: 0,
-                child: SideBar(
-                  windows: _windows,
-                  onButtonPressed: _sideBarButtonPressed
-                ),
+                child: SideBar(),
               ),
             ],
           ),

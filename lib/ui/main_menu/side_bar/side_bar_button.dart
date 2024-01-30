@@ -31,13 +31,6 @@ class _SideBarButtonState extends State<SideBarButton> with TickerProviderStateM
 
   bool _hover = false;
 
-  @override
-  void dispose() {
-    _hoverAnimationController.dispose();
-    _activeAnimationController.dispose();
-    super.dispose();
-  }
-
   double _pairedAnimationValue() {
     return min(_activeAnimation.value + _hoverAnimation.value, 1);
   }
@@ -66,6 +59,13 @@ class _SideBarButtonState extends State<SideBarButton> with TickerProviderStateM
     _activeAnimationController.addListener(() {
       setState(() {});
     });
+  }
+
+  @override
+  void dispose() {
+    _hoverAnimationController.dispose();
+    _activeAnimationController.dispose();
+    super.dispose();
   }
 
   @override

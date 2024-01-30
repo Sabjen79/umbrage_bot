@@ -1,45 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
-import 'package:umbrage_bot/ui/main_menu/main_window.dart';
+import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar_button.dart';
 
 class SideBar extends StatefulWidget {
   static const double size = 60;
 
-  final Function(int) onButtonPressed;
-  final List<MainWindow> windows;
-
-  const SideBar({required this.windows, required this.onButtonPressed, super.key});
+  const SideBar({super.key});
 
   @override
   State<SideBar> createState() => _SideBarState();
 }
 
 class _SideBarState extends State<SideBar> {
-  int _activeIndex = 0;
-
-  void setActiveButton(int index) {
-    setState(() {
-      _activeIndex = index;
-      widget.onButtonPressed(index);
-    });
+  void _onRouteChanged() {
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
+    
+    MainMenuRouter().onRouteChanged(_onRouteChanged);
   }
 
-  Widget _sideBarButton(int index) {
-    var window = widget.windows[index];
+  @override
+  void dispose() {
+    MainMenuRouter().removeListener(_onRouteChanged);
+
+    super.dispose();
+  }
+
+  Widget _createButton(int index) {
+    var route = MainMenuRouter().getMainRoutes()[index];
 
     return SideBarButton(
-      label: window.getName(),
-      icon: window.getIcon(),
-      onTap: () { setActiveButton(index); },
-      isActive: _activeIndex == index,
-      child: window.getIcon() == null ? Image.network(Bot().user.avatar.url.toString()) : null,
+      label: route.name,
+      icon: route.icon,
+      isActive: route == MainMenuRouter().getActiveMainRoute(),
+      onTap: () { MainMenuRouter().routeTo(route.routeName); },
+      child: route.icon == null ? Image.network(Bot().user.avatar.url.toString()) : null,
     );
   }
 
@@ -55,7 +56,7 @@ class _SideBarState extends State<SideBar> {
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            _sideBarButton(0),
+            _createButton(0),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Container(
@@ -65,10 +66,11 @@ class _SideBarState extends State<SideBar> {
               ),
             ),
             ...() {
+              var routes = MainMenuRouter().getMainRoutes();
               var widgets = [];
 
-              for(int i = 1; i < widget.windows.length; i++) {
-                widgets.add(_sideBarButton(i));
+              for(int i = 1; i < routes.length; i++) {
+                widgets.add(_createButton(i));
               }
 
               return widgets;

@@ -1,11 +1,11 @@
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_add_window.dart';
-import 'package:umbrage_bot/ui/main_menu/main_sub_window.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
+import 'package:umbrage_bot/ui/main_menu/router/main_route.dart';
 
-class LexiconWindow extends MainWindow {
-  LexiconWindow({super.key}) : super("Lexicon", Symbols.quick_phrases) {
+class LexiconWindow extends MainRoute {
+  LexiconWindow() : super("lexicon", "Lexicon", Symbols.quick_phrases) {
     _resetWindows();
 
     Bot().lexicon.addListener(() {
@@ -14,21 +14,21 @@ class LexiconWindow extends MainWindow {
   }
 
   void _resetWindows() {
-    windows.clear();
+    clearWindows();
     var lexicon = Bot().lexicon;
 
     var variables = lexicon.getCustomVariables();
 
-    windows.add(LexiconAddWindow());
+    addWindow(LexiconAddWindow());
     
     for(var v in variables) {
-      windows.add(EmptyMainSubWindow(v.keyword), "CUSTOM VARIABLES");
+      addWindow(EmptyMainSubWindow(v.keyword, "CUSTOM VARIABLES", v.keyword));
     }
 
     var events = lexicon.getAllEvents();
 
     for(var e in events) {
-      windows.add(EmptyMainSubWindow(e.name), "EVENTS");
+      addWindow(EmptyMainSubWindow(e.name, "EVENTS", e.name));
     }
   }
 }
