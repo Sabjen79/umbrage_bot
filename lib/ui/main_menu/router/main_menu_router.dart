@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_route.dart';
+import 'package:umbrage_bot/ui/main_menu/router/save_changes_snackbar.dart';
 
 class MainMenuRouter {
   // Singleton
@@ -16,12 +20,23 @@ class MainMenuRouter {
   //
 
   late final Map<String, MainRoute> _routes;
-  String _activeRoute = "";
-  final List<VoidCallback> _listeners = [];
 
+  final List<Function(bool)> _listeners = [];
+
+  final SaveChangesSnackbar _snackBar = const SaveChangesSnackbar();
+
+  Function(bool, AsyncCallback?, AsyncCallback?)? blockListener;
+
+  String _activeRoute = "";
+
+  bool _blocked = false;
+
+
+  SaveChangesSnackbar? getSaveChangesSnackbar() => _snackBar;
   List<MainRoute> getMainRoutes() => _routes.values.toList();
   MainRoute getActiveMainRoute() => _routes[_activeRoute]!;
   MainWindow? getActiveWindow() => _routes[_activeRoute]?.getActiveWindow();
+
 
   void addRoute(MainRoute r) {
     _routes[r.routeName] = r;
@@ -29,23 +44,37 @@ class MainMenuRouter {
     if(_activeRoute.isEmpty) _activeRoute = r.routeName;
 
     for(var l in _listeners) {
-      l();
+      l(true);
     }
   }
 
+  void block(AsyncCallback resetAction, AsyncCallback saveAction) {
+    _blocked = true;
+
+    blockListener?.call(true, resetAction, saveAction);
+  }
+
+  void unblock() {
+    _blocked = false;
+
+    blockListener?.call(false, null, null);
+  }
+
   void routeTo(String route) {
-    var split = route.split(RegExp(r'[\\/]+'));
-    if(split.length > 2 || split.isEmpty) throw Exception("Invalid route: $route");
+    if(!_blocked) {
+      var split = route.split(RegExp(r'[\\/]+'));
+      if(split.length > 2 || split.isEmpty) throw Exception("Invalid route: $route");
 
-    if(_routes[split[0]] == null) throw Exception("Non-existent route: $route");
-    _activeRoute = split[0];
+      if(_routes[split[0]] == null) throw Exception("Non-existent route: $route");
+      _activeRoute = split[0];
 
-    if(split.length == 2) {
-      _routes[_activeRoute]!.routeTo(split[1]);
+      if(split.length == 2) {
+        _routes[_activeRoute]!.routeTo(split[1]);
+      }
     }
 
     for(var l in _listeners) {
-      l();
+      l(_blocked);
     }
   }
 
@@ -53,11 +82,11 @@ class MainMenuRouter {
     routeTo("$_activeRoute/$route");
   }
 
-  void onRouteChanged(VoidCallback v) {
+  void onRouteChanged(Function(bool) v) {
     _listeners.add(v);
   }
 
-  void removeListener(VoidCallback v) {
+  void removeListener(Function(bool) v) {
     _listeners.remove(v);
   }
 }

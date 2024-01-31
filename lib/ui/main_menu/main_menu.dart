@@ -18,12 +18,6 @@ class _MainMenuState extends State<MainMenu> {
   //final MainMenuWindow musicWindow = MainMenuWindow("Music", Symbols.music_note); // TO-DO
   //final MainMenuWindow settingsWindow = MainMenuWindow("Settings", Symbols.settings); // TO-DO
 
-  void _onRouteChanged() {
-    setState(() {
-      
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -44,6 +38,10 @@ class _MainMenuState extends State<MainMenu> {
     super.dispose();
   }
 
+  void _onRouteChanged(bool b) {
+    if(!b) setState(() {});
+  }
+
   bool _shouldDrawSecondarySideBar() {
     return MainMenuRouter().getActiveMainRoute().getWindowCount() > 1;
   }
@@ -55,26 +53,29 @@ class _MainMenuState extends State<MainMenu> {
         child: SizedBox(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          child: Stack(
-            alignment: Alignment.center,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Positioned(
-                left: SideBar.size + (_shouldDrawSecondarySideBar() ? SecondarySideBar.size : 0),
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width - SideBar.size - (_shouldDrawSecondarySideBar() ? SecondarySideBar.size : 0),
-                  height: MediaQuery.of(context).size.height,
-                  child: MainMenuRouter().getActiveWindow() ?? Container()
-                )
-              ),
-              () {
-                return !_shouldDrawSecondarySideBar() ? Container() : const Positioned(
-                  left: SideBar.size,
-                  child: SecondarySideBar(),
-                );
-              }(),
-              const Positioned(
-                left: 0,
-                child: SideBar(),
+              const SideBar(),
+
+              _shouldDrawSecondarySideBar() ? const SecondarySideBar() : const SizedBox(),
+
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: double.maxFinite,
+                      height: double.maxFinite,
+                      child: MainMenuRouter().getActiveWindow() ?? Container(),
+                    ),
+                    
+                    Positioned(
+                      bottom: 10,
+                      child: MainMenuRouter().getSaveChangesSnackbar() ?? Container()
+                    ) 
+                  ],
+                ),
               ),
             ],
           ),

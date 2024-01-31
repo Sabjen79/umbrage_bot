@@ -57,6 +57,7 @@ class DiscordTheme {
               return primaryColor;
             },
           ),
+          padding: const MaterialStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.all(0)),
           foregroundColor: const MaterialStatePropertyAll<Color>(white),
           shape: const MaterialStatePropertyAll<OutlinedBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2)))),
           textStyle: const MaterialStatePropertyAll<TextStyle>(TextStyle(

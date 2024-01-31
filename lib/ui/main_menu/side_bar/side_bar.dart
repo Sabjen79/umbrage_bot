@@ -14,8 +14,8 @@ class SideBar extends StatefulWidget {
 }
 
 class _SideBarState extends State<SideBar> {
-  void _onRouteChanged() {
-    setState(() {});
+  void _onRouteChanged(bool b) {
+    if(!b) setState(() {});
   }
 
   @override
