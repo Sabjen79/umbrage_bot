@@ -78,7 +78,7 @@ class _ProfileWidgetState extends State<ProfileWidget> with SingleTickerProvider
                   showDialog(
                     context: context, 
                     builder: (BuildContext context) => SimpleDiscordDialog(
-                      onSubmit: () { 
+                      onSubmit: () async { 
                         widget.onRemove(widget.profile);
                         Navigator.pop(context);
                       },

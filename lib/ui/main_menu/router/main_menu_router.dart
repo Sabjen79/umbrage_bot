@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_route.dart';
 import 'package:umbrage_bot/ui/main_menu/router/save_changes_snackbar.dart';

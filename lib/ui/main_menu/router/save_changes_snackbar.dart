@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:umbrage_bot/ui/components/simple_discord_button.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 
@@ -123,24 +124,17 @@ class _SaveChangesSnackbarState extends State<SaveChangesSnackbar> with TickerPr
                   child: Text("Reset", style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500)),
                 )
               ),
-              SizedBox(
+              SimpleDiscordButton(
                 width: 90,
-                child: ElevatedButton(
-                  clipBehavior: Clip.none,
-                  onPressed: _waiting ? null : () async {
-                    setState(() { _waiting = true; });
-                    if(saveAction != null) await saveAction!();
-                    setState(() { _waiting = false; });
-                  },
-                  child: _waiting ? const CircularProgressIndicator() : const Text(
-                    "Save Changes",
-                    softWrap: false,
-                    style: TextStyle(
-                      color: DiscordTheme.white2,
-                      fontSize: 11
-                    )
-                  )
-                ),
+                height: 30,
+                color: const Color(0xFF248046),
+                text: "Save Changes",
+                loadingAnimation: true,
+                onTap: _waiting ? null : () async {
+                  setState(() { _waiting = true; });
+                  if(saveAction != null) await saveAction!();
+                  setState(() { _waiting = false; });
+                },
               )
             ],
           ),

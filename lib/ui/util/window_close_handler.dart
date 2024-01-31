@@ -22,7 +22,7 @@ class WindowCloseHandler {
               _isOpen = false;
             },
             submitText: "Exit",
-            onSubmit: () => {
+            onSubmit: () async => {
               Bot().close().then((v) => Navigator.pop(context, true))
             },
             content: Padding(

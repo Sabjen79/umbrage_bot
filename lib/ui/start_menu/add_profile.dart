@@ -15,7 +15,6 @@ class AddProfile extends StatefulWidget {
 class _AddProfileState extends State<AddProfile> {
   late TextEditingController _textController;
   bool _disableAdding = true;
-  bool _checkingToken = false;
   String? _tokenError;
 
   @override
@@ -36,16 +35,12 @@ class _AddProfileState extends State<AddProfile> {
     super.dispose();
   }
 
-  void _submitToken() async {
-    setState(() {
-      _checkingToken = true;
-    });
-
+  Future<void> _submitToken() async {
     var result = await BotProfileList().createProfile(_textController.text);
 
     if(!result.isSuccess) {
       setState(() {
-        _checkingToken = _disableAdding = false;
+        _disableAdding = false;
         _tokenError = result.error;
       });
       return;
@@ -54,7 +49,7 @@ class _AddProfileState extends State<AddProfile> {
     await widget._addProfileFunction(result.value!);
 
     setState(() {
-      _checkingToken = _disableAdding = false;
+      _disableAdding = false;
     });
 
     if (!context.mounted) return;
@@ -66,7 +61,7 @@ class _AddProfileState extends State<AddProfile> {
     return SimpleDiscordDialog(
       submitText: "Add Bot",
       disableSubmit: _disableAdding,
-      loadingSubmit: _checkingToken,
+      enableLoadingAnimation: true,
       onSubmit: _submitToken,
       content: Column(
         mainAxisAlignment: MainAxisAlignment.center,

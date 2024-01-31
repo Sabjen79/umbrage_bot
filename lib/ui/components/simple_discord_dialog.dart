@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:umbrage_bot/ui/components/simple_discord_button.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 
 class SimpleDiscordDialog extends StatefulWidget {
@@ -7,10 +9,10 @@ class SimpleDiscordDialog extends StatefulWidget {
   final String cancelText;
   final String submitText;
   final VoidCallback? onCancel;
-  final VoidCallback? onSubmit;
+  final AsyncCallback? onSubmit;
 
   final bool disableSubmit;
-  final bool loadingSubmit;
+  final bool enableLoadingAnimation;
 
   const SimpleDiscordDialog({
     required this.content,
@@ -20,7 +22,7 @@ class SimpleDiscordDialog extends StatefulWidget {
     this.onCancel,
     this.onSubmit,
     this.disableSubmit = false,
-    this.loadingSubmit = false,
+    this.enableLoadingAnimation = false,
     super.key
   });
 
@@ -76,27 +78,13 @@ class _SimpleDiscordDialogState extends State<SimpleDiscordDialog> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: SizedBox(
+                  child: SimpleDiscordButton(
                     width: 90,
                     height: 24,
-                    child: ElevatedButton(
-                      onPressed: (widget.disableSubmit || widget.loadingSubmit) ? null : widget.onSubmit,
-                      child: () {
-                        if(widget.loadingSubmit) {
-                          return const SizedBox(
-                            width: 10,
-                            height: 10,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 1,
-                            )
-                          );
-                        } else {
-                          return Text(widget.submitText, style: const TextStyle(fontSize: 10));
-                        }
-                      }()
-                    ),
-                  ),
+                    text: widget.submitText,
+                    loadingAnimation: widget.enableLoadingAnimation,
+                    onTap: (widget.disableSubmit) ? null : widget.onSubmit,
+                  )
                 )
               ],
             ),
