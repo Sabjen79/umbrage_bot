@@ -15,10 +15,10 @@ abstract class MainRoute {
   int getWindowCount() => _windows.length;
   List<MainWindow> getWindows() => _windows.values.toList();
 
-  void addWindow(MainWindow w) {
+  void addWindow(MainWindow w, [bool routeTo = false]) {
     _windows[w.route] = w;
 
-    if(_activeSubRoute.isEmpty) _activeSubRoute = w.route;
+    if(_activeSubRoute.isEmpty || routeTo) _activeSubRoute = w.route;
   }
 
   void routeTo(String route) {

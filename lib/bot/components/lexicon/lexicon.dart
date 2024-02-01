@@ -5,6 +5,9 @@ import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_mention_event.dart';
 import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
+import 'package:umbrage_bot/bot/util/result.dart';
+import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_variable_window.dart';
+import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 
 class Lexicon with ChangeNotifier {
   final List<LexiconCustomVariable> _customVariables = [];
@@ -52,12 +55,49 @@ class Lexicon with ChangeNotifier {
     return _customVariables;
   }
 
-  void addCustomVariable(LexiconCustomVariable variable) {
-    _customVariables.add(variable);
+  Result<LexiconCustomVariable> _validateVariable(String keyword, String name, String description, int color, List<String> words, [LexiconCustomVariable? oldVariable]) {
+    if(name.isEmpty || name.replaceAll(" ", "").isEmpty) return Result.failure("Name cannot be empty.");
+    if(keyword.isEmpty) return Result.failure("Keyword cannot be empty.");
+    if(RegExp(r'[^\w]').hasMatch(keyword)) return Result.failure("Keyword cannot contain spaces or any character besides underscores.");
 
-    _saveLexiconVariable(variable);
+    for(var w in MainMenuRouter().getActiveMainRoute().getWindows()) {
+      if(w is! LexiconVariableWindow && (keyword == "add_variable" || keyword == w.route)) return Result.failure("'$keyword' is a restricted keyword used that would cause errors.");
+    }
 
-    notifyListeners();
+    for(var v in _customVariables) {
+      if(oldVariable == v) continue;
+      if(v.keyword == keyword) return Result.failure("There is another variable with the same keyword. Change it!");
+    }
+
+    return Result.success(LexiconCustomVariable(keyword, name, description, color, words));
+  }
+
+  Result<LexiconCustomVariable> createCustomVariable(String keyword, String name, String description, int color, List<String> words) {
+    var result = _validateVariable(keyword, name, description, color, words);
+
+    if(result.isSuccess) {
+      _customVariables.add(result.value!);
+      _saveLexiconVariable(result.value!);
+      notifyListeners();
+    }
+
+    return result;
+  }
+
+  Result<LexiconCustomVariable> updateCustomVariable(LexiconCustomVariable oldVariable, String keyword, String name, String description, int color, List<String> words) {
+    var result = _validateVariable(keyword, name, description, color, words, oldVariable);
+
+    if(result.isSuccess) {
+      int index = _customVariables.indexOf(oldVariable);
+      _customVariables[index] = result.value!;
+
+      BotFiles().deleteFile("lexicon/variables/${oldVariable.keyword}.txt");
+      _saveLexiconVariable(result.value!);
+
+      notifyListeners();
+    }
+
+    return result;
   }
 
   void deleteCustomVariable(LexiconCustomVariable variable) {
@@ -68,24 +108,14 @@ class Lexicon with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateCustomVariable(LexiconCustomVariable oldVariable, LexiconCustomVariable newVariable) {
-    int index = _customVariables.indexOf(oldVariable);
-    _customVariables[index] = newVariable;
-
-    BotFiles().deleteFile("lexicon/variables/${oldVariable.keyword}.txt");
-    _saveLexiconVariable(newVariable);
-
-    notifyListeners();
-  }
-
   void _saveLexiconVariable(LexiconCustomVariable v) {
-    _lexiconSaveToFile([v.name, v.description, v.color, ...v.words], "variables", v.keyword);
+    _lexiconSaveToFile([v.name, v.description, v.color.toString(), ...v.words], "variables", v.keyword);
   }
 
   LexiconCustomVariable _loadLexiconVariable(String filename) {
     var strings = _lexiconLoadFromFile("variables", filename);
 
-    return LexiconCustomVariable(filename.split('.')[0], strings[0], strings[1], strings[2], strings.sublist(3));
+    return LexiconCustomVariable(filename.split('.')[0], strings[0], strings[1], int.parse(strings[2]), strings.sublist(3));
   }
 
   void _saveLexiconEvent(LexiconEvent p) {

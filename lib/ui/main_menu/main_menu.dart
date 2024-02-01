@@ -7,6 +7,12 @@ import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar.dart';
 import 'package:umbrage_bot/ui/util/window_close_handler.dart';
 
 class MainMenu extends StatefulWidget {
+  static double getMainWindowWidth(BuildContext context) {
+    return MediaQuery.of(context).size.width - 
+            SideBar.size - 
+            (MainMenuRouter().getActiveMainRoute().getWindowCount() > 1 ? SecondarySideBar.size : 0);
+  }
+
   const MainMenu({super.key});
 
   @override
@@ -59,7 +65,7 @@ class _MainMenuState extends State<MainMenu> {
               Positioned(
                 left: SideBar.size + (_shouldDrawSecondarySideBar() ? SecondarySideBar.size : 0),
                 child: SizedBox(
-                  width: MediaQuery.of(context).size.width - SideBar.size - (_shouldDrawSecondarySideBar() ? SecondarySideBar.size : 0),
+                  width: MainMenu.getMainWindowWidth(context),
                   height: MediaQuery.of(context).size.height,
                   child: Stack(
                     alignment: Alignment.center,

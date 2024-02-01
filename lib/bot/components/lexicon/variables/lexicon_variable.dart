@@ -2,7 +2,7 @@ abstract class LexiconVariable {
   String keyword;
   String name;
   String description;
-  String color;
+  int color;
 
   LexiconVariable(this.keyword, this.name, this.description, this.color);
 
