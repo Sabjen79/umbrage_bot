@@ -6,7 +6,7 @@ import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_mention_event.
 import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
 import 'package:umbrage_bot/bot/util/result.dart';
-import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_variable_window.dart';
+import 'package:umbrage_bot/ui/main_menu/lexicon/custom_variables/lexicon_variable_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 
 class Lexicon with ChangeNotifier {
@@ -27,7 +27,7 @@ class Lexicon with ChangeNotifier {
       );
     }
 
-    mentionEvent = LexiconMentionEvent(this, _loadLexiconEventPhrases("mention_bot.txt"));
+    mentionEvent = LexiconMentionEvent(this);
   }
   //
 
@@ -50,7 +50,6 @@ class Lexicon with ChangeNotifier {
   }
 
   // Custom Variables
-
   List<LexiconCustomVariable> getCustomVariables() {
     return _customVariables;
   }
@@ -104,6 +103,12 @@ class Lexicon with ChangeNotifier {
       if(w is! LexiconVariableWindow && (keyword == "add_variable" || keyword == w.route)) return Result.failure("'$keyword' is a restricted keyword used that would cause errors.");
     }
 
+    for(var event in getAllEvents()) {
+      for(var v in event.variables) {
+        if(v.getKeyword() == keyword) return Result.failure("The keyword '\$$keyword\$' is used by a predefined variable. Choose another one!");
+      }
+    }
+
     for(var v in _customVariables) {
       if(oldVariable == v) continue;
       if(v.getKeyword() == keyword) return Result.failure("There is another variable with the same keyword. Change it!");
@@ -121,15 +126,6 @@ class Lexicon with ChangeNotifier {
 
     return LexiconCustomVariable(filename.split('.')[0], strings[0], strings[1], int.parse(strings[2]), strings.sublist(3));
   }
-
-  void _saveLexiconEvent(LexiconEvent p) {
-    _lexiconSaveToFile(p.getPhrases(), "events", p.filename);
-  }
-
-  List<String> _loadLexiconEventPhrases(String filename) {
-    return _lexiconLoadFromFile("events", filename);
-  }
-
   //
 
   void _lexiconSaveToFile(List<String> strings, String folder, String filename) {

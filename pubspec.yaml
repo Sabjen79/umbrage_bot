@@ -45,6 +45,7 @@ dependencies:
   path_provider: ^2.1.2
   material_symbols_icons: ^4.2716.0
   provider: ^6.1.1
+  rich_text_controller: ^1.4.2
 
 dev_dependencies:
   flutter_test:

@@ -5,8 +5,8 @@ import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_vari
 import 'package:umbrage_bot/ui/components/simple_discord_button.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
-import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_variable_window_field.dart';
-import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_variable_word_field.dart';
+import 'package:umbrage_bot/ui/main_menu/lexicon/custom_variables/lexicon_variable_window_field.dart';
+import 'package:umbrage_bot/ui/main_menu/lexicon/custom_variables/lexicon_variable_word_field.dart';
 import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';

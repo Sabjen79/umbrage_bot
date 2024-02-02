@@ -8,8 +8,8 @@ import 'package:umbrage_bot/bot/components/lexicon/variables/predefined/lexicon_
 class LexiconMentionEvent extends LexiconEvent {
   LexiconMentionVariable mentionVariable = LexiconMentionVariable("Mentions the user that sent the message.");
 
-  LexiconMentionEvent(Lexicon l, List<String> phrases) :
-  super(l, "mention_bot", "Mention Event", "When someone mentions the bot's name, it will sometimes reply back.", phrases) {
+  LexiconMentionEvent(Lexicon l) :
+  super(l, "mention_bot", "Mention Event", "When someone mentions the bot's name, it will sometimes reply back.") {
     variables.addAll([
       mentionVariable,
       LexiconEveryoneVariable()

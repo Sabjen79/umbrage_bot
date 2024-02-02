@@ -1,7 +1,7 @@
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_variable_window.dart';
-import 'package:umbrage_bot/ui/main_menu/main_window.dart';
+import 'package:umbrage_bot/ui/main_menu/lexicon/custom_variables/lexicon_variable_window.dart';
+import 'package:umbrage_bot/ui/main_menu/lexicon/events/lexicon_event_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_route.dart';
 
 class LexiconWindow extends MainRoute {
@@ -27,8 +27,10 @@ class LexiconWindow extends MainRoute {
 
     var events = lexicon.getAllEvents();
 
+    bool t = true; // To make the first event window the default subroute
     for(var e in events) {
-      addWindow(EmptyMainSubWindow(e.filename, "EVENTS", e.name));
+      addWindow(LexiconEventWindow(e), t);
+      t = false;
     }
   }
 }
