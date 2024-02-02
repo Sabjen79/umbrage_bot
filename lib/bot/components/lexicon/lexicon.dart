@@ -55,25 +55,8 @@ class Lexicon with ChangeNotifier {
     return _customVariables;
   }
 
-  Result<LexiconCustomVariable> _validateVariable(String keyword, String name, String description, int color, List<String> words, [LexiconCustomVariable? oldVariable]) {
-    if(name.isEmpty || name.replaceAll(" ", "").isEmpty) return Result.failure("Name cannot be empty.");
-    if(keyword.isEmpty) return Result.failure("Keyword cannot be empty.");
-    if(RegExp(r'[^\w]').hasMatch(keyword)) return Result.failure("Keyword cannot contain spaces or any character besides underscores.");
-
-    for(var w in MainMenuRouter().getActiveMainRoute().getWindows()) {
-      if(w is! LexiconVariableWindow && (keyword == "add_variable" || keyword == w.route)) return Result.failure("'$keyword' is a restricted keyword used that would cause errors.");
-    }
-
-    for(var v in _customVariables) {
-      if(oldVariable == v) continue;
-      if(v.keyword == keyword) return Result.failure("There is another variable with the same keyword. Change it!");
-    }
-
-    return Result.success(LexiconCustomVariable(keyword, name, description, color, words));
-  }
-
   Result<LexiconCustomVariable> createCustomVariable(String keyword, String name, String description, int color, List<String> words) {
-    var result = _validateVariable(keyword, name, description, color, words);
+    var result = _createVariable(keyword, name, description, color, words);
 
     if(result.isSuccess) {
       _customVariables.add(result.value!);
@@ -85,13 +68,13 @@ class Lexicon with ChangeNotifier {
   }
 
   Result<LexiconCustomVariable> updateCustomVariable(LexiconCustomVariable oldVariable, String keyword, String name, String description, int color, List<String> words) {
-    var result = _validateVariable(keyword, name, description, color, words, oldVariable);
+    var result = _createVariable(keyword, name, description, color, words, oldVariable);
 
     if(result.isSuccess) {
       int index = _customVariables.indexOf(oldVariable);
       _customVariables[index] = result.value!;
 
-      BotFiles().deleteFile("lexicon/variables/${oldVariable.keyword}.txt");
+      BotFiles().deleteFile("lexicon/variables/${oldVariable.getKeyword()}.txt");
       _saveLexiconVariable(result.value!);
 
       notifyListeners();
@@ -103,13 +86,34 @@ class Lexicon with ChangeNotifier {
   void deleteCustomVariable(LexiconCustomVariable variable) {
     if(!_customVariables.remove(variable)) return;
 
-    BotFiles().deleteFile("lexicon/variables/${variable.keyword}.txt");
+    BotFiles().deleteFile("lexicon/variables/${variable.getKeyword()}.txt");
 
     notifyListeners();
   }
 
   void _saveLexiconVariable(LexiconCustomVariable v) {
-    _lexiconSaveToFile([v.name, v.description, v.color.toString(), ...v.words], "variables", v.keyword);
+    _lexiconSaveToFile([v.getName(), v.getDescription(), v.getColorInt().toString(), ...v.getWords()], "variables", v.getKeyword());
+  }
+
+  Result<LexiconCustomVariable> _createVariable(String keyword, String name, String description, int color, List<String> words, [LexiconCustomVariable? oldVariable]) {
+    if(name.isEmpty || name.replaceAll(" ", "").isEmpty) return Result.failure("Name cannot be empty.");
+    if(RegExp(r'[^\w]').hasMatch(keyword)) return Result.failure("Name and Keyword cannot contain any character besides underscores.");
+    if(description.isNotEmpty && description.replaceAll(" ", "").isEmpty) return Result.failure("Description contains only whitespaces. Make it empty or write something!");
+
+    for(var w in MainMenuRouter().getActiveMainRoute().getWindows()) {
+      if(w is! LexiconVariableWindow && (keyword == "add_variable" || keyword == w.route)) return Result.failure("'$keyword' is a restricted keyword used that would cause errors.");
+    }
+
+    for(var v in _customVariables) {
+      if(oldVariable == v) continue;
+      if(v.getKeyword() == keyword) return Result.failure("There is another variable with the same keyword. Change it!");
+    }
+
+    for(var w in words) {
+      if(w.isEmpty || w.replaceAll(" ", "").isEmpty) return Result.failure("One or more words are empty.");
+    }
+
+    return Result.success(LexiconCustomVariable(keyword, name, description, color, words));
   }
 
   LexiconCustomVariable _loadLexiconVariable(String filename) {
