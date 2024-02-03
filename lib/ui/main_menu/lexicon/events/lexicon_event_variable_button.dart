@@ -128,7 +128,10 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                 ),
                 
                 Container(
+                  decoration: const BoxDecoration(),
+                  clipBehavior: Clip.hardEdge,
                   padding: const EdgeInsets.only(bottom: 2),
+                  width: 135,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,14 +139,17 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                       Text(
                         widget.variable.getName(), 
                         style: TextStyle(
+                          overflow: TextOverflow.ellipsis,
                           color: widget.variable.getColor(),
                           fontSize: 12,
                           fontWeight: FontWeight.w500
                         ),
                       ),
+                      
                       Text(
                         "\$${widget.variable.getKeyword()}\$", 
                         style: const TextStyle(
+                          overflow: TextOverflow.ellipsis,
                           color: DiscordTheme.lightGray,
                           fontSize: 10
                         ),
@@ -180,7 +186,7 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                   ),
                 )
               ),
-            )
+            ),
           ],
         )
       )

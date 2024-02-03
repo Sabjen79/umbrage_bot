@@ -21,6 +21,26 @@ class DiscordTheme {
 
   static ThemeData get() {
     return ThemeData(
+      switchTheme: SwitchThemeData(
+        splashRadius: 0,
+        thumbColor: MaterialStateProperty.all<Color>(DiscordTheme.white2),
+        trackColor: MaterialStateColor.resolveWith(
+          (Set<MaterialState> states) {
+            if (states.contains(MaterialState.selected)) {
+              return Colors.green;
+            }
+            return DiscordTheme.lightGray;
+          },
+        ),
+        thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+          (Set<MaterialState> states) {
+            if (states.contains(MaterialState.selected)) {
+              return const Icon(Icons.check, color: Colors.green,);
+            }
+            return const Icon(Icons.close);
+          },
+        )
+      ),
       scrollbarTheme: ScrollbarThemeData(
         thickness: const MaterialStatePropertyAll<double?>(3),
         thumbColor: MaterialStatePropertyAll<Color?>(black.withOpacity(0.7)),

@@ -143,237 +143,239 @@ class _LexiconVariableWindowState extends State<LexiconVariableWindow> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return Stack(
       children: [
-        Stack(
+        ListView(
+          padding: const EdgeInsets.only(top: 120, left: 20, right: 20),
           children: [
-            // Top colored bar
-            Container(
-              height: 115,
-              decoration: BoxDecoration(
-                color: Color(_color),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x77000000),
-                    blurRadius: 10,
-                    spreadRadius: 2
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+
+                // Description input
+                Container(
+                  margin: const EdgeInsets.only(top: 15, bottom: 5),
+                  width: MainMenu.getMainWindowWidth(context),
+                  child: LexiconVariableWindowField(
+                    onChanged: (value) {
+                      _description = value;
+
+                      _showSaveChanges();
+                    },
+                    initialText: _description,
+                    maxLength: 70,
+                    fontSize: 14,
+                    color: DiscordTheme.lightGray,
+                    hintText: "Description",
                   )
-                ]
-              ),
-            ),
+                ),
 
-            // Color Selector
-            Positioned(
-              top: 20,
-              left: 20,
-              child: Row(
-                children: () {
-                  var list = <Widget>[];
+                // Add Word Button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      child: SimpleDiscordButton(
+                        width: 70, 
+                        height: 25, 
+                        text: "Add Word",
+                        onTap: () async {
+                          _words = [""] + _words;
 
-                  for(int i = 0; i < _colorList.length; i++) {
-                    list.add(
-                      InkWell(
-                        onTap: () {
-                          if(_selectedColor == i) return;
-
-                          setState(() { 
-                            _selectedColor = i;
-                            _color = _colorList[i];
-                          });
+                          setState(() {});
 
                           _showSaveChanges();
                         },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 2),
-                          width: 15,
-                          height: 15,
-                          decoration: BoxDecoration(
-                            boxShadow: const [BoxShadow(color: Color(0x33000000),blurRadius: 10, spreadRadius: 3)],
-                            color: Color(_colorList[i]),
-                            borderRadius: const BorderRadius.all(Radius.circular(3))
-                          ),
-                          child: i != _selectedColor ? null : const Center(
-                            child: Icon(
-                              Symbols.check,
-                              color: Colors.black,
-                              size: 15,
+                      )
+                    )
+                  ] 
+                ),
+                
+                // Word List
+                Container(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  width: MainMenu.getMainWindowWidth(context),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: () {
+                      var list = <Widget>[];
+                      
+                      for(int i = 0; i <= _words.length; i++) {
+                        list.add( Container(
+                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
+                          width: double.infinity, 
+                          height: 1, 
+                          color: DiscordTheme.gray
+                        ));
+
+                        if(i == _words.length) continue; // In order to add an aditional divider
+
+                        list.add(LexiconVariableWordField(
+                            onDelete: () {
+                              setState(() { 
+                                _words.removeAt(i);
+                              });
+
+                              _showSaveChanges();
+                            }, 
+                            child: LexiconVariableWindowField(
+                              onChanged: (value) {
+                                _words[i] = value;
+
+                                _showSaveChanges();
+                              },
+                              initialText: _words[i],
+                              maxLength: 100,
+                              fontSize: 14,
+                              color: DiscordTheme.white2,
+                              hintText: "Word",
                             ),
                           )
-                        ),
-                      )
-                    );
-                  }
+                        );
+                      }
 
-                  return list;
-                }()
-              ),
-            ),
+                      return list;
+                    }()
+                  )
+                )
+              ]
+            )
+          ]
+        ),
 
-            // Delete Button
-            () {
-              return widget.variable == null ? const SizedBox() : Positioned(
-                top: 10,
-                right: 10,
-                child: InkWell(
-                  onTap: () {
-                    showDialog(
-                      context: context, 
-                      builder: (context) => SimpleDiscordDialog(
-                        cancelText: "No!",
-                        submitText: "Yea, delete it",
-                        onCancel: () async => Navigator.pop(context, false),
-                        onSubmit: () async {
-                          Bot().lexicon.deleteCustomVariable(widget.variable!);
+        // Top colored bar
+        Container(
+          height: 120,
+          decoration: BoxDecoration(
+            color: Color(_color),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x77000000),
+                blurRadius: 10,
+                spreadRadius: 2
+              )
+            ]
+          ),
+          
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Color Selector
+              Padding(
+                padding: const EdgeInsets.only(top: 20, left: 20),
+                child: Row(
+                  children: () {
+                    var list = <Widget>[];
 
-                          MainMenuRouter().subRouteTo("add_variable");
+                    for(int i = 0; i < _colorList.length; i++) {
+                      list.add(
+                        InkWell(
+                          onTap: () {
+                            if(_selectedColor == i) return;
 
-                          Navigator.pop(context, false);
-                        },
-                        content: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                          width: 300,
-                          child: const Text(
-                            "Are you sure you want to delete this custom variable? You will permanently lose it!",
-                            textAlign: TextAlign.center,
-                          )
-                        ),
-                      )
-                    );
-                  },
-                  child: const Icon(
-                    Symbols.delete,
-                    shadows: [
-                      Shadow(
-                        color: Color(0xFF000000),
-                        blurRadius: 7
-                      )
-                    ],
-                    size: 30,
-                    color: Colors.red,
-                  ),
-                ),
-              );
-            }(),
-
-            Container(
-              padding: const EdgeInsets.only(top: 45, left: 20, right: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-
-                  Container(
-                    margin: const EdgeInsets.only(left: 5, bottom: 0),
-                    child: Text(
-                      "\$$_keyword\$",
-                      style: TextStyle(
-                        shadows: const [Shadow(color: Color(0xff000000), blurRadius: 2)],
-                        color: Color.lerp(Color(_color), Colors.white, 0.3)
-                      ),
-                    )
-                  ),
-
-                  // Name input
-                  SizedBox(
-                    width: MainMenu.getMainWindowWidth(context),
-                    child: nameInput
-                  ),
-
-                  // Description input
-                  Container(
-                    margin: const EdgeInsets.only(top: 15, bottom: 5),
-                    width: MainMenu.getMainWindowWidth(context),
-                    child: LexiconVariableWindowField(
-                      onChanged: (value) {
-                        _description = value;
-
-                        _showSaveChanges();
-                      },
-                      initialText: _description,
-                      maxLength: 70,
-                      fontSize: 14,
-                      color: DiscordTheme.lightGray,
-                      hintText: "Description",
-                    )
-                  ),
-
-                  // Add Word Button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                        child: SimpleDiscordButton(
-                          width: 70, 
-                          height: 25, 
-                          text: "Add Word",
-                          onTap: () async {
-                            _words = [""] + _words;
-
-                            setState(() {});
+                            setState(() { 
+                              _selectedColor = i;
+                              _color = _colorList[i];
+                            });
 
                             _showSaveChanges();
                           },
-                        )
-                      )
-                    ] 
-                  ),
-                  
-                  
-
-                  // Word List
-                  Container(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    width: MainMenu.getMainWindowWidth(context),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: () {
-                        var list = <Widget>[];
-                        
-                        for(int i = 0; i <= _words.length; i++) {
-                          list.add( Container(
-                            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
-                            width: double.infinity, 
-                            height: 1, 
-                            color: DiscordTheme.gray
-                          ));
-
-                          if(i == _words.length) continue; // In order to add an aditional divider
-
-                          list.add(LexiconVariableWordField(
-                              onDelete: () {
-                                setState(() { 
-                                  _words.removeAt(i);
-                                });
-
-                                _showSaveChanges();
-                              }, 
-                              child: LexiconVariableWindowField(
-                                onChanged: (value) {
-                                  _words[i] = value;
-
-                                  _showSaveChanges();
-                                },
-                                initialText: _words[i],
-                                maxLength: 100,
-                                fontSize: 14,
-                                color: DiscordTheme.white2,
-                                hintText: "Word",
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 2),
+                            width: 15,
+                            height: 15,
+                            decoration: BoxDecoration(
+                              boxShadow: const [BoxShadow(color: Color(0x33000000),blurRadius: 10, spreadRadius: 3)],
+                              color: Color(_colorList[i]),
+                              borderRadius: const BorderRadius.all(Radius.circular(3))
+                            ),
+                            child: i != _selectedColor ? null : const Center(
+                              child: Icon(
+                                Symbols.check,
+                                color: Colors.black,
+                                size: 15,
                               ),
                             )
-                          );
-                        }
+                          ),
+                        )
+                      );
+                    }
 
-                        return list;
-                      }(),
+                    return list;
+                  }()
+                ),
+              ),
+
+              // Keyword
+              Padding(
+                padding: const EdgeInsets.only(left: 20, top: 10),
+                child: Text(
+                  "\$$_keyword\$",
+                  style: TextStyle(
+                    shadows: const [Shadow(color: Color(0xff000000), blurRadius: 2)],
+                    color: Color.lerp(Color(_color), Colors.white, 0.3)
+                  ),
+                )
+              ),
+
+              // Name input
+              Container(
+                padding: const EdgeInsets.only(left: 15),
+                width: MainMenu.getMainWindowWidth(context),
+                child: nameInput
+              ),
+            ],
+          )
+        ),
+
+        // Delete Button
+        () {
+          return widget.variable == null ? const SizedBox() : Positioned(
+            top: 10,
+            right: 10,
+            child: InkWell(
+              onTap: () {
+                showDialog(
+                  context: context, 
+                  builder: (context) => SimpleDiscordDialog(
+                    cancelText: "No!",
+                    submitText: "Yea, delete it",
+                    onCancel: () async => Navigator.pop(context, false),
+                    onSubmit: () async {
+                      Bot().lexicon.deleteCustomVariable(widget.variable!);
+
+                      MainMenuRouter().subRouteTo("add_variable");
+
+                      Navigator.pop(context, false);
+                    },
+                    content: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                      width: 300,
+                      child: const Text(
+                        "Are you sure you want to delete this custom variable? You will permanently lose it!",
+                        textAlign: TextAlign.center,
+                      )
                     ),
                   )
+                );
+              },
+              child: const Icon(
+                Symbols.delete,
+                shadows: [
+                  Shadow(
+                    color: Color(0xFF000000),
+                    blurRadius: 7
+                  )
                 ],
-              )
+                size: 30,
+                color: Colors.red,
+              ),
             ),
-          ],
-        )
-      ],
+          );
+        }()
+      ]
     );
   }
 }
