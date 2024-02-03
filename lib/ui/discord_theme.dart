@@ -21,6 +21,12 @@ class DiscordTheme {
 
   static ThemeData get() {
     return ThemeData(
+      sliderTheme: const SliderThemeData(
+        showValueIndicator: ShowValueIndicator.always,
+        trackHeight: 10,
+        thumbColor: DiscordTheme.white2,
+        overlayColor: Colors.transparent
+      ),
       switchTheme: SwitchThemeData(
         splashRadius: 0,
         thumbColor: MaterialStateProperty.all<Color>(DiscordTheme.white2),

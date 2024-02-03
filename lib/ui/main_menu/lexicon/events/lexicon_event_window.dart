@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_event.dart';
@@ -22,8 +23,42 @@ class LexiconEventWindow extends MainWindow {
   State<LexiconEventWindow> createState() => _LexiconEventWindowState();
 }
 
-class _LexiconEventWindowState extends State<LexiconEventWindow> {
-  bool _enabled = true;
+class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProviderStateMixin {
+  late bool _enabled;
+  late double _chance;
+  late Widget _changeInput;
+
+  late TextEditingController _chanceController;
+  String _chanceString() => _chance > 0.999 ? (_chance*100).toStringAsFixed(0) : (_chance*100).toStringAsFixed(2);
+
+  void init() {
+    _enabled = widget.event.isEnabled;
+    _chance = widget.event.chance;
+
+    _chanceController = TextEditingController(text: (_chance*100).toString());
+    _changeInput = TextField(
+      maxLength: 5,
+      textAlign: TextAlign.end,
+      controller: _chanceController,
+      decoration: const InputDecoration(
+        suffixText: "%",
+        counter: SizedBox(),
+      ),
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter.allow(RegExp(r'^(100(?:\.(0)*)?|\d?\d(?:\.\d*?)?)$'), replacementString: "regex"),
+      ],
+      onChanged: (v) {
+        if(v == "regex") {
+          _chanceController.text = _chanceString();
+          return;
+        }
+
+        setState(() {
+          _chance = v.isEmpty ? 0 : double.parse(v)/100.0;
+        });
+      },
+    );
+  }
 
   Widget _getVariableListDivider(String text) {
     return Container(
@@ -38,6 +73,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> {
       )
     );
   }
+
   List<Widget> _getVariableList() {
     var list = <Widget>[];
 
@@ -56,55 +92,73 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> {
     return list;
   }
 
-  Widget _divider() {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
-      width: double.infinity, 
-      height: 1, 
-      color: DiscordTheme.gray
-    );
+  @override
+  void initState() {
+    super.initState();
+    init();
   }
 
-  Widget _settingRow({required String name, required String description, required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      height: 80,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  color: DiscordTheme.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500
-                )
-              ),
-              Text(
-                description,
-                style: const TextStyle(
-                  color: DiscordTheme.white2,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w400
-                )
-              )
-            ],
-          ),
+  @override
+  void didUpdateWidget(covariant LexiconEventWindow oldWidget) {
+    super.didUpdateWidget(oldWidget);
 
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: child,
+    init();
+  }
+
+  @override
+  void dispose() {
+    _chanceController.dispose();
+    super.dispose();
+  }
+
+  List<Widget> _settingRow({required String name, required String description, required Widget child}) {
+    return [
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        height: 80,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    color: DiscordTheme.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500
+                  )
+                ),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    color: DiscordTheme.white2,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w400
+                  )
+                )
+              ],
+            ),
+
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: child,
+              )
             )
-          )
-        ],
+          ],
+        )
+      ),
+      Container(
+        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
+        width: double.infinity, 
+        height: 1, 
+        color: DiscordTheme.gray
       )
-    );
+    ];
   }
 
   @override
@@ -176,7 +230,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> {
                 padding: const EdgeInsets.only(top: 100),
                 child: ListView(
                   children: [
-                    _settingRow(
+                    ..._settingRow(
                       name: "Enabled",
                       description: "Enables/Disables this event from running.",
                       child: SimpleSwitch(
@@ -189,7 +243,65 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> {
                         }
                       )
                     ),
-                    _divider(),
+
+                    ..._settingRow(
+                      name: "Chance",
+                      description: "The chance that the bot will respond when the event is triggered.",
+                      child: SizedBox(
+                        width: 400,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              child: Slider(
+                                value: _chance,
+                                max: 1.0,
+                                onChanged: (v) {
+                                  setState(() {
+                                    _chance = double.parse(v.toStringAsFixed(2));
+                                    _chanceController.text = _chanceString();
+                                  });
+                                },
+                              )
+                            ),
+                            SizedBox(
+                              width: 75,
+                              child: _changeInput,
+                            )
+                            
+                          ]
+                        )
+                      )
+                    ),
+
+                    ..._settingRow(
+                      name: "Cooldown",
+                      description: "If the bot responds to the event, it will not be able to respond again for some time.",
+                      child: SizedBox(
+                        width: 100,
+                        child: TextField(
+                          textAlign: TextAlign.end,
+                          controller: _chanceController, // TO-DO: cooldown
+                          decoration: const InputDecoration(
+                            suffixText: "%",
+                            counter: SizedBox(),
+                          ),
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.allow(RegExp(r'^(?:\d?\d(\:[0-5]?\d?|[0-5]\d\:){0,2})$'), replacementString: "regex"),
+                          ],
+                          onChanged: (v) {
+                            if(v == "regex") {
+                              _chanceController.text = _chanceString();
+                              return;
+                            }
+
+                            setState(() {
+                              _chance = v.isEmpty ? 0 : double.parse(v)/100.0;
+                            });
+                          },
+                        )
+                      )
+                    ),
                     
                   ],
                 ),
