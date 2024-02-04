@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_event.dart';
-import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_mention_event.dart';
-import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_variable.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_mention_event.dart';
+import 'package:umbrage_bot/bot/lexicon/variables/lexicon_custom_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
 import 'package:umbrage_bot/bot/util/result.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/custom_variables/lexicon_variable_window.dart';

@@ -1,5 +1,5 @@
 import 'package:nyxx/nyxx.dart';
-import 'package:umbrage_bot/bot/components/lexicon/lexicon.dart';
+import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
 import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';

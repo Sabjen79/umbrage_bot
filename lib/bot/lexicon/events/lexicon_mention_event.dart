@@ -1,9 +1,9 @@
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/bot/components/lexicon/events/lexicon_event.dart';
-import 'package:umbrage_bot/bot/components/lexicon/lexicon.dart';
-import 'package:umbrage_bot/bot/components/lexicon/variables/predefined/lexicon_everyone_variable.dart';
-import 'package:umbrage_bot/bot/components/lexicon/variables/predefined/lexicon_mention_variable.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
+import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
+import 'package:umbrage_bot/bot/lexicon/variables/predefined/lexicon_everyone_variable.dart';
+import 'package:umbrage_bot/bot/lexicon/variables/predefined/lexicon_mention_variable.dart';
 
 class LexiconMentionEvent extends LexiconEvent {
   LexiconMentionVariable mentionVariable = LexiconMentionVariable("Mentions the user that sent the message.");

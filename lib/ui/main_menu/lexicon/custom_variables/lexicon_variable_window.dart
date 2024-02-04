@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/bot/components/lexicon/variables/lexicon_custom_variable.dart';
+import 'package:umbrage_bot/bot/lexicon/variables/lexicon_custom_variable.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_button.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
@@ -113,7 +113,7 @@ class _LexiconVariableWindowState extends State<LexiconVariableWindow> {
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
               width: 300,
               child: Text(
-                "ERROR: ${result.error}",
+                "Could not create variable:\n${result.error}",
                 textAlign: TextAlign.center,
               )
             ),
