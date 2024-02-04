@@ -26,38 +26,39 @@ class LexiconEventWindow extends MainWindow {
 class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProviderStateMixin {
   late bool _enabled;
   late double _chance;
-  late Widget _changeInput;
+  late int _cooldown;
 
   late TextEditingController _chanceController;
   String _chanceString() => _chance > 0.999 ? (_chance*100).toStringAsFixed(0) : (_chance*100).toStringAsFixed(2);
 
+  late TextEditingController _cooldownControllerHour, _cooldownControllerMinutes, _cooldownControllerSeconds;
+
   void init() {
     _enabled = widget.event.isEnabled;
     _chance = widget.event.chance;
+    _cooldown = widget.event.cooldown;
 
     _chanceController = TextEditingController(text: (_chance*100).toString());
-    _changeInput = TextField(
-      maxLength: 5,
-      textAlign: TextAlign.end,
-      controller: _chanceController,
-      decoration: const InputDecoration(
-        suffixText: "%",
-        counter: SizedBox(),
-      ),
-      inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.allow(RegExp(r'^(100(?:\.(0)*)?|\d?\d(?:\.\d*?)?)$'), replacementString: "regex"),
-      ],
-      onChanged: (v) {
-        if(v == "regex") {
-          _chanceController.text = _chanceString();
-          return;
-        }
+    _cooldownControllerHour = TextEditingController();
+    _cooldownControllerMinutes = TextEditingController();
+    _cooldownControllerSeconds = TextEditingController();
+    _resetCooldownControllers();
+  }
 
-        setState(() {
-          _chance = v.isEmpty ? 0 : double.parse(v)/100.0;
-        });
-      },
-    );
+  void _resetCooldownControllers() {
+    double d = _cooldown + 0.0;
+    _cooldownControllerHour.text = (d ~/ 3600).toString();
+    d = (d / 3600) % 1;
+    _cooldownControllerMinutes.text = (d * 60).toStringAsFixed(0);
+    d = (d * 60) % 1;
+    _cooldownControllerSeconds.text = (d * 60).toStringAsFixed(0);
+  }
+
+  void _setCooldown() {
+    _cooldown = 
+      int.parse('0${_cooldownControllerHour.text}') * 3600 +
+      int.parse('0${_cooldownControllerMinutes.text}') * 60 +
+      int.parse('0${_cooldownControllerSeconds.text}');
   }
 
   Widget _getVariableListDivider(String text) {
@@ -109,6 +110,41 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
   void dispose() {
     _chanceController.dispose();
     super.dispose();
+  }
+
+  List<Widget> _cooldownInput(TextEditingController controller, String regex, String text) {
+    return [
+      SizedBox(
+        width: 34,
+        child: TextField(
+          maxLength: 2,
+          textAlign: TextAlign.end,
+          controller: controller,
+          decoration: const InputDecoration(
+            contentPadding: EdgeInsets.symmetric(vertical: 7, horizontal: 4),
+            counter: SizedBox(),
+          ),
+          inputFormatters: <TextInputFormatter>[
+            FilteringTextInputFormatter.allow(RegExp(regex), replacementString: "er"),
+          ],
+          onChanged: (v) {
+            if(v == "er") {
+              _resetCooldownControllers();
+              return;
+            }
+
+            setState(() {
+              _setCooldown();
+            });
+          },
+        ),
+      ),
+
+      Padding(
+        padding: const EdgeInsets.only(bottom: 10, left: 4, right: 7),
+        child: Text(text, style: const TextStyle(fontWeight: FontWeight.w500),),
+      )
+    ];
   }
 
   List<Widget> _settingRow({required String name, required String description, required Widget child}) {
@@ -248,7 +284,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                       name: "Chance",
                       description: "The chance that the bot will respond when the event is triggered.",
                       child: SizedBox(
-                        width: 400,
+                        width: 300,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -266,7 +302,28 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                             ),
                             SizedBox(
                               width: 75,
-                              child: _changeInput,
+                              child: TextField(
+                                maxLength: 5,
+                                textAlign: TextAlign.end,
+                                controller: _chanceController,
+                                decoration: const InputDecoration(
+                                  suffixText: "%",
+                                  counter: SizedBox(),
+                                ),
+                                inputFormatters: <TextInputFormatter>[
+                                  FilteringTextInputFormatter.allow(RegExp(r'^(100(?:\.(0)*)?|\d?\d(?:\.\d*?)?)$'), replacementString: "error"),
+                                ],
+                                onChanged: (v) {
+                                  if(v == "error") {
+                                    _chanceController.text = _chanceString();
+                                    return;
+                                  }
+
+                                  setState(() {
+                                    _chance = v.isEmpty ? 0 : double.parse(v)/100.0;
+                                  });
+                                },
+                              ),
                             )
                             
                           ]
@@ -277,29 +334,14 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                     ..._settingRow(
                       name: "Cooldown",
                       description: "If the bot responds to the event, it will not be able to respond again for some time.",
-                      child: SizedBox(
-                        width: 100,
-                        child: TextField(
-                          textAlign: TextAlign.end,
-                          controller: _chanceController, // TO-DO: cooldown
-                          decoration: const InputDecoration(
-                            suffixText: "%",
-                            counter: SizedBox(),
-                          ),
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.allow(RegExp(r'^(?:\d?\d(\:[0-5]?\d?|[0-5]\d\:){0,2})$'), replacementString: "regex"),
-                          ],
-                          onChanged: (v) {
-                            if(v == "regex") {
-                              _chanceController.text = _chanceString();
-                              return;
-                            }
-
-                            setState(() {
-                              _chance = v.isEmpty ? 0 : double.parse(v)/100.0;
-                            });
-                          },
-                        )
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ..._cooldownInput(_cooldownControllerHour, r'^\d?\d?$', "Hours"),
+                          ..._cooldownInput(_cooldownControllerMinutes, r'^[0-5]?\d?$', "Minutes"),
+                          ..._cooldownInput(_cooldownControllerSeconds, r'^[0-5]?\d?$', "Seconds"),
+                        ],
                       )
                     ),
                     

@@ -23,7 +23,7 @@ class DiscordTheme {
     return ThemeData(
       sliderTheme: const SliderThemeData(
         showValueIndicator: ShowValueIndicator.always,
-        trackHeight: 10,
+        trackHeight: 5,
         thumbColor: DiscordTheme.white2,
         overlayColor: Colors.transparent
       ),
