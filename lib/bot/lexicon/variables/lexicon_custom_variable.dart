@@ -2,14 +2,23 @@ import 'dart:math';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 
 class LexiconCustomVariable extends LexiconVariable {
-  List<String> _words;
+  final List<String> _words;
+  List<int> _randomizedWordsIndexes = [];
+  List<String> get words => _words;
+  
 
-  List<String> getWords() => _words;
+  LexiconCustomVariable(super.keyword, super.name, super.description, super.color, this._words) {
+    if(_words.isEmpty) return;
 
-  LexiconCustomVariable(super.keyword, super.name, super.description, super.color, this._words);
+    _randomizedWordsIndexes = List<int>.generate(_words.length, (index) => index)..shuffle();
+  }
 
   @override
   String getValue() {
-    return _words.isEmpty ? "" : _words[Random().nextInt(_words.length)];
+    if(words.isEmpty) return "";
+
+    if(_randomizedWordsIndexes.isEmpty) _randomizedWordsIndexes = List<int>.generate(_words.length, (index) => index)..shuffle();
+
+    return _words[_randomizedWordsIndexes.removeAt(0)];
   }
 }

@@ -9,12 +9,13 @@ abstract class LexiconEvent {
   final String _filename;
   final String _name;
   final String _description;
-  bool _enabled = true;
+  bool _enabled = false;
   int _cooldown = 0;
   double _chance = 1.0;
 
   final List<String> _phrases = [];
   final List<LexiconVariable> _variables = [];
+  List<int> _phrasesRandomIndexes = [];
 
   LexiconEvent(this._lexicon, this._filename, this._name, this._description) {
     loadSettingsFromFile();
@@ -34,39 +35,38 @@ abstract class LexiconEvent {
   String getPhrase() {
     if(_phrases.isEmpty) return "";
 
-    String phrase = _phrases[Random().nextInt(_phrases.length)];
+    if(_phrasesRandomIndexes.isEmpty) {
+      _phrasesRandomIndexes = List<int>.generate(_phrases.length, (index) => index)..shuffle();
+    }
 
-    for(var v in [..._variables, ..._lexicon.getCustomVariables()]) {
-      phrase = phrase.replaceAll("\$${v.getKeyword()}\$", v.getValue());
+    String phrase = _phrases[_phrasesRandomIndexes.removeAt(0)];
+
+    for(var v in _variables) {
+      phrase = phrase.replaceAll("\$${v.keyword}\$", v.getValue());
+    }
+
+    for(var v in _lexicon.customVariables) {
+      Set<String> usedValues = {};
+      while(phrase.contains(v.keyword)) {
+        var value = v.getValue();
+
+        if(usedValues.contains(value) && usedValues.length != v.words.length) continue;
+        usedValues.add(value);
+
+        phrase = phrase.replaceFirst(v.keyword, value);
+      }
     }
 
     return phrase;
-  }
-
-  void saveSettingsToFile() {
-    File f = File("${BotFiles().getDir("lexicon/events").path}/$filename.txt");
-
-    String newLine = Platform.lineTerminator;
-    
-    var buffer = StringBuffer("");
-
-    buffer
-      ..write("${_enabled.toString()}$newLine")
-      ..write("${_cooldown.toString()}$newLine")
-      ..write("${_chance.toString()}$newLine");
-
-    for(var p in _phrases) {
-      buffer.write("$p$newLine");
-    }
-
-    f.writeAsStringSync(buffer.toString());
   }
 
   void loadSettingsFromFile() {
     File f = File("${BotFiles().getDir("lexicon/events").path}/$filename.txt");
 
     if(!f.existsSync()) {
-      saveSettingsToFile();
+      String newLine = Platform.lineTerminator;
+
+      f.writeAsStringSync("${_enabled.toString()}$newLine${_chance.toString()}$newLine${_cooldown.toString()}$newLine");
       return;
     }
 
@@ -74,9 +74,10 @@ abstract class LexiconEvent {
       List<String> fileLines = f.readAsLinesSync();
 
       _enabled = bool.parse(fileLines[0]);
-      _cooldown = int.parse(fileLines[1]);
-      _chance = double.parse(fileLines[2]);
+      _chance = double.parse(fileLines[1]);
+      _cooldown = int.parse(fileLines[2]);
       _phrases..clear()..addAll(fileLines.sublist(3));
+      _phrasesRandomIndexes = List<int>.generate(_phrases.length, (index) => index)..shuffle();
 
     } catch (e) {
       // Yeah, very insightful description, something is wrong WITH YOU, not with the file

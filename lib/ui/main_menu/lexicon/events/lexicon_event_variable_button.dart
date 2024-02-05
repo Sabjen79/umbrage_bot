@@ -84,7 +84,7 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
         });
       },
       onTap: () async {
-        await Clipboard.setData(ClipboardData(text: "\$${widget.variable.getKeyword()}\$"));
+        await Clipboard.setData(ClipboardData(text: "\$${widget.variable.keyword}\$"));
         
         _tapController..reset()..forward();
       },
@@ -108,7 +108,7 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                   width: 22,
                   height: 22,
                   decoration: BoxDecoration(
-                    color: widget.variable.getColor(),
+                    color: widget.variable.color,
                     borderRadius: BorderRadius.circular(22)
                   ),
                   child: Transform.rotate(
@@ -137,17 +137,17 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.variable.getName(), 
+                        widget.variable.name, 
                         style: TextStyle(
                           overflow: TextOverflow.ellipsis,
-                          color: widget.variable.getColor(),
+                          color: widget.variable.color,
                           fontSize: 12,
                           fontWeight: FontWeight.w500
                         ),
                       ),
                       
                       Text(
-                        "\$${widget.variable.getKeyword()}\$", 
+                        "\$${widget.variable.keyword}\$", 
                         style: const TextStyle(
                           overflow: TextOverflow.ellipsis,
                           color: DiscordTheme.lightGray,
@@ -177,7 +177,7 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                     child: Text(
-                      widget.variable.getDescription().isNotEmpty ? widget.variable.getDescription() : "No Description.",
+                      widget.variable.description.isNotEmpty ? widget.variable.description : "No Description.",
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 12

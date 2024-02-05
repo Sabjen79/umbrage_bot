@@ -6,11 +6,11 @@ abstract class LexiconVariable {
   final String _description;
   final int _color;
 
-  String getKeyword() => _keyword;
-  String getName() => _name;
-  String getDescription() => _description;
-  int getColorInt() => _color;
-  Color getColor() => Color(_color);
+  String get keyword => _keyword;
+  String get name => _name;
+  String get description => _description;
+  int get colorInt => _color;
+  Color get color => Color(_color);
 
   LexiconVariable(this._keyword, this._name, this._description, this._color);
 

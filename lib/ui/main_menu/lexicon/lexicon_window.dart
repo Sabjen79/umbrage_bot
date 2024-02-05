@@ -17,7 +17,7 @@ class LexiconWindow extends MainRoute {
     clearWindows();
     var lexicon = Bot().lexicon;
 
-    var variables = lexicon.getCustomVariables();
+    var variables = lexicon.customVariables;
 
     addWindow(LexiconVariableWindow(null));
     
@@ -25,7 +25,7 @@ class LexiconWindow extends MainRoute {
       addWindow(LexiconVariableWindow(v));
     }
 
-    var events = lexicon.getAllEvents();
+    var events = lexicon.events;
 
     bool t = true; // To make the first event window the default subroute
     for(var e in events) {

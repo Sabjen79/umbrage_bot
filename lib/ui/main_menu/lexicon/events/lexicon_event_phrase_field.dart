@@ -26,6 +26,36 @@ class _LexiconEventPhraseFieldState extends State<LexiconEventPhraseField> with 
   late AnimationController _controller;
   late Animation _animation;
   late RichTextController _textController;
+  late Widget _textField;
+
+  void init() {
+    Map<RegExp, TextStyle> matches = {};
+
+    for(var v in widget.variables) {
+      matches[RegExp("\\\$${v.keyword}\\\$")] = TextStyle(color: v.color, fontWeight: FontWeight.w500);
+    }
+
+    _textController = RichTextController(
+      onMatch: (l) {},
+      patternMatchMap: matches,
+      deleteOnBack: true,
+      text: widget.initialText
+    );
+
+    _textField = TextField(
+      controller: _textController,
+      minLines: 1,
+      maxLines: 5,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r"\n"))
+      ],
+      decoration: const InputDecoration(
+        hintText: "Phrase"
+      ),
+      style: const TextStyle(fontSize: 14),
+      onChanged: widget.onChanged,
+    );
+  }
 
   @override
   void initState() {
@@ -38,18 +68,14 @@ class _LexiconEventPhraseFieldState extends State<LexiconEventPhraseField> with 
       setState(() {});
     });
 
-    Map<RegExp, TextStyle> matches = {};
+    init();
+  }
 
-    for(var v in widget.variables) {
-      matches[RegExp("\\\$${v.getKeyword()}\\\$")] = TextStyle(color: v.getColor(), fontWeight: FontWeight.w500);
-    }
+  @override
+  void didUpdateWidget(covariant LexiconEventPhraseField oldWidget) {
+    super.didUpdateWidget(oldWidget);
 
-    _textController = RichTextController(
-      onMatch: (l) {},
-      patternMatchMap: matches,
-      deleteOnBack: true,
-      text: widget.initialText
-    );
+    init();
   }
 
   @override
@@ -102,19 +128,7 @@ class _LexiconEventPhraseFieldState extends State<LexiconEventPhraseField> with 
                 offset: Offset(-10.0 + _animation.value * 20.0, 0),
                 child: Padding(
                   padding: EdgeInsets.only(right: _animation.value * 10.0),
-                  child: TextField(
-                    controller: _textController,
-                    minLines: 1,
-                    maxLines: 5,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.deny(RegExp(r"\n"))
-                    ],
-                    decoration: const InputDecoration(
-                      hintText: "Phrase"
-                    ),
-                    style: const TextStyle(fontSize: 14),
-                    onChanged: widget.onChanged,
-                  ),
+                  child: _textField,
                 )
               )
             )

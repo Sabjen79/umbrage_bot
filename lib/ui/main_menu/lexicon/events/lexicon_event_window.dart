@@ -4,6 +4,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
+import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/components/simple_switch.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/events/lexicon_event_phrase_field.dart';
@@ -44,7 +45,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
     _enabled = widget.event.isEnabled;
     _chance = widget.event.chance;
     _cooldown = widget.event.cooldown;
-    _phrases = widget.event.phrases;
+    _phrases = widget.event.phrases.toList();
 
     _chanceController = TextEditingController(text: (_chance*100).toString());
     _cooldownControllerHour = TextEditingController();
@@ -94,7 +95,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
 
     list.add(_getVariableListDivider("CUSTOM VARIABLES"));
 
-    for(var v in Bot().lexicon.getCustomVariables()) {
+    for(var v in Bot().lexicon.customVariables) {
       list.add(LexiconEventVariableButton(variable: v));
     }
 
@@ -104,7 +105,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
   @override
   void initState() {
     super.initState();
-    _variables = [...widget.event.variables, ...Bot().lexicon.getCustomVariables()];
+    _variables = [...widget.event.variables, ...Bot().lexicon.customVariables];
     init();
   }
 
@@ -129,6 +130,30 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
 
       MainMenuRouter().unblock();
     }, () async {
+      var result = Bot().lexicon.updateEvent(widget.event.filename, _enabled, _chance, _cooldown, _phrases);
+
+      if(!result.isSuccess) {
+        showDialog(
+          context: context, 
+          builder: (context) => SimpleDiscordDialog(
+            cancelText: "",
+            submitText: "OKAY, SORRY!",
+            onSubmit: () async => {
+              Navigator.pop(context, false)
+            },
+            content: Container(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+              width: 300,
+              child: Text(
+                "Could not update event:\n${result.error}",
+                textAlign: TextAlign.center,
+              )
+            ),
+          )
+        );
+        return;
+      }
+
       setState(() {});
 
       MainMenuRouter().unblock();
@@ -228,6 +253,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
     for(int i = 0; i < _phrases.length; i++) {
       list.add(
         LexiconEventPhraseField(
+          initialText: _phrases[i],
           variables: _variables,
           onChanged: (value) {
             if(value == _phrases[i]) return;
@@ -237,6 +263,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
             _showSaveChanges();
           },
           onDelete: () {
+
             setState(() {
               _phrases.removeAt(i);
             });
@@ -336,7 +363,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                       )
                     ),
 
-                    ..._settingRow(
+                    ...(!_enabled ? [] : _settingRow(
                       name: "Chance",
                       description: "The chance that the bot will respond when the event is triggered.",
                       child: SizedBox(
@@ -388,9 +415,9 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                           ]
                         )
                       )
-                    ),
+                    )),
 
-                    ..._settingRow(
+                    ...(!_enabled ? [] : _settingRow(
                       name: "Cooldown",
                       description: "If the bot responds to the event, it will not be able to respond again for some time.",
                       child: Padding(
@@ -405,9 +432,9 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                           ],
                         )
                       )
-                    ),
+                    )),
                     
-                    Container(
+                    !_enabled ? Container() : Container(
                       clipBehavior: Clip.hardEdge,
                       margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
                       decoration: BoxDecoration(

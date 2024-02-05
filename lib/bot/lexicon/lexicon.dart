@@ -11,13 +11,15 @@ import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 
 class Lexicon with ChangeNotifier {
   final List<LexiconCustomVariable> _customVariables = [];
-
-  // Always remember to include all events in getAllEvents()!!!
-  late final LexiconMentionEvent mentionEvent;
+  final List<LexiconEvent> _events = [];
 
   // Constructor
   Lexicon() {
     final BotFiles files = BotFiles();
+
+    _events.addAll([
+      LexiconMentionEvent(this)
+    ]);
 
     for(var file in files.getDir("lexicon/variables").listSync()) {
       _customVariables.add(
@@ -26,33 +28,57 @@ class Lexicon with ChangeNotifier {
         )
       );
     }
-
-    mentionEvent = LexiconMentionEvent(this);
   }
   //
 
-  // Event Getters
-  LexiconEvent? getEvent<T extends LexiconEvent>() {
+  // Events
+  List<LexiconEvent> get events => _events;
+
+  LexiconEvent getEvent<T extends LexiconEvent>() {
     if(T.toString() == "LexiconEvent") throw Exception("Lexicon.getEvent() should be called with a generic type included");
 
-    for(var event in getAllEvents()) {
+    for(var event in _events) {
       if(event is T) {
         return event;
       }
     }
-    return null;
+
+    throw Exception("Event does not exist.");
   }
 
-  List<LexiconEvent> getAllEvents() {
-    return <LexiconEvent>[
-      mentionEvent
-    ];
+  Result<LexiconEvent> updateEvent(String filename, bool enabled, double chance, int cooldown, List<String> phrases) {
+    if(enabled && chance == 0) return Result.failure("Chance is 0. Disable the event instead.");
+
+    File f = File("${BotFiles().getDir("lexicon/events").path}/$filename.txt");
+
+    String newLine = Platform.lineTerminator;
+    
+    var buffer = StringBuffer("");
+
+    buffer
+      ..write("${enabled.toString()}$newLine")
+      ..write("${chance.toString()}$newLine")
+      ..write("${cooldown.toString()}$newLine");
+
+    for(var p in phrases) {
+      if(p.replaceAll(" ", " ").isEmpty) return Result.failure("One or more phrases are empty.");
+      buffer.write("$p$newLine");
+    }
+
+    f.writeAsStringSync(buffer.toString());
+
+    for(var e in _events) {
+      if(e.filename == filename) {
+        e.loadSettingsFromFile();
+        return Result.success(e);
+      }
+    }
+
+    return Result.failure("Event does not exist."); // This should not ever happen!
   }
 
   // Custom Variables
-  List<LexiconCustomVariable> getCustomVariables() {
-    return _customVariables;
-  }
+  List<LexiconCustomVariable> get customVariables => _customVariables;
 
   Result<LexiconCustomVariable> createCustomVariable(String keyword, String name, String description, int color, List<String> words) {
     var result = _createVariable(keyword, name, description, color, words);
@@ -73,7 +99,7 @@ class Lexicon with ChangeNotifier {
       int index = _customVariables.indexOf(oldVariable);
       _customVariables[index] = result.value!;
 
-      BotFiles().deleteFile("lexicon/variables/${oldVariable.getKeyword()}.txt");
+      BotFiles().deleteFile("lexicon/variables/${oldVariable.keyword}.txt");
       _saveLexiconVariable(result.value!);
 
       notifyListeners();
@@ -85,13 +111,13 @@ class Lexicon with ChangeNotifier {
   void deleteCustomVariable(LexiconCustomVariable variable) {
     if(!_customVariables.remove(variable)) return;
 
-    BotFiles().deleteFile("lexicon/variables/${variable.getKeyword()}.txt");
+    BotFiles().deleteFile("lexicon/variables/${variable.keyword}.txt");
 
     notifyListeners();
   }
 
   void _saveLexiconVariable(LexiconCustomVariable v) {
-    _lexiconSaveToFile([v.getName(), v.getDescription(), v.getColorInt().toString(), ...v.getWords()], "variables", v.getKeyword());
+    _lexiconSaveToFile([v.name, v.description, v.colorInt.toString(), ...v.words], "variables", v.keyword);
   }
 
   Result<LexiconCustomVariable> _createVariable(String keyword, String name, String description, int color, List<String> words, [LexiconCustomVariable? oldVariable]) {
@@ -103,15 +129,15 @@ class Lexicon with ChangeNotifier {
       if(w is! LexiconVariableWindow && (keyword == "add_variable" || keyword == w.route)) return Result.failure("'$keyword' is a restricted keyword used that would cause errors.");
     }
 
-    for(var event in getAllEvents()) {
+    for(var event in _events) {
       for(var v in event.variables) {
-        if(v.getKeyword() == keyword) return Result.failure("The keyword '\$$keyword\$' is used by a predefined variable. Choose another one!");
+        if(v.keyword == keyword) return Result.failure("The keyword '\$$keyword\$' is used by a predefined variable. Choose another one!");
       }
     }
 
     for(var v in _customVariables) {
       if(oldVariable == v) continue;
-      if(v.getKeyword() == keyword) return Result.failure("There is another variable with the same keyword. Change it!");
+      if(v.keyword == keyword) return Result.failure("There is another variable with the same keyword. Change it!");
     }
 
     for(var w in words) {

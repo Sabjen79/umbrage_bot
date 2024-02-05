@@ -16,8 +16,8 @@ class LexiconVariableWindow extends MainWindow {
 
   LexiconVariableWindow(this.variable, {super.key}) : super(
     sideBarIcon: variable == null ? Symbols.add_circle : Symbols.tag, 
-    route: variable == null ? "add_variable" : variable.getKeyword(),
-    name: variable == null ? "Create Variable" : variable.getName(),
+    route: variable == null ? "add_variable" : variable.keyword,
+    name: variable == null ? "Create Variable" : variable.name,
     category: variable == null ? "" : "CUSTOM VARIABLES"
   );
 
@@ -57,11 +57,11 @@ class _LexiconVariableWindowState extends State<LexiconVariableWindow> {
       _keyword = "";
       _words = [];
     } else { // Update Page
-      _name = variable.getName();
-      _description = variable.getDescription();
-      _color = variable.getColorInt();
-      _keyword = variable.getKeyword();
-      _words = variable.getWords().toList();
+      _name = variable.name;
+      _description = variable.description;
+      _color = variable.colorInt;
+      _keyword = variable.keyword;
+      _words = variable.words.toList();
     }
 
     _selectedColor = -1;
@@ -113,7 +113,7 @@ class _LexiconVariableWindowState extends State<LexiconVariableWindow> {
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
               width: 300,
               child: Text(
-                "Could not create variable:\n${result.error}",
+                "Could not ${widget.variable == null ? "create" : "update"} variable:\n${result.error}",
                 textAlign: TextAlign.center,
               )
             ),
