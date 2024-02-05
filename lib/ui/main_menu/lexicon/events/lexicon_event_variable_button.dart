@@ -84,7 +84,7 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
         });
       },
       onTap: () async {
-        await Clipboard.setData(ClipboardData(text: "\$${widget.variable.keyword}\$"));
+        await Clipboard.setData(ClipboardData(text: "\$${widget.variable.keyword}\$ "));
         
         _tapController..reset()..forward();
       },

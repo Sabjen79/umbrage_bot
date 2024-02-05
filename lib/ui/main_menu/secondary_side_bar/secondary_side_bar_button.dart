@@ -52,16 +52,17 @@ class _SecondarySideBarButtonState extends State<SecondarySideBarButton> {
               left: 3,
               child: Icon(
                 widget.icon,
+                fill: 1,
                 size: 20,
-                opticalSize: 20,
+                opticalSize: 10,
                 grade: 200,
-                weight: 100,
+                weight: 200,
                 color: DiscordTheme.lightGray,
               ),
             ),
             Positioned(
               left: 25,
-              top: 1.5,
+              top: 2,
               child: Text(
                 widget.name,
                 overflow: TextOverflow.ellipsis,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_custom_variable.dart';
-import 'package:umbrage_bot/ui/components/simple_discord_button.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/custom_variables/lexicon_variable_window_field.dart';
@@ -141,6 +140,36 @@ class _LexiconVariableWindowState extends State<LexiconVariableWindow> {
     init();
   }
 
+  List<Widget> _wordFields() {
+    var list = <Widget>[];
+
+    for(int i = 0; i < _words.length; i++) {
+      list.add(
+        LexiconVariableWordField(
+          initialText: _words[i],
+          onChanged: (value) {
+            if(value == _words[i]) return;
+
+            _words[i] = value;
+
+            _showSaveChanges();
+          },
+          onDelete: () {
+            setState(() {
+              _words.removeAt(i);
+            });
+
+            _showSaveChanges();
+          },
+        )
+      );
+
+      list.add(Container(color: DiscordTheme.gray, width: double.infinity, height: 1));
+    }
+
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -170,76 +199,31 @@ class _LexiconVariableWindowState extends State<LexiconVariableWindow> {
                     hintText: "Description",
                   )
                 ),
-
-                // Add Word Button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                      child: SimpleDiscordButton(
-                        width: 70, 
-                        height: 25, 
-                        text: "Add Word",
-                        onTap: () async {
-                          _words = [""] + _words;
-
-                          setState(() {});
+                
+                // Word List
+                Container(
+                  clipBehavior: Clip.hardEdge,
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: DiscordTheme.backgroundColorDarkest,
+                    borderRadius: BorderRadius.circular(5)
+                  ),
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      ..._wordFields(),
+                      _AddWordWidget(
+                        onTap: () {
+                          setState(() {
+                            _words.add("");
+                          });
 
                           _showSaveChanges();
                         },
                       )
-                    )
-                  ] 
+                    ],
+                  ),
                 ),
-                
-                // Word List
-                Container(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  width: MainMenu.getMainWindowWidth(context),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: () {
-                      var list = <Widget>[];
-                      
-                      for(int i = 0; i <= _words.length; i++) {
-                        list.add( Container(
-                          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
-                          width: double.infinity, 
-                          height: 1, 
-                          color: DiscordTheme.gray
-                        ));
-
-                        if(i == _words.length) continue; // In order to add an aditional divider
-
-                        list.add(LexiconVariableWordField(
-                            onDelete: () {
-                              setState(() { 
-                                _words.removeAt(i);
-                              });
-
-                              _showSaveChanges();
-                            }, 
-                            child: LexiconVariableWindowField(
-                              onChanged: (value) {
-                                _words[i] = value;
-
-                                _showSaveChanges();
-                              },
-                              initialText: _words[i],
-                              maxLength: 100,
-                              fontSize: 14,
-                              color: DiscordTheme.white2,
-                              hintText: "Word",
-                            ),
-                          )
-                        );
-                      }
-
-                      return list;
-                    }()
-                  )
-                )
               ]
             )
           ]
@@ -377,5 +361,61 @@ class _LexiconVariableWindowState extends State<LexiconVariableWindow> {
         }()
       ]
     );
+  }
+}
+
+
+class _AddWordWidget extends StatefulWidget {
+  final VoidCallback onTap;
+
+  const _AddWordWidget({required this.onTap});
+
+  @override
+  State<_AddWordWidget> createState() => _AddWordWidgetState();
+}
+
+class _AddWordWidgetState extends State<_AddWordWidget> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+    onTap: widget.onTap,
+    onHover: (b) {
+      setState(() {
+        _hover = b;
+      });
+    },
+    child: Container(
+      color: _hover ? DiscordTheme.backgroundColorDarker : DiscordTheme.backgroundColorDarkest,
+      height: 40,
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: 10, right: 3),
+            child: Icon(
+              Symbols.add,
+              size: 25,
+              opticalSize: 20,
+              color: DiscordTheme.lightGray,
+            )
+          ),
+
+          Padding(
+            padding: EdgeInsets.only(bottom: 1),
+            child: Text(
+              "Add New Word", 
+              style: TextStyle(
+                color: DiscordTheme.lightGray,
+                fontWeight: FontWeight.w500
+              ),
+            ),
+          )
+        ],
+      ),
+    ),
+  );
   }
 }

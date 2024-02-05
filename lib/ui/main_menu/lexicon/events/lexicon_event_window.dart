@@ -8,6 +8,7 @@ import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/components/simple_switch.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/events/lexicon_event_phrase_field.dart';
+import 'package:umbrage_bot/ui/main_menu/lexicon/events/lexicon_event_status.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/events/lexicon_event_variable_button.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
@@ -39,7 +40,6 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
   String _chanceString() => _chance > 0.999 ? (_chance*100).toStringAsFixed(0) : (_chance*100).toStringAsFixed(2);
 
   late TextEditingController _cooldownControllerHour, _cooldownControllerMinutes, _cooldownControllerSeconds;
-  bool _addButtonHover = false;
 
   void init() {
     _enabled = widget.event.isEnabled;
@@ -291,7 +291,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
               Container(
                 alignment: Alignment.centerLeft,
                 width: double.infinity,
-                height: 100,
+                height: 120,
                 decoration: const BoxDecoration(
                   color: DiscordTheme.gray,
                   boxShadow: [
@@ -306,7 +306,11 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-
+                    Padding(
+                      padding: const EdgeInsets.only(left: 30),
+                      child: LexiconEventStatus(event: widget.event),
+                    ),
+                    
                     // Event Name
                     Padding(
                       padding: const EdgeInsets.only(left: 25),
@@ -345,7 +349,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
               ),
 
               Padding(
-                padding: const EdgeInsets.only(top: 100),
+                padding: const EdgeInsets.only(top: 120),
                 child: ListView(
                   children: [
                     ..._settingRow(
@@ -445,7 +449,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                       child: Column(
                         children: [
                           ..._phraseFields(),
-                          InkWell(
+                          _AddPhraseWidget(
                             onTap: () {
                               setState(() {
                                 _phrases.add("");
@@ -453,42 +457,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
 
                               _showSaveChanges();
                             },
-                            onHover: (b) {
-                              setState(() {
-                                _addButtonHover = b;
-                              });
-                            },
-                            child: Container(
-                              color: _addButtonHover ? DiscordTheme.backgroundColorDarker : DiscordTheme.backgroundColorDarkest,
-                              height: 40,
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 10, right: 3),
-                                    child: Icon(
-                                      Symbols.add,
-                                      size: 25,
-                                      opticalSize: 20,
-                                      color: DiscordTheme.lightGray,
-                                    )
-                                  ),
-
-                                  Padding(
-                                    padding: EdgeInsets.only(bottom: 1),
-                                    child: Text(
-                                      "Add New Phrase", 
-                                      style: TextStyle(
-                                        color: DiscordTheme.lightGray,
-                                        fontWeight: FontWeight.w500
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
+                          )
                         ],
                       ),
                     )
@@ -517,5 +486,60 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
         )
       ],
     );
+  }
+}
+
+class _AddPhraseWidget extends StatefulWidget {
+  final VoidCallback onTap;
+
+  const _AddPhraseWidget({required this.onTap});
+
+  @override
+  State<_AddPhraseWidget> createState() => _AddPhraseWidgetState();
+}
+
+class _AddPhraseWidgetState extends State<_AddPhraseWidget> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+    onTap: widget.onTap,
+    onHover: (b) {
+      setState(() {
+        _hover = b;
+      });
+    },
+    child: Container(
+      color: _hover ? DiscordTheme.backgroundColorDarker : DiscordTheme.backgroundColorDarkest,
+      height: 40,
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: 10, right: 3),
+            child: Icon(
+              Symbols.add,
+              size: 25,
+              opticalSize: 20,
+              color: DiscordTheme.lightGray,
+            )
+          ),
+
+          Padding(
+            padding: EdgeInsets.only(bottom: 1),
+            child: Text(
+              "Add New Phrase", 
+              style: TextStyle(
+                color: DiscordTheme.lightGray,
+                fontWeight: FontWeight.w500
+              ),
+            ),
+          )
+        ],
+      ),
+    ),
+  );
   }
 }

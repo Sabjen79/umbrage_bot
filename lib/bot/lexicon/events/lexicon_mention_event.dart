@@ -22,6 +22,9 @@ class LexiconMentionEvent extends LexiconEvent {
       if(user == Bot().user || !event.message.mentions.contains(Bot().user)) return;
       
       mentionVariable.setSecondaryValue(user);
+
+      if(!canRun) return;
+      startCooldown();
       
       await event.message.channel.sendMessage(MessageBuilder( // TO-DO: Implement a GOOD Message Builder
         content: getPhrase(),

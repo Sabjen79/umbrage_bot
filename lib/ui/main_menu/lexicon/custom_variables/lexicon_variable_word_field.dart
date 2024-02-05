@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
+import 'package:flutter/services.dart';
 
 class LexiconVariableWordField extends StatefulWidget {
+  final String initialText;
+  final Function(String) onChanged;
   final VoidCallback onDelete;
-  final Widget child;
-
+  
   const LexiconVariableWordField({
+    required this.onChanged,
     required this.onDelete,
-    required this.child,
+    this.initialText = "",
     super.key
   });
 
@@ -16,9 +18,31 @@ class LexiconVariableWordField extends StatefulWidget {
   State<LexiconVariableWordField> createState() => _LexiconVariableWordFieldState();
 }
 
-class _LexiconVariableWordFieldState extends State<LexiconVariableWordField> with SingleTickerProviderStateMixin {
+class _LexiconVariableWordFieldState extends State<LexiconVariableWordField> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation _animation;
+  late TextEditingController _textController;
+  late Widget _textField;
+
+  void init() {
+    _textController = TextEditingController(
+      text: widget.initialText
+    );
+
+    _textField = TextField(
+      controller: _textController,
+      minLines: 1,
+      maxLines: 2,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r"\n"))
+      ],
+      decoration: const InputDecoration(
+        hintText: "Word"
+      ),
+      style: const TextStyle(fontSize: 14),
+      onChanged: widget.onChanged,
+    );
+  }
 
   @override
   void initState() {
@@ -30,6 +54,15 @@ class _LexiconVariableWordFieldState extends State<LexiconVariableWordField> wit
     _controller.addListener(() {
       setState(() {});
     });
+
+    init();
+  }
+
+  @override
+  void didUpdateWidget(covariant LexiconVariableWordField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    init();
   }
 
   @override
@@ -46,13 +79,12 @@ class _LexiconVariableWordFieldState extends State<LexiconVariableWordField> wit
       child: Container(
         alignment: Alignment.centerLeft,
         width: double.infinity,
-        height: 30,
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.centerLeft,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Positioned(
-              left: -20.0 + _animation.value * 20.0,
+            Transform.translate(
+              offset: Offset(-20.0 + _animation.value * 25.0, 0),
               child: Opacity(
                 opacity: _animation.value,
                 child: InkWell(
@@ -78,13 +110,14 @@ class _LexiconVariableWordFieldState extends State<LexiconVariableWordField> wit
               )
             ),
             
-            Positioned(
-              left: 5.0 + _animation.value * 20.0,
-              top: 4,
-              child: SizedBox(
-                width: MainMenu.getMainWindowWidth(context),
-                child: widget.child,
-              ),
+            Expanded(
+              child: Transform.translate(
+                offset: Offset(-10.0 + _animation.value * 20.0, 0),
+                child: Padding(
+                  padding: EdgeInsets.only(right: _animation.value * 10.0),
+                  child: _textField,
+                )
+              )
             )
           ],
         ),

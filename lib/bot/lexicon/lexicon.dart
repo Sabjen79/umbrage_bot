@@ -126,7 +126,7 @@ class Lexicon with ChangeNotifier {
     if(description.isNotEmpty && description.replaceAll(" ", "").isEmpty) return Result.failure("Description contains only whitespaces. Make it empty or write something!");
 
     for(var w in MainMenuRouter().getActiveMainRoute().getWindows()) {
-      if(w is! LexiconVariableWindow && (keyword == "add_variable" || keyword == w.route)) return Result.failure("'$keyword' is a restricted keyword used that would cause errors.");
+      if(w is! LexiconVariableWindow && (keyword == "add_variable" || keyword == w.route)) return Result.failure("'$keyword' is a restricted keyword used by the application, using it will cause errors!");
     }
 
     for(var event in _events) {

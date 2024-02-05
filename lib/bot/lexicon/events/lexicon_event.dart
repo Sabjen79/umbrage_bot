@@ -16,6 +16,7 @@ abstract class LexiconEvent {
   final List<String> _phrases = [];
   final List<LexiconVariable> _variables = [];
   List<int> _phrasesRandomIndexes = [];
+  int _cooldownEnd = 0;
 
   LexiconEvent(this._lexicon, this._filename, this._name, this._description) {
     loadSettingsFromFile();
@@ -30,6 +31,18 @@ abstract class LexiconEvent {
   List<String> get phrases => _phrases;
   List<LexiconVariable> get variables => _variables;
 
+  bool get onCooldown => DateTime.now().millisecondsSinceEpoch < _cooldownEnd;
+  int get cooldownLeft => !onCooldown ? 0 : _cooldownEnd - DateTime.now().millisecondsSinceEpoch;
+  bool get canRun => isEnabled && !onCooldown && Random().nextDouble() <= chance;
+
+  void startCooldown() {
+    _cooldownEnd = DateTime.now().millisecondsSinceEpoch + cooldown*1000;
+  }
+
+  void endCooldown() {
+    _cooldownEnd = 0;
+  }
+
   void addVariables(List<LexiconVariable> v) { _variables.addAll(v); }
 
   String getPhrase() {
@@ -39,7 +52,7 @@ abstract class LexiconEvent {
       _phrasesRandomIndexes = List<int>.generate(_phrases.length, (index) => index)..shuffle();
     }
 
-    String phrase = _phrases[_phrasesRandomIndexes.removeAt(0)];
+    String phrase = _phrases[_phrasesRandomIndexes.removeAt(0)].replaceAll("\\n", Platform.lineTerminator);
 
     for(var v in _variables) {
       phrase = phrase.replaceAll("\$${v.keyword}\$", v.getValue());
@@ -53,7 +66,7 @@ abstract class LexiconEvent {
         if(usedValues.contains(value) && usedValues.length != v.words.length) continue;
         usedValues.add(value);
 
-        phrase = phrase.replaceFirst(v.keyword, value);
+        phrase = phrase.replaceFirst("\$${v.keyword}\$", value);
       }
     }
 
