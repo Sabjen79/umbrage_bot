@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:rich_text_controller/rich_text_controller.dart';
+import 'package:umbrage_bot/bot/conversation/conversation_delimiters.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
+import 'package:umbrage_bot/ui/discord_theme.dart';
 
 class LexiconEventPhraseField extends StatefulWidget {
   final List<LexiconVariable> variables;
+  final List<ConversationDelimiters> delimiters;
   final String initialText;
   final Function(String) onChanged;
   final VoidCallback onDelete;
   
   const LexiconEventPhraseField({
     required this.variables,
+    required this.delimiters,
     required this.onChanged,
     required this.onDelete,
     this.initialText = "",
@@ -35,10 +39,28 @@ class _LexiconEventPhraseFieldState extends State<LexiconEventPhraseField> with 
       matches[RegExp("\\\$${v.keyword}\\\$")] = TextStyle(color: v.color, fontWeight: FontWeight.w500);
     }
 
+    var style = const TextStyle(color: DiscordTheme.white, fontWeight: FontWeight.w500, shadows: [Shadow(color: DiscordTheme.white, blurRadius: 3)]);
+
+    for(var d in widget.delimiters) {
+      switch(d) {
+        case ConversationDelimiters.chain:
+          matches[RegExp(r"==>")] = style;
+          break;
+        case ConversationDelimiters.wait:
+          matches[RegExp(r"==\?")] = style;
+          break;
+        case ConversationDelimiters.reaction:
+          matches[RegExp(r"h([^\w\d\s]{2})".replaceAll("h", ConversationDelimiters.reaction.delimiter))] = style;
+          break;
+      } 
+        
+
+    }
+
     _textController = RichTextController(
       onMatch: (l) {},
       patternMatchMap: matches,
-      deleteOnBack: true,
+      deleteOnBack: false,
       text: widget.initialText
     );
 

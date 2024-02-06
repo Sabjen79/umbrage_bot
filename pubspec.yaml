@@ -47,6 +47,7 @@ dependencies:
   provider: ^6.1.1
   rich_text_controller: ^1.4.2
   window_manager: ^0.3.8
+  nyxx_extensions: ^4.1.0
 
 dev_dependencies:
   flutter_test:

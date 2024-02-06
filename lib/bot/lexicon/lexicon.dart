@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:umbrage_bot/bot/conversation/conversation_delimiters.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_mention_event.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_custom_variable.dart';
@@ -127,6 +128,10 @@ class Lexicon with ChangeNotifier {
 
     for(var w in MainMenuRouter().getActiveMainRoute().getWindows()) {
       if(w is! LexiconVariableWindow && (keyword == "add_variable" || keyword == w.route)) return Result.failure("'$keyword' is a restricted keyword used by the application, using it will cause errors!");
+    }
+
+    for(var d in ConversationDelimiters.values) {
+      if(d.delimiter == keyword) return Result.failure("'$keyword' is a restricted keyword used by the application, using it will cause errors!");
     }
 
     for(var event in _events) {

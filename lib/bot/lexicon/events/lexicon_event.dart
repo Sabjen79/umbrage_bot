@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:umbrage_bot/bot/conversation/conversation_delimiters.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
 
-abstract class LexiconEvent {
+abstract class LexiconEvent<T> {
   final Lexicon _lexicon;
   final String _filename;
   final String _name;
@@ -15,12 +16,25 @@ abstract class LexiconEvent {
 
   final List<String> _phrases = [];
   final List<LexiconVariable> _variables = [];
+  final List<ConversationDelimiters> _delimiters = [];
+  final Stream<T> _stream;
   List<int> _phrasesRandomIndexes = [];
   int _cooldownEnd = 0;
 
-  LexiconEvent(this._lexicon, this._filename, this._name, this._description) {
+  LexiconEvent(this._lexicon, this._stream, this._filename, this._name, this._description) {
     loadSettingsFromFile();
+
+    _stream.listen((event) async {
+      if(!await validateEvent(event) || !canRun) return;
+
+      _cooldownEnd = DateTime.now().millisecondsSinceEpoch + cooldown*1000;
+
+      runEvent(event);
+    });
   }
+
+  Future<bool> validateEvent(T event);
+  Future<void> runEvent(T event);
 
   String get filename => _filename;
   String get name => _name;
@@ -30,20 +44,15 @@ abstract class LexiconEvent {
   double get chance => _chance;
   List<String> get phrases => _phrases;
   List<LexiconVariable> get variables => _variables;
+  List<ConversationDelimiters> get delimiters => _delimiters;
 
   bool get onCooldown => DateTime.now().millisecondsSinceEpoch < _cooldownEnd;
   int get cooldownLeft => !onCooldown ? 0 : _cooldownEnd - DateTime.now().millisecondsSinceEpoch;
   bool get canRun => isEnabled && !onCooldown && Random().nextDouble() <= chance;
 
-  void startCooldown() {
-    _cooldownEnd = DateTime.now().millisecondsSinceEpoch + cooldown*1000;
-  }
-
   void endCooldown() {
     _cooldownEnd = 0;
   }
-
-  void addVariables(List<LexiconVariable> v) { _variables.addAll(v); }
 
   String getPhrase() {
     if(_phrases.isEmpty) return "";

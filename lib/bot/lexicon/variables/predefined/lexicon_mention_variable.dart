@@ -7,6 +7,8 @@ class LexiconMentionVariable extends LexiconVariable with LexiconVariableSeconda
     
   @override
   String getValue() {
-    return "<@${getSecondaryValue().id.toString()}>";
+    if(getSecondaryValue() == null) return "";
+    
+    return "<@${getSecondaryValue()!.id.toString()}>";
   }
 }

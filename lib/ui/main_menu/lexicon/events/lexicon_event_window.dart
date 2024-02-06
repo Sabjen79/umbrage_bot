@@ -87,16 +87,37 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
   List<Widget> _getVariableList() {
     var list = <Widget>[];
 
+    list.add(_getVariableListDivider("MESSAGE DELIMITERS"));
+
+    for(var d in widget.event.delimiters) {
+      list.add(LexiconEventVariableButton(
+        keyword: d.delimiter,
+        name: d.name,
+        description: d.description,
+        color: DiscordTheme.white2
+      ));
+    }
+
     list.add(_getVariableListDivider("EVENT VARIABLES"));
 
     for(var v in widget.event.variables) {
-      list.add(LexiconEventVariableButton(variable: v));
+      list.add(LexiconEventVariableButton(
+        keyword: "\$${v.keyword}\$",
+        name: v.name,
+        description: v.description,
+        color: v.color
+      ));
     }
 
     list.add(_getVariableListDivider("CUSTOM VARIABLES"));
 
     for(var v in Bot().lexicon.customVariables) {
-      list.add(LexiconEventVariableButton(variable: v));
+      list.add(LexiconEventVariableButton(
+        keyword: "\$${v.keyword}\$",
+        name: v.name,
+        description: v.description,
+        color: v.color
+      ));
     }
 
     return list;
@@ -255,6 +276,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
         LexiconEventPhraseField(
           initialText: _phrases[i],
           variables: _variables,
+          delimiters: widget.event.delimiters,
           onChanged: (value) {
             if(value == _phrases[i]) return;
 

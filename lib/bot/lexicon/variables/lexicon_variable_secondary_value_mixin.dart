@@ -1,9 +1,9 @@
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 
 mixin LexiconVariableSecondaryValueMixin<T> on LexiconVariable {
-  late T _secondaryValue;
+  T? _secondaryValue;
 
-  T getSecondaryValue() {
+  T? getSecondaryValue() {
     return _secondaryValue;
   }
 

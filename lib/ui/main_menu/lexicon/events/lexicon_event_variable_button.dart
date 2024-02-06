@@ -1,16 +1,23 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar.dart';
 
 class LexiconEventVariableButton extends StatefulWidget {
-  final LexiconVariable variable;
+  final String keyword;
+  final String name;
+  final String description;
+  final Color color;
 
-  const LexiconEventVariableButton({required this.variable, super.key});
+  const LexiconEventVariableButton({
+    required this.keyword,
+    required this.name,
+    required this.description,
+    required this.color,
+    super.key
+  });
 
   @override
   State<LexiconEventVariableButton> createState() => _LexiconEventVariableButtonState();
@@ -84,7 +91,7 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
         });
       },
       onTap: () async {
-        await Clipboard.setData(ClipboardData(text: "\$${widget.variable.keyword}\$ "));
+        await Clipboard.setData(ClipboardData(text: widget.keyword));
         
         _tapController..reset()..forward();
       },
@@ -108,7 +115,7 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                   width: 22,
                   height: 22,
                   decoration: BoxDecoration(
-                    color: widget.variable.color,
+                    color: widget.color,
                     borderRadius: BorderRadius.circular(22)
                   ),
                   child: Transform.rotate(
@@ -137,17 +144,17 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.variable.name, 
+                        widget.name, 
                         style: TextStyle(
                           overflow: TextOverflow.ellipsis,
-                          color: widget.variable.color,
+                          color: widget.color,
                           fontSize: 12,
                           fontWeight: FontWeight.w500
                         ),
                       ),
                       
                       Text(
-                        "\$${widget.variable.keyword}\$", 
+                        widget.keyword, 
                         style: const TextStyle(
                           overflow: TextOverflow.ellipsis,
                           color: DiscordTheme.lightGray,
@@ -177,7 +184,7 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                     child: Text(
-                      widget.variable.description.isNotEmpty ? widget.variable.description : "No Description.",
+                      widget.description.isNotEmpty ? widget.description : "No Description.",
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 12
