@@ -1,13 +1,15 @@
 import 'package:nyxx/nyxx.dart';
+import 'package:umbrage_bot/bot/components/event_handler.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
 import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
 
 class Bot {
-  late NyxxGateway client; // Discord Client
-  late User user;
+  late final NyxxGateway client; // Discord Client
+  late final User user;
   late final Lexicon lexicon;
+  late final EventHandler eventHandler;
   //final ProfilePictureChanger _pfpChanger = ProfilePictureChanger();
 
   // Singleton
@@ -26,6 +28,7 @@ class Bot {
       profile.getToken(),
       GatewayIntents.all,
       options: GatewayClientOptions(
+        loggerName: 'Umbrage',
         plugins: [
           logging, 
           cliIntegration
@@ -44,6 +47,8 @@ class Bot {
 
     //The bot is set on 'Do Not Disturb' and cannot be changed because he is too exalted to be perturbed by commoners.
     _instance.client.updatePresence(PresenceBuilder(status: CurrentUserStatus.dnd, isAfk: false));
+
+    _instance.eventHandler = EventHandler(_instance.client);
   }
 
   //==============================================================================

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
+import 'package:umbrage_bot/bot/conversation/conversation_delimiters.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
@@ -89,7 +90,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
 
     list.add(_getVariableListDivider("MESSAGE DELIMITERS"));
 
-    for(var d in widget.event.delimiters) {
+    for(var d in ConversationDelimiters.values) {
       list.add(LexiconEventVariableButton(
         keyword: d.delimiter,
         name: d.name,
@@ -276,7 +277,6 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
         LexiconEventPhraseField(
           initialText: _phrases[i],
           variables: _variables,
-          delimiters: widget.event.delimiters,
           onChanged: (value) {
             if(value == _phrases[i]) return;
 

@@ -8,14 +8,12 @@ import 'package:umbrage_bot/ui/discord_theme.dart';
 
 class LexiconEventPhraseField extends StatefulWidget {
   final List<LexiconVariable> variables;
-  final List<ConversationDelimiters> delimiters;
   final String initialText;
   final Function(String) onChanged;
   final VoidCallback onDelete;
   
   const LexiconEventPhraseField({
     required this.variables,
-    required this.delimiters,
     required this.onChanged,
     required this.onDelete,
     this.initialText = "",
@@ -41,7 +39,7 @@ class _LexiconEventPhraseFieldState extends State<LexiconEventPhraseField> with 
 
     var style = const TextStyle(color: DiscordTheme.white, fontWeight: FontWeight.w500, shadows: [Shadow(color: DiscordTheme.white, blurRadius: 3)]);
 
-    for(var d in widget.delimiters) {
+    for(var d in ConversationDelimiters.values) {
       switch(d) {
         case ConversationDelimiters.chain:
           matches[RegExp(r"==>")] = style;

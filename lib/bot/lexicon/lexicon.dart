@@ -1,9 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:nyxx/nyxx.dart';
+import 'package:umbrage_bot/bot/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/conversation/conversation_delimiters.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_everyone_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_mention_event.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_voice_join_event.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_voice_leave_event.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_custom_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
 import 'package:umbrage_bot/bot/util/result.dart';
@@ -11,6 +16,7 @@ import 'package:umbrage_bot/ui/main_menu/lexicon/custom_variables/lexicon_variab
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 
 class Lexicon with ChangeNotifier {
+  final Map<Snowflake, Conversation?> conversations = {}; // One conversation per text channel!
   final List<LexiconCustomVariable> _customVariables = [];
   final List<LexiconEvent> _events = [];
 
@@ -19,7 +25,10 @@ class Lexicon with ChangeNotifier {
     final BotFiles files = BotFiles();
 
     _events.addAll([
-      LexiconMentionEvent(this)
+      LexiconMentionEvent(this),
+      LexiconEveryoneEvent(this),
+      LexiconVoiceJoinEvent(this),
+      LexiconVoiceLeaveEvent(this)
     ]);
 
     for(var file in files.getDir("lexicon/variables").listSync()) {
@@ -31,6 +40,21 @@ class Lexicon with ChangeNotifier {
     }
   }
   //
+
+  Future<bool> handleEvent(DispatchEvent dispatchEvent) async {
+    for(var event in _events) {
+      if(await event.handleEvent(dispatchEvent)) {
+        return true;
+      }
+    }
+
+    if(dispatchEvent is MessageCreateEvent) {
+      conversations[dispatchEvent.message.channelId]?.advance(dispatchEvent);
+      return true;
+    }
+
+    return false;
+  }
 
   // Events
   List<LexiconEvent> get events => _events;
