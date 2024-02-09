@@ -42,7 +42,7 @@ class Conversation {
 
     String message = messages.removeAt(0).trim();
 
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(Duration(milliseconds: Bot().config.randomReactionSpeed));
     for(var content in message.split(ConversationDelimiters.chain.delimiter)) {
       await Future.delayed(const Duration(milliseconds: 100));
 
@@ -62,7 +62,7 @@ class Conversation {
       
       if(content.trim().isNotEmpty) {
         await channel.triggerTyping();
-        await Future.delayed(Duration(milliseconds: (content.length / 30 * 1000).toInt()));
+        await Future.delayed(Duration(milliseconds: (content.length / Bot().config.typingSpeed * 1000).toInt()));
         await channel.sendMessage(MessageBuilder(
           content: content,
           replyId: isReply ? replyMessage?.id : null

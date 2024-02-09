@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:umbrage_bot/ui/main_menu/bot_profile/bot_profile_window.dart';
-import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar.dart';
 import 'package:umbrage_bot/ui/main_menu/side_bar/side_bar.dart';
@@ -22,17 +20,12 @@ class MainMenu extends StatefulWidget {
 class _MainMenuState extends State<MainMenu> {
   //final MainMenuWindow timerWindow = MainMenuWindow("Timers", Symbols.timer); // TO-DO
   //final MainMenuWindow musicWindow = MainMenuWindow("Music", Symbols.music_note); // TO-DO
-  //final MainMenuWindow settingsWindow = MainMenuWindow("Settings", Symbols.settings); // TO-DO
 
   @override
   void initState() {
     super.initState();
 
-    var router = MainMenuRouter();
-    router.addRoute(BotProfileWindow());
-    router.addRoute(LexiconWindow());
-
-    router.onRouteChanged(_onRouteChanged);
+    MainMenuRouter().onRouteChanged(_onRouteChanged);
 
     WindowCloseHandler.init(context);
   }
