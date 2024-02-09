@@ -43,7 +43,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
   late TextEditingController _cooldownControllerHour, _cooldownControllerMinutes, _cooldownControllerSeconds;
 
   void init() {
-    _enabled = widget.event.isEnabled;
+    _enabled = widget.event.enabled;
     _chance = widget.event.chance;
     _cooldown = widget.event.cooldown;
     _phrases = widget.event.phrases.toList();

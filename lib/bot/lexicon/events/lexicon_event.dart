@@ -5,15 +5,16 @@ import 'package:umbrage_bot/bot/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
+import 'package:umbrage_bot/bot/util/json_serializable.dart';
 
-abstract class LexiconEvent<T extends DispatchEvent> {
+abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   final Lexicon _lexicon;
   final String _filename;
   final String _name;
   final String _description;
-  bool _enabled = false;
-  int _cooldown = 600;
-  double _chance = 0.5;
+  bool enabled = false;
+  int cooldown = 600;
+  double chance = 0.5;
 
   final List<String> _phrases = [];
   final List<LexiconVariable> _variables = [];
@@ -21,8 +22,25 @@ abstract class LexiconEvent<T extends DispatchEvent> {
   int _cooldownEnd = 0;
 
   LexiconEvent(this._lexicon, this._filename, this._name, this._description) {
-    loadSettingsFromFile();
+    var json = loadFromJson();
+    if(json == null) return;
+
+    enabled = json['enabled'] as bool;
+    cooldown = json['cooldown'] as int;
+    chance = json['chance'] as double;
+    _phrases..clear()..addAll(List<String>.from(json['phrases']));
   }
+
+  @override
+  String get jsonFilepath => "${BotFiles().getMainDir().path}/lexicon/events/$filename.json";
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'enabled': enabled,
+    'cooldown': cooldown,
+    'chance': chance,
+    'phrases': _phrases
+  };
 
   Future<bool> handleEvent(DispatchEvent event) async {
     if(event is! T || !await validateEvent(event) || !canRun) return false;
@@ -42,15 +60,12 @@ abstract class LexiconEvent<T extends DispatchEvent> {
   String get filename => _filename;
   String get name => _name;
   String get description => _description;
-  bool get isEnabled => _enabled;
-  int get cooldown => _cooldown;
-  double get chance => _chance;
   List<String> get phrases => _phrases;
   List<LexiconVariable> get variables => _variables;
 
   bool get onCooldown => DateTime.now().millisecondsSinceEpoch < _cooldownEnd;
   int get cooldownLeft => !onCooldown ? 0 : _cooldownEnd - DateTime.now().millisecondsSinceEpoch;
-  bool get canRun => isEnabled && !onCooldown && Random().nextDouble() <= chance;
+  bool get canRun => enabled && !onCooldown && Random().nextDouble() <= chance;
 
   void endCooldown() {
     _cooldownEnd = 0;
@@ -82,30 +97,5 @@ abstract class LexiconEvent<T extends DispatchEvent> {
     }
 
     return phrase;
-  }
-
-  void loadSettingsFromFile() {
-    File f = File("${BotFiles().getDir("lexicon/events").path}/$filename.txt");
-
-    if(!f.existsSync()) {
-      String newLine = Platform.lineTerminator;
-
-      f.writeAsStringSync("${_enabled.toString()}$newLine${_chance.toString()}$newLine${_cooldown.toString()}$newLine");
-      return;
-    }
-
-    try {
-      List<String> fileLines = f.readAsLinesSync();
-
-      _enabled = bool.parse(fileLines[0]);
-      _chance = double.parse(fileLines[1]);
-      _cooldown = int.parse(fileLines[2]);
-      _phrases..clear()..addAll(fileLines.sublist(3));
-      _phrasesRandomIndexes = List<int>.generate(_phrases.length, (index) => index)..shuffle();
-
-    } catch (e) {
-      // Yeah, very insightful description, something is wrong WITH YOU, not with the file
-      throw Exception("Something is wrong with the file: $filename.txt"); 
-    }
   }
 }

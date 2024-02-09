@@ -33,9 +33,7 @@ class Lexicon with ChangeNotifier {
 
     for(var file in files.getDir("lexicon/variables").listSync()) {
       _customVariables.add(
-        _loadLexiconVariable(
-          file.path.split(RegExp(r'[/\\]+')).last // Splits path by '/' and '\'
-        )
+        LexiconCustomVariable.fromJson(file.path.split(RegExp(r'[/\\]+')).last) // Splits path by '/' and '\'
       );
     }
   }
@@ -74,28 +72,20 @@ class Lexicon with ChangeNotifier {
   Result<LexiconEvent> updateEvent(String filename, bool enabled, double chance, int cooldown, List<String> phrases) {
     if(enabled && chance == 0) return Result.failure("Chance is 0. Disable the event instead.");
 
-    File f = File("${BotFiles().getDir("lexicon/events").path}/$filename.txt");
-
-    String newLine = Platform.lineTerminator;
-    
-    var buffer = StringBuffer("");
-
-    buffer
-      ..write("${enabled.toString()}$newLine")
-      ..write("${chance.toString()}$newLine")
-      ..write("${cooldown.toString()}$newLine");
-
     for(var p in phrases) {
-      if(p.replaceAll(" ", " ").isEmpty) return Result.failure("One or more phrases are empty.");
-      buffer.write("$p$newLine");
+      if(p.replaceAll(" ", "").isEmpty) return Result.failure("One or more phrases are empty.");
     }
 
-    f.writeAsStringSync(buffer.toString());
+    for(var event in _events) {
+      if(event.filename == filename) {
+        event.enabled = enabled;
+        event.cooldown = cooldown;
+        event.chance = chance;
+        event.phrases..clear()..addAll(phrases);
 
-    for(var e in _events) {
-      if(e.filename == filename) {
-        e.loadSettingsFromFile();
-        return Result.success(e);
+        event.saveToJson();
+
+        return Result.success(event);
       }
     }
 
@@ -110,7 +100,7 @@ class Lexicon with ChangeNotifier {
 
     if(result.isSuccess) {
       _customVariables.add(result.value!);
-      _saveLexiconVariable(result.value!);
+      result.value!.saveToJson();
       notifyListeners();
     }
 
@@ -124,8 +114,8 @@ class Lexicon with ChangeNotifier {
       int index = _customVariables.indexOf(oldVariable);
       _customVariables[index] = result.value!;
 
-      BotFiles().deleteFile("lexicon/variables/${oldVariable.keyword}.txt");
-      _saveLexiconVariable(result.value!);
+      BotFiles().deleteFile("lexicon/variables/${oldVariable.keyword}.json");
+      result.value!.saveToJson();
 
       notifyListeners();
     }
@@ -136,13 +126,9 @@ class Lexicon with ChangeNotifier {
   void deleteCustomVariable(LexiconCustomVariable variable) {
     if(!_customVariables.remove(variable)) return;
 
-    BotFiles().deleteFile("lexicon/variables/${variable.keyword}.txt");
+    BotFiles().deleteFile("lexicon/variables/${variable.keyword}.json");
 
     notifyListeners();
-  }
-
-  void _saveLexiconVariable(LexiconCustomVariable v) {
-    _lexiconSaveToFile([v.name, v.description, v.colorInt.toString(), ...v.words], "variables", v.keyword);
   }
 
   Result<LexiconCustomVariable> _createVariable(String keyword, String name, String description, int color, List<String> words, [LexiconCustomVariable? oldVariable]) {
@@ -175,42 +161,5 @@ class Lexicon with ChangeNotifier {
 
     return Result.success(LexiconCustomVariable(keyword, name, description, color, words));
   }
-
-  LexiconCustomVariable _loadLexiconVariable(String filename) {
-    var strings = _lexiconLoadFromFile("variables", filename);
-
-    return LexiconCustomVariable(filename.split('.')[0], strings[0], strings[1], int.parse(strings[2]), strings.sublist(3));
-  }
   //
-
-  void _lexiconSaveToFile(List<String> strings, String folder, String filename) {
-    File f = File("${BotFiles().getDir("lexicon/$folder").path}/$filename.txt");
-
-    String newLine = Platform.lineTerminator;
-    
-    var buffer = StringBuffer("");
-
-    for(var s in strings) {
-      buffer.write("$s$newLine");
-    }
-
-    f.writeAsStringSync(buffer.toString());
-  }
-
-  List<String> _lexiconLoadFromFile(String folder, String filename) {
-    File f = File("${BotFiles().getDir("lexicon/$folder").path}/$filename");
-
-    if(!f.existsSync()) {
-      _lexiconSaveToFile([], folder, filename);
-      return [];
-    }
-
-    List<String> strings = [];
-
-    for(var line in f.readAsLinesSync()) {
-      strings.add(line);
-    }
-
-    return strings;
-  }
 }
