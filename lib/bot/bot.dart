@@ -47,7 +47,7 @@ class Bot {
     // Initializes BotFiles
     await BotFiles().initialize();
     
-    _instance.config = BotConfiguration(_instance);
+    _instance.config = BotConfiguration(await _instance.client.listGuilds());
     _instance.lexicon = Lexicon();
     _instance.eventHandler = EventHandler(_instance.client);
   }

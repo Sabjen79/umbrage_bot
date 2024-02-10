@@ -23,12 +23,11 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
 
   LexiconEvent(this._lexicon, this._filename, this._name, this._description) {
     var json = loadFromJson();
-    if(json == null) return;
 
-    enabled = json['enabled'] as bool;
-    cooldown = json['cooldown'] as int;
-    chance = json['chance'] as double;
-    _phrases..clear()..addAll(List<String>.from(json['phrases']));
+    enabled = (json['enabled'] ?? false) as bool;
+    cooldown = (json['cooldown'] ?? 600) as int;
+    chance = (json['chance'] ?? 0.5) as double;
+    _phrases..clear()..addAll(List<String>.from(json['phrases'] ?? []));
   }
 
   @override

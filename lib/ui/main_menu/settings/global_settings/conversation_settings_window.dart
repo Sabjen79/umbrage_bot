@@ -7,9 +7,9 @@ import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 import 'package:umbrage_bot/ui/main_menu/settings/settings_row.dart';
 
 class ConversationSettingsWindow extends MainWindow {
-  ConversationSettingsWindow({super.key}) : super(
+  const ConversationSettingsWindow({super.key}) : super(
     route: "conversation",
-    name: "Conversation Settings",
+    name: "Conversation",
     sideBarIcon: Symbols.quick_phrases
   );
 

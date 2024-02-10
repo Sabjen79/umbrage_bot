@@ -8,7 +8,7 @@ class SettingsWindow extends MainRoute {
   SettingsWindow() : super("settings", "Settings", Symbols.settings);
 
   Future<void> initWindows() async {
-    addWindow(ConversationSettingsWindow());
+    addWindow(const ConversationSettingsWindow());
 
     for(var guild in await Bot().client.listGuilds()) {
       addWindow(GuildSettingsWindow(await guild.get()));

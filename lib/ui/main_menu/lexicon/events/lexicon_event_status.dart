@@ -52,7 +52,7 @@ class _LexiconEventStatusState extends State<LexiconEventStatus> {
 
   @override
   Widget build(BuildContext context) {
-    _color = !widget.event.enabled ? const Color(0xFFCC0A0A) : widget.event.onCooldown ? Color(0xFFe3ce0d) : const Color(0xFF13AA08);
+    _color = !widget.event.enabled ? const Color(0xFFCC0A0A) : widget.event.onCooldown ? const Color(0xFFe3ce0d) : const Color(0xFF13AA08);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
