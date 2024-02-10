@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 
 mixin SettingsRow {
-  List<Widget> settingsRow({required String name, required String description, required Widget child}) {
+  List<Widget> settingsRow({required String name, required String description, required Widget child, bool first = false}) {
     return [
-      Container(
+      first ? Container(
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
         width: double.infinity, 
         height: 1, 
         color: DiscordTheme.gray
-      ),
+      ) : Container(),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         height: 70,
@@ -49,6 +49,12 @@ mixin SettingsRow {
             )
           ],
         )
+      ),
+      Container(
+        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
+        width: double.infinity, 
+        height: 1, 
+        color: DiscordTheme.gray
       ),
     ];
   }

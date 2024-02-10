@@ -15,7 +15,7 @@ class GuildSettingsWindow extends MainWindow {
   GuildSettingsWindow(this.guild, {super.key}) : super(
     route: guild.id.toString(),
     name: guild.name,
-    sideBarIcon: Symbols.dns,
+    sideBarIcon: Symbols.groups,
     category: "GUILDS"
   );
   
@@ -89,8 +89,9 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       children: [
         ...settingsRow(
+          first: true,
           name: "Music Channel",
-          description: "The text channel where users can queue music",
+          description: "The text channel where users can queue music\nIf set to 'No Music Channel', music will be disabled for that guild",
           child: Container(
             width: 200,
             height: 40,
@@ -123,7 +124,7 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
 
         ...settingsRow(
           name: "Restrict Music Channel",
-          description: "If enabled, users can't write messages in the music channel, they can only queue music commands.",
+          description: "If enabled, users can't write messages in the music channel, they can only queue music commands",
           child: SimpleSwitch(
             size: 45,
             value: _restrictMusicChannel,

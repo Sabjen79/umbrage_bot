@@ -77,7 +77,7 @@ class _SimpleDiscordButtonState extends State<SimpleDiscordButton> {
               softWrap: false,
               style: const TextStyle(
                 color: DiscordTheme.white2,
-                fontSize: 11
+                fontSize: 11,
               )
             ),
         )

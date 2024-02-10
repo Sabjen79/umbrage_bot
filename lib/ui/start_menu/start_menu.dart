@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
 import 'package:umbrage_bot/ui/main_menu/bot_profile/bot_profile_window.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_window.dart';
 import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
+import 'package:umbrage_bot/ui/main_menu/music/music_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 import 'package:umbrage_bot/ui/main_menu/settings/settings_window.dart';
 import 'package:umbrage_bot/ui/start_menu/add_profile.dart';
@@ -45,14 +47,16 @@ class _StartMenuState extends State<StartMenu> {
     });
 
     Bot.create(profile).then((_) async {
+      List<Guild> guilds = [];
+      for(var pg in await Bot().client.listGuilds()) {
+        guilds.add(await pg.get());
+      }
 
       var router = MainMenuRouter();
       router.addRoute(BotProfileWindow());
+      router.addRoute(MusicWindow(guilds));
       router.addRoute(LexiconWindow());
-      
-      var settingsWindow = SettingsWindow();
-      await settingsWindow.initWindows();
-      router.addRoute(settingsWindow);
+      router.addRoute(SettingsWindow(guilds));
 
     }).then((_) {
       Navigator.pushReplacement(

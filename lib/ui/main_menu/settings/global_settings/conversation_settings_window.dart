@@ -62,8 +62,9 @@ class _ConversationSettingsWindowState extends State<ConversationSettingsWindow>
       children: [
 
         ...settingsRow(
+          first: true,
           name: "Typing Speed",
-          description: "The CPS (characters per second) that the bot will simulate when writing messages from the lexicon.",
+          description: "The CPS (characters per second) that the bot will simulate when writing messages from the lexicon",
           child: Slider(
             divisions: 12,
             min: 20,

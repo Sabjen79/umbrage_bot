@@ -8,7 +8,7 @@ class MainMenu extends StatefulWidget {
   static double getMainWindowWidth(BuildContext context) {
     return MediaQuery.of(context).size.width - 
             SideBar.size - 
-            (MainMenuRouter().getActiveMainRoute().getWindowCount() > 1 ? SecondarySideBar.size : 0);
+            (MainMenuRouter().getActiveMainRoute().showSidebar ? SecondarySideBar.size : 0);
   }
 
   const MainMenu({super.key});
@@ -42,7 +42,7 @@ class _MainMenuState extends State<MainMenu> {
   }
 
   bool _shouldDrawSecondarySideBar() {
-    return MainMenuRouter().getActiveMainRoute().getWindowCount() > 1;
+    return MainMenuRouter().getActiveMainRoute().showSidebar;
   }
 
   @override

@@ -5,10 +5,11 @@ abstract class MainRoute {
   final String routeName;
   final String name;
   final IconData? icon;
+  final bool showSidebar;
   final Map<String, MainWindow> _windows = {}; // key is route name
   String _activeSubRoute = "";
 
-  MainRoute(this.routeName, this.name, this.icon);
+  MainRoute(this.routeName, this.name, this.icon, [this.showSidebar = true]);
 
   MainWindow? getActiveWindow() => _windows[_activeSubRoute];
   String getActiveRoute() => _activeSubRoute;
