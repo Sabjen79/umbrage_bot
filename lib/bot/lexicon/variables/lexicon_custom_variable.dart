@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
-import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
+import 'package:umbrage_bot/bot/util/bot_files.dart';
 import 'package:umbrage_bot/bot/util/json_serializable.dart';
 
 class LexiconCustomVariable extends LexiconVariable with JsonSerializable {

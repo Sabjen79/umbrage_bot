@@ -4,7 +4,7 @@ import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
-import 'package:umbrage_bot/bot/util/bot_files/bot_files.dart';
+import 'package:umbrage_bot/bot/util/bot_files.dart';
 import 'package:umbrage_bot/bot/util/json_serializable.dart';
 
 abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {

@@ -22,6 +22,8 @@ class EventHandler {
     var user = (await event.member!.get()).user!;
     if(user == Bot().user) return;
 
+    if(event.guildId != null && Bot().musicManager[event.guildId!].handleEvent(event)) return;
+
     Bot().lexicon.handleEvent(event);
   }
 
@@ -36,6 +38,7 @@ class EventHandler {
 }
 
 // The field oldState is the same as state in VoiceStateUpdateEvent, so it needs to be manually created
+// TODO: Find a fix for a more elegant solution
 class VoiceStateUpdateEventFixed extends VoiceStateUpdateEvent { 
   VoiceStateUpdateEventFixed({required super.gateway, required super.oldState, required super.state});
 }
