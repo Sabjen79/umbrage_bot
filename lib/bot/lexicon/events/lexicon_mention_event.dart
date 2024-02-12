@@ -20,9 +20,10 @@ class LexiconMentionEvent extends LexiconEvent<MessageCreateEvent> {
   @override
   Future<bool> validateEvent(MessageCreateEvent event) async {
     var user = (await event.member!.get()).user!;
-    if(!event.message.mentions.contains(Bot().user)) return false;
-      
     mentionVariable.setSecondaryValue(user);
+
+    if(!event.message.mentions.contains(Bot().user) &&
+     !event.message.content.toLowerCase().contains(Bot().user.username.toLowerCase())) return false;
 
     return true;
   }

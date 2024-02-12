@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_lavalink/nyxx_lavalink.dart' as lavalink;
 import 'package:umbrage_bot/bot/bot.dart';
@@ -7,14 +5,20 @@ import 'package:umbrage_bot/bot/voice/guild_music_manager.dart';
 
 class GuildVoiceManager {
   final PartialGuild guild;
+  late final Snowflake? afk; // To stay away from this
   final GuildMusicManager music;
 
-  GuildVoiceManager(this.guild) : music = GuildMusicManager(guild);
+  GuildVoiceManager(this.guild) : music = GuildMusicManager(guild) {
+    guild.get().then((value) => afk = value.afkChannelId);
+    Future.delayed(const Duration(seconds: 3)).then((value) {
+      _autoConnect(guild.voiceStates[Bot().user.id]);
+    });
+  }
 
   void handleEvent(VoiceStateUpdateEvent event) async {
-    var botState = event.state.guild!.voiceStates[Bot().user.id];
+    var botState = guild.voiceStates[Bot().user.id];
 
-    if(Bot().config.autoConnectVoice) _autoConnect(botState);
+    _autoConnect(botState);
   }
 
   void connectTo(GuildVoiceChannel vc) async {
@@ -36,20 +40,39 @@ class GuildVoiceManager {
   }
 
   void _autoConnect(VoiceState? botState) async {
-    // TODO: Better calculation
+    if(!Bot().config.autoConnectVoice) return;
+
     Map<PartialChannel, int> points = {};
+    var maxpoints = 0;
+    PartialChannel? bestChannel;
 
     for(var vs in guild.voiceStates.values) {
-      if(vs.userId != Bot().user.id && !vs.isDeafened && vs.channel != null) {
+      if(!vs.isDeafened && vs.channel != null && vs.channelId != afk) {
         points[vs.channel!] ??= 0;
-        points[vs.channel!] = points[vs.channel!]! + 1;
+        points[vs.channel!] = points[vs.channel!]! + (vs.user == Bot().user ? 1 : 2); // The bot will prefer to remain in his voice channel
+        
+        if(points[vs.channel!]! > maxpoints) {
+          maxpoints = points[vs.channel!]!;
+          bestChannel = vs.channel!;
+        }
       }
     }
 
-    if(points.isEmpty) {
-      if(Bot().config.autoConnectVoicePersist && botState != null) {
+    if(maxpoints < 2) {
+      if(Bot().config.autoConnectVoicePersist) {
+        var channelId = botState?.channelId;
+        if(channelId == null) {
+          final list = await guild.fetchChannels();
+          for(var c in list) {
+            if(c is GuildVoiceChannel) {
+              channelId = c.id;
+              break;
+            }
+          }
+        }
+
         Bot().client.updateVoiceState(guild.id, GatewayVoiceStateBuilder(
-          channelId: botState.channelId, 
+          channelId: channelId, 
           isMuted: true, 
           isDeafened: false
         ));
@@ -60,9 +83,7 @@ class GuildVoiceManager {
       return;
     }
 
-    final sorted = SplayTreeMap<PartialChannel, int>.from(points, (key1, key2) => points[key1]!.compareTo(points[key2]!));
-
-    final channel = await Bot().client.channels.fetch(sorted.keys.last.id) as GuildVoiceChannel; // Get the vc with the highest score
+    final channel = await Bot().client.channels.fetch(bestChannel!.id) as GuildVoiceChannel;
     
     connectTo(channel);
   }
