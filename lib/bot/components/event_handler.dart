@@ -20,9 +20,6 @@ class EventHandler {
         ));
       }
     });
-
-    
-    
   }
 
   void onMessageCreate(MessageCreateEvent event) async {

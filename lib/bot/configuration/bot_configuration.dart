@@ -16,6 +16,7 @@ class BotConfiguration with JsonSerializable {
   late String restrictMusicChannelMessage;
   late bool autoConnectVoice;
   late bool autoConnectVoicePersist;
+  late String invalidMusicCommandChannelMessage;
 
   BotConfiguration(List<PartialGuild> guilds) {
     for(var g in guilds) {
@@ -36,6 +37,7 @@ class BotConfiguration with JsonSerializable {
     restrictMusicChannelMessage = (json['restrictMusicChannelMessage'] ?? "You can only queue music here!") as String;
     autoConnectVoice = (json['autoConnectVoice'] ?? true) as bool;
     autoConnectVoicePersist = (json['autoConnectVoicePersist'] ?? false) as bool;
+    invalidMusicCommandChannelMessage = (json['invalidMusicCommandChannelMessage'] ?? "Music Commands can only be used in \$channel\$") as String;
   }
 
   @override
@@ -46,7 +48,8 @@ class BotConfiguration with JsonSerializable {
     'restrictMusicChannel': restrictMusicChannel,
     'restrictMusicChannelMessage': restrictMusicChannelMessage,
     'autoConnectVoice': autoConnectVoice,
-    'autoConnectVoicePersist': autoConnectVoicePersist
+    'autoConnectVoicePersist': autoConnectVoicePersist,
+    'invalidMusicCommandChannelMessage': invalidMusicCommandChannelMessage
   };
 
   @override

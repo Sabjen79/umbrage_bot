@@ -25,6 +25,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
   late TextEditingController _restrictMusicChannelTextController;
   late bool _autoConnectVoice;
   late bool _autoConnectVoicePersist;
+  late TextEditingController _invalidMusicCommandChannelMessageController;
 
   @override
   void initState() {
@@ -37,6 +38,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
     _restrictMusicChannelTextController = TextEditingController(text: config.restrictMusicChannelMessage);
     _autoConnectVoice = config.autoConnectVoice;
     _autoConnectVoicePersist = config.autoConnectVoicePersist;
+    _invalidMusicCommandChannelMessageController = TextEditingController(text: config.invalidMusicCommandChannelMessage);
   }
 
   void _showSaveChanges() {
@@ -51,6 +53,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
       config.restrictMusicChannelMessage = _restrictMusicChannelTextController.text;
       config.autoConnectVoice = _autoConnectVoice;
       config.autoConnectVoicePersist = _autoConnectVoicePersist;
+      config.invalidMusicCommandChannelMessage = _invalidMusicCommandChannelMessageController.text;
 
       config.saveToJson();
 
@@ -65,8 +68,11 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
       children: () {
         var list = <Widget>[];
 
+        list.add(titleRow("MUSIC", false));
+
         list.addAll(
           settingsRow(
+            first: true,
             name: "Restrict Music Channel",
             description: "If enabled, users can't write messages in the music channel, they can only queue music commands",
             child: SimpleSwitch(
@@ -100,6 +106,22 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
 
         list.addAll(
           settingsRow(
+            name: "Invalid Music Command Channel Message",
+            description: "The message that the bot will send when a user tries to queue a music command in a non-music channel.\nThe string '\$channel\$' is replaced by the mention of the music channel.",
+            child: TextField(
+              controller: _invalidMusicCommandChannelMessageController,
+              onChanged: (v) {
+                _showSaveChanges();
+              },
+            )
+          )
+        );
+
+        list.add(titleRow("AUTO-CONNECT"));
+
+        list.addAll(
+          settingsRow(
+            first: true,
             name: "Auto Connect to Voice Channels",
             description: "If enabled, the bot will automatically join or leave voice channels as he pleases.",
             child: SimpleSwitch(
@@ -119,7 +141,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
         if(_autoConnectVoice) {
           list.addAll(
             settingsRow(
-              name: "Persist Voice Channels",
+              name: "Solitude in Voice Channels",
               description: "If enabled, the bot will not leave voice channels when left alone and will mute himself to not talk by his own.",
               child: SimpleSwitch(
                 size: 45,

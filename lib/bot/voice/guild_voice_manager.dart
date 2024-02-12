@@ -1,7 +1,6 @@
 import 'package:nyxx/nyxx.dart';
-import 'package:nyxx_lavalink/nyxx_lavalink.dart' as lavalink;
 import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/bot/voice/guild_music_manager.dart';
+import 'package:umbrage_bot/bot/voice/music/guild_music_manager.dart';
 
 class GuildVoiceManager {
   final PartialGuild guild;
@@ -21,14 +20,12 @@ class GuildVoiceManager {
     _autoConnect(botState);
   }
 
-  void connectTo(GuildVoiceChannel vc) async {
+  void connectTo(Snowflake? id, [bool muted = false]) async {
     Bot().client.updateVoiceState(guild.id, GatewayVoiceStateBuilder(
-      channelId: vc.id, 
-      isMuted: false, 
+      channelId: id, 
+      isMuted: muted, 
       isDeafened: false
     ));
-
-    music.player ??= await vc.connectLavalink();
   }
 
   void disconnect() async {
@@ -71,11 +68,7 @@ class GuildVoiceManager {
           }
         }
 
-        Bot().client.updateVoiceState(guild.id, GatewayVoiceStateBuilder(
-          channelId: channelId, 
-          isMuted: true, 
-          isDeafened: false
-        ));
+        connectTo(channelId, true);
       } else {
         disconnect();
       }
@@ -85,6 +78,6 @@ class GuildVoiceManager {
 
     final channel = await Bot().client.channels.fetch(bestChannel!.id) as GuildVoiceChannel;
     
-    connectTo(channel);
+    connectTo(channel.id);
   }
 }

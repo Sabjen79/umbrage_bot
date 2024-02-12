@@ -2,6 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 
 mixin SettingsRow {
+  Widget titleRow(String text, [bool topPadding = true]) {
+    return Padding(
+      padding: EdgeInsets.only(left: 35, bottom: 5, top: topPadding ? 30 : 5),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 28,
+          color: DiscordTheme.white
+        ),
+      ),
+    );
+  }
+
   List<Widget> settingsRow({required String name, required String description, required Widget child, bool first = false}) {
     return [
       first ? Container(
