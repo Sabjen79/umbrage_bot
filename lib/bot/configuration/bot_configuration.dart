@@ -12,6 +12,11 @@ class BotConfiguration with JsonSerializable {
   late int reactionSpeedMax;
   int get randomReactionSpeed => reactionSpeedMin == reactionSpeedMax ? reactionSpeedMin : reactionSpeedMin + Random().nextInt(reactionSpeedMax - reactionSpeedMin);
 
+  late bool restrictMusicChannel;
+  late String restrictMusicChannelMessage;
+  late bool autoConnectVoice;
+  late bool autoConnectVoicePersist;
+
   BotConfiguration(List<PartialGuild> guilds) {
     for(var g in guilds) {
       _guilds[g.id.toString()] = BotGuildConfiguration(g.id.toString());
@@ -26,13 +31,22 @@ class BotConfiguration with JsonSerializable {
     typingSpeed = (json['typingSpeed'] ?? 30) as int;
     reactionSpeedMin = (json['reactionSpeedMin'] ?? 1000) as int;
     reactionSpeedMax = (json['reactionSpeedMax'] ?? 1500) as int;
+
+    restrictMusicChannel = (json['restrictMusicChannel'] ?? true) as bool;
+    restrictMusicChannelMessage = (json['restrictMusicChannelMessage'] ?? "You can only queue music here!") as String;
+    autoConnectVoice = (json['autoConnectVoice'] ?? true) as bool;
+    autoConnectVoicePersist = (json['autoConnectVoicePersist'] ?? false) as bool;
   }
 
   @override
   Map<String, dynamic> toJson() => {
     'typingSpeed': typingSpeed,
     'reactionSpeedMin': reactionSpeedMin,
-    'reactionSpeedMax': reactionSpeedMax
+    'reactionSpeedMax': reactionSpeedMax,
+    'restrictMusicChannel': restrictMusicChannel,
+    'restrictMusicChannelMessage': restrictMusicChannelMessage,
+    'autoConnectVoice': autoConnectVoice,
+    'autoConnectVoicePersist': autoConnectVoicePersist
   };
 
   @override

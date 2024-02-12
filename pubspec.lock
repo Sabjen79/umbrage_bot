@@ -216,6 +216,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.7"
+  json_annotation:
+    dependency: transitive
+    description:
+      name: json_annotation
+      sha256: b10a7b2ff83d83c777edba3c6a0f97045ddadd56c944e1a23a3fdf43a1bf4467
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.8.1"
+  lavalink:
+    dependency: transitive
+    description:
+      name: lavalink
+      sha256: "8631bda4d4d21cd933327ff70e4addd17dd7dbb97c9de14c2a1a845fffbe0844"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   lints:
     dependency: transitive
     description:
@@ -288,6 +304,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
+  nyxx_lavalink:
+    dependency: "direct main"
+    description:
+      name: nyxx_lavalink
+      sha256: "3034ae31c265013b632785673df10f75a05e9f5eeec39a4b478ef1359064ac19"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0-dev.1"
   oauth2:
     dependency: transitive
     description:

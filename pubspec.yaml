@@ -48,6 +48,7 @@ dependencies:
   rich_text_controller: ^1.4.2
   window_manager: ^0.3.8
   nyxx_extensions: ^4.1.0
+  nyxx_lavalink: ^4.0.0-dev.1
 
 dev_dependencies:
   flutter_test:

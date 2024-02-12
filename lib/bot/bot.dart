@@ -1,11 +1,12 @@
 import 'package:nyxx/nyxx.dart';
+import 'package:nyxx_lavalink/nyxx_lavalink.dart';
 import 'package:umbrage_bot/bot/components/event_handler.dart';
 import 'package:umbrage_bot/bot/configuration/bot_configuration.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
-import 'package:umbrage_bot/bot/music/music_manager.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
+import 'package:umbrage_bot/bot/voice/bot_voice_manager.dart';
 
 class Bot {
   late final NyxxGateway client; // Discord Client
@@ -13,7 +14,7 @@ class Bot {
   late final BotConfiguration config;
   late final Lexicon lexicon;
   late final EventHandler eventHandler;
-  late final MusicManager musicManager;
+  late final BotVoiceManager voiceManager;
   //final ProfilePictureChanger _pfpChanger = ProfilePictureChanger();
 
   // Singleton
@@ -28,12 +29,14 @@ class Bot {
   //==============================================================================
 
   static Future<void> create(BotProfile profile) async {
+    
     _instance.client = await Nyxx.connectGateway(
       profile.getToken(),
       GatewayIntents.all,
       options: GatewayClientOptions(
         loggerName: 'Umbrage',
         plugins: [
+          LavalinkPlugin(base: Uri.http("lavalink-v4.teramont.net:25569"), password: "eHKuFcz67k4lBS64"),
           logging, 
           cliIntegration
         ]
@@ -55,7 +58,8 @@ class Bot {
       ..config = BotConfiguration(guilds)
       ..lexicon = Lexicon()
       ..eventHandler = EventHandler(_instance.client)
-      ..musicManager = MusicManager(guilds);
+      ..voiceManager = BotVoiceManager(guilds);
+      
   }
 
   //==============================================================================

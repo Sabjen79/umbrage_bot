@@ -3,7 +3,6 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/configuration/bot_guild_configuration.dart';
-import 'package:umbrage_bot/ui/components/simple_switch.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
@@ -34,8 +33,6 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
   late final BotGuildConfiguration config;
   final List<_MusicChannel> _musicChannels = [];
   late _MusicChannel? _musicChannel;
-  late bool _restrictMusicChannel;
-  late TextEditingController _restrictMusicChannelTextController;
 
   @override
   void initState() {
@@ -63,9 +60,6 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
 
       setState(() {});
     });
-
-    _restrictMusicChannel = config.restrictMusicChannel;
-    _restrictMusicChannelTextController = TextEditingController(text: config.restrictMusicChannelMessage);
   }
 
   void _showSaveChanges() {
@@ -77,8 +71,6 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
       MainMenuRouter().unblock();
     }, () async {
       config.musicChannelId = _musicChannel!.id;
-      config.restrictMusicChannel = _restrictMusicChannel;
-      config.restrictMusicChannelMessage = _restrictMusicChannelTextController.text;
 
       config.saveToJson();
 
@@ -128,39 +120,6 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
             )
           )
         );
-
-        list.addAll(
-          settingsRow(
-            name: "Restrict Music Channel",
-            description: "If enabled, users can't write messages in the music channel, they can only queue music commands",
-            child: SimpleSwitch(
-              size: 45,
-              value: _restrictMusicChannel,
-              onChanged: (b) {
-                setState(() {
-                  _restrictMusicChannel = b;
-                });
-
-                _showSaveChanges();
-              }
-            )
-          )
-        );
-
-        if(_restrictMusicChannel) {
-          list.addAll(
-            settingsRow(
-              name: "Restrict Music Channel Message",
-              description: "The message that the bot will send when a user tries to write in a music channel",
-              child: TextField(
-                controller: _restrictMusicChannelTextController,
-                onChanged: (v) {
-                  _showSaveChanges();
-                },
-              )
-            )
-          );
-        }
 
         return list;
       }(),

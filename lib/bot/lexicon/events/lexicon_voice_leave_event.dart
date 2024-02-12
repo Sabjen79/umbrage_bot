@@ -1,11 +1,11 @@
-import 'package:umbrage_bot/bot/components/event_handler.dart';
+import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/predefined/lexicon_everyone_variable.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/predefined/lexicon_mention_variable.dart';
 
-class LexiconVoiceLeaveEvent extends LexiconEvent<VoiceStateUpdateEventFixed> {
+class LexiconVoiceLeaveEvent extends LexiconEvent<VoiceStateUpdateEvent> {
   LexiconMentionVariable mentionVariable = LexiconMentionVariable("Mentions the user that joined the voice channel.");
 
   LexiconVoiceLeaveEvent(Lexicon l) :
@@ -17,7 +17,7 @@ class LexiconVoiceLeaveEvent extends LexiconEvent<VoiceStateUpdateEventFixed> {
   }
 
   @override
-  Future<bool> validateEvent(VoiceStateUpdateEventFixed event) async {
+  Future<bool> validateEvent(VoiceStateUpdateEvent event) async {
     var textChannel = (await event.state.guild?.get())?.systemChannel;
     var user = (await event.state.member?.get())?.user;
 
@@ -30,7 +30,7 @@ class LexiconVoiceLeaveEvent extends LexiconEvent<VoiceStateUpdateEventFixed> {
   }
 
   @override
-  Future<Conversation> buildConversation(VoiceStateUpdateEventFixed event) async {
+  Future<Conversation> buildConversation(VoiceStateUpdateEvent event) async {
     return Conversation(
       content: getPhrase(),
       channel: (await event.state.guild!.get()).systemChannel!,
