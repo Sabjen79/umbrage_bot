@@ -22,6 +22,8 @@ class MusicSettingsWindow extends MainWindow {
 
 class _MusicSettingsWindowState extends State<MusicSettingsWindow> with SettingsRow {
   final BotConfiguration config = Bot().config;
+  late TextEditingController _ytApiKeyController;
+  late TextEditingController _ytNotFoundMessageController;
   late bool _restrictMusicChannel;
   late TextEditingController _restrictMusicChannelTextController;
   late bool _autoConnectVoice;
@@ -45,6 +47,8 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
   }
 
   void reset() {
+    _ytApiKeyController = TextEditingController(text: config.ytApiKey);
+    _ytNotFoundMessageController = TextEditingController(text: config.ytNotFoundMessage);
     _restrictMusicChannel = config.restrictMusicChannel;
     _restrictMusicChannelTextController = TextEditingController(text: config.restrictMusicChannelMessage);
     _autoConnectVoice = config.autoConnectVoice;
@@ -71,6 +75,8 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
       MainMenuRouter().unblock();
     }, () async {
       config
+        ..ytApiKey = _ytApiKeyController.text
+        ..ytNotFoundMessage = _ytNotFoundMessageController.text
         ..restrictMusicChannel = _restrictMusicChannel
         ..restrictMusicChannelMessage = _restrictMusicChannelTextController.text
         ..autoConnectVoice = _autoConnectVoice
@@ -100,8 +106,38 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
       children: () {
         var list = <Widget>[];
 
+        // YOUTUBE
+        list.add(titleRow("Youtube Search", false));
+
+        list.addAll(
+          settingsRow(
+            first: true,
+            name: "Youtube API Key",
+            description: "Your youtube api key to enable the play command to search for songs on yt.\nDirect links will work otherwise. Leave empty to disable the feature",
+            child: TextField(
+              controller: _ytApiKeyController,
+              onChanged: (v) {
+                _showSaveChanges();
+              },
+            )
+          )
+        );
+
+        list.addAll(
+          settingsRow(
+            name: "Youtube Search Not Found Message",
+            description: "The message that the bot will send when it cannot find a youtube video",
+            child: TextField(
+              controller: _ytNotFoundMessageController,
+              onChanged: (v) {
+                _showSaveChanges();
+              },
+            )
+          )
+        );
+
         // AUTO-CONNECT
-        list.add(titleRow("Auto-Connect", false));
+        list.add(titleRow("Auto-Connect"));
 
         list.addAll(
           settingsRow(

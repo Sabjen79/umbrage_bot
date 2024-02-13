@@ -49,6 +49,7 @@ dependencies:
   window_manager: ^0.3.8
   nyxx_extensions: ^4.1.0
   nyxx_lavalink: ^4.0.0-dev.1
+  yt: ^2.2.5+3
 
 dev_dependencies:
   flutter_test:

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
+import 'package:umbrage_bot/bot/util/member_name.dart';
 import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
 import 'package:umbrage_bot/bot/voice/music/music_track.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
@@ -88,10 +89,11 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
               ),
             ),
           ),
+
           SizedBox(
             width: 100,
             child: Text(
-              track == null ? "User" : track.member.user!.username,
+              track == null ? "Added By" : track.member.effectiveName,
               style: TextStyle(
                 color: DiscordTheme.white2,
                 fontWeight: track == null ? FontWeight.w500 : FontWeight.normal,
@@ -102,7 +104,7 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
           SizedBox(
             width: 110,
             child: Text(
-              track == null ? "Unskippable" : track.isUnskippable ? "Yes" : "No",
+              track == null ? "Unskippable" : track.isUnskippable ? "✅" : "⛔",
               style: TextStyle(
                 color: DiscordTheme.white2,
                 fontWeight: track == null ? FontWeight.w500 : FontWeight.normal

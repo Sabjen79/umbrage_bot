@@ -27,9 +27,9 @@ class EventHandler {
     final user = (await event.member!.get()).user!;
     if(user == Bot().user) return;
 
-    if(event.guildId != null && Bot().voiceManager[event.guildId!].music.handleEvent(event)) return;
+    if(event.guildId != null && await Bot().voiceManager[event.guildId!].music.handleEvent(event)) return;
 
-    Bot().lexicon.handleEvent(event);
+    await Bot().lexicon.handleEvent(event);
   }
 
   void onVoiceStateUpdate(VoiceStateUpdateEvent event) async {

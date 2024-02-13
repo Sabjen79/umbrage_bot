@@ -24,14 +24,14 @@ class GuildMusicManager {
 
   MusicQueue get queue => _musicQueue;
 
-  bool handleEvent(MessageCreateEvent event) {
+  Future<bool> handleEvent(MessageCreateEvent event) async {
     final config = Bot().config[event.guildId!];
     final musicChannelId = config.musicChannelId;
 
     if(musicChannelId == 0) return false;
 
     for(var command in _commands) {
-      if(command.validateEvent(event)) {
+      if(await command.validateEvent(event)) {
         
         if(event.guild!.voiceStates[event.member?.id]?.channel == null) {
           ChatAlert.sendAlert(event.message, Bot().config.noVoiceChannelMessage);

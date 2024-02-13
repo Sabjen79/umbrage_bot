@@ -12,6 +12,9 @@ class BotConfiguration with JsonSerializable {
   late int reactionSpeedMax;
   int get randomReactionSpeed => reactionSpeedMin == reactionSpeedMax ? reactionSpeedMin : reactionSpeedMin + Random().nextInt(reactionSpeedMax - reactionSpeedMin);
 
+  late String ytApiKey;
+  late String ytNotFoundMessage;
+
   late bool restrictMusicChannel;
   late String restrictMusicChannelMessage;
   late bool autoConnectVoice;
@@ -43,6 +46,8 @@ class BotConfiguration with JsonSerializable {
 
   void reset() {
     var json = loadFromJson();
+    ytApiKey = (json['ytApiKey'] ?? "") as String;
+    ytNotFoundMessage = (json['ytNotFoundMessage'] ?? "I couldn't find any video") as String;
 
     typingSpeed = (json['typingSpeed'] ?? 30) as int;
     reactionSpeedMin = (json['reactionSpeedMin'] ?? 1000) as int;
@@ -69,6 +74,8 @@ class BotConfiguration with JsonSerializable {
 
   @override
   Map<String, dynamic> toJson() => {
+    'ytApiKey': ytApiKey,
+    'ytNotFoundMessage': ytNotFoundMessage,
     'typingSpeed': typingSpeed,
     'reactionSpeedMin': reactionSpeedMin,
     'reactionSpeedMax': reactionSpeedMax,

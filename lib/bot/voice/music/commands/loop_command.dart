@@ -5,7 +5,7 @@ import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
 
 class LoopCommand extends MusicCommand {
   @override
-  bool validateEvent(MessageCreateEvent event) {
+  Future<bool> validateEvent(MessageCreateEvent event) async {
     final String content = event.message.content.trim();
 
     if(content != '-l' && content != '-loop') return false;

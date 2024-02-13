@@ -1,5 +1,6 @@
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
+import 'package:umbrage_bot/bot/util/member_name.dart';
 import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
 import 'package:umbrage_bot/bot/voice/music/music_track.dart';
 
@@ -32,7 +33,7 @@ class MusicCommandMessage {
         color: const DiscordColor(0xffffff),
         thumbnail: track.info.artworkUrl == null ? null : EmbedThumbnailBuilder(url: track.info.artworkUrl!),
         author: EmbedAuthorBuilder(
-          name: _getMemberName(musicTrack.member),
+          name: musicTrack.member.effectiveName,
           iconUrl: musicTrack.member.user!.avatar.url
         ),
         fields: [
@@ -60,7 +61,7 @@ class MusicCommandMessage {
         color: const DiscordColor(0xff0000),
         thumbnail: track.info.artworkUrl == null ? null : EmbedThumbnailBuilder(url: track.info.artworkUrl!),
         author: EmbedAuthorBuilder(
-          name: "${_getMemberName(member)} skipped:",
+          name: "${member.effectiveName} skipped:",
           iconUrl: skippedTrack.member.user!.avatar.url
         ),
       )
@@ -74,17 +75,11 @@ class MusicCommandMessage {
         title: b ? "LOOP ON" : "LOOP OFF",
         color: const DiscordColor(0x0000ff),
         author: EmbedAuthorBuilder(
-          name: _getMemberName(member),
+          name: member.effectiveName,
           iconUrl: member.user!.avatar.url
         ),
       )
     ]));
-  }
-
-  String _getMemberName(Member member) {
-    if(member.nick != null) return member.nick!;
-    if(member.user!.globalName != null) return member.user!.globalName!;
-    return member.user!.username;
   }
 
   Future<TextChannel> _getChannel(Snowflake guildId) async 

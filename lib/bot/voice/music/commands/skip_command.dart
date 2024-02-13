@@ -6,7 +6,7 @@ import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
 
 class SkipCommand extends MusicCommand {
   @override
-  bool validateEvent(MessageCreateEvent event) {
+  Future<bool> validateEvent(MessageCreateEvent event) async {
     final String content = event.message.content.trim();
 
     if(content != '-s' && content != '-skip') return false;

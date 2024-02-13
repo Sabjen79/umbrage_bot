@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
+import 'package:umbrage_bot/bot/util/member_name.dart';
 import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
 import 'package:umbrage_bot/bot/voice/music/music_track.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
@@ -124,7 +125,7 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
                     ),
                     children: [
                       const TextSpan(text: "Added by: ", style: TextStyle(color: DiscordTheme.lightGray)),
-                      TextSpan(text: currentTrack!.member.user!.username, style: const TextStyle(fontWeight: FontWeight.w500)),
+                      TextSpan(text: currentTrack!.member.effectiveName, style: const TextStyle(fontWeight: FontWeight.w500)),
                     ]
                   ),
                 ),
@@ -135,8 +136,10 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
                     overflow: TextOverflow.ellipsis
                   ),
                   children: [
-                    const TextSpan(text: "Unskippable: ", style: TextStyle(color: Color(0xffffdc4e))),
-                    TextSpan(text: currentTrack!.isUnskippable ? "YES (${_getUnskipString()} left)" : "NO", style: const TextStyle(fontWeight: FontWeight.w500)),
+                    const TextSpan(text: "Unskippable: ", style: TextStyle(fontWeight: FontWeight.w500, color: Color(0xffffdc4e))),
+                    TextSpan(
+                      text: currentTrack!.isUnskippable ? "✅ (${_getUnskipString()} left)" : "⛔", 
+                    ),
                   ]
                 ),
               ),
@@ -147,7 +150,7 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
                   ),
                   children: [
                     const TextSpan(text: "Loop: ", style: TextStyle(color: DiscordTheme.primaryColor)),
-                    TextSpan(text: _queue.loop ? "ON" : "OFF", style: const TextStyle(fontWeight: FontWeight.w500)),
+                    TextSpan(text: _queue.loop ? "✅" : "⛔", style: const TextStyle(fontWeight: FontWeight.w500)),
                   ]
                 ),
               ),
