@@ -60,6 +60,7 @@ class _ConversationSettingsWindowState extends State<ConversationSettingsWindow>
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       children: [
+        titleRow("Conversation", false),
 
         ...settingsRow(
           first: true,

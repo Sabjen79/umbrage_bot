@@ -10,7 +10,14 @@ mixin SettingsRow {
         style: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 28,
-          color: DiscordTheme.white
+          color: DiscordTheme.white,
+          shadows: [
+            Shadow(
+              color: Color(0xFF000000),
+              blurRadius: 5,
+              offset: Offset(0, 1)
+            )
+          ]
         ),
       ),
     );

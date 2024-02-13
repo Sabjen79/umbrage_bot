@@ -85,6 +85,8 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
       children: () {
         var list = <Widget>[];
 
+        list.add(titleRow("Music", false));
+
         list.addAll(
           settingsRow(
             first: true,

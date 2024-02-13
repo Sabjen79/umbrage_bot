@@ -20,6 +20,7 @@ class BotConfiguration with JsonSerializable {
   late String errorLoadingTrackMessage;
   late String duplicateTrackMessage;
   late String emptyQueueMessage;
+  late String noVoiceChannelMessage;
 
   late bool unskippableSongs;
   late double userUnskippableChance;
@@ -55,6 +56,7 @@ class BotConfiguration with JsonSerializable {
     errorLoadingTrackMessage = (json['errorLoadingTrackMessage'] ?? "Error loading track!") as String;
     duplicateTrackMessage = (json['duplicateTrackMessage'] ?? "This track is already in queue") as String;
     emptyQueueMessage = (json['emptyQueueMessage'] ?? "There is nothing to skip!") as String;
+    noVoiceChannelMessage = (json['noVoiceChannelMessage'] ?? "You must be connected to a voice channel!") as String;
 
     unskippableSongs = (json['unskippableSongs'] ?? false) as bool;
     userUnskippableChance = (json['userUnskippableChance'] ?? 0.1) as double;
@@ -62,6 +64,7 @@ class BotConfiguration with JsonSerializable {
     unskippableMessage = (json['unskippableMessage'] ?? "I won't skip that!") as String;
     unskippableMinDuration = (json['unskippableMinDuration'] ?? 300000) as int;
     unskippableMaxDuration = (json['unskippableMaxDuration'] ?? 600000) as int;
+    
   }
 
   @override
@@ -77,6 +80,7 @@ class BotConfiguration with JsonSerializable {
     'errorLoadingTrackMessage': errorLoadingTrackMessage,
     'duplicateTrackMessage': duplicateTrackMessage,
     'emptyQueueMessage': emptyQueueMessage,
+    'noVoiceChannelMessage': noVoiceChannelMessage,
     'unskippableSongs': unskippableSongs,
     'userUnskippableChance': userUnskippableChance,
     'botUnskippableChance': botUnskippableChance,

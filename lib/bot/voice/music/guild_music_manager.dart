@@ -22,6 +22,8 @@ class GuildMusicManager {
     _musicQueue.replayCurrentTrack();
   }
 
+  MusicQueue get queue => _musicQueue;
+
   bool handleEvent(MessageCreateEvent event) {
     final config = Bot().config[event.guildId!];
     final musicChannelId = config.musicChannelId;
@@ -30,11 +32,13 @@ class GuildMusicManager {
 
     for(var command in _commands) {
       if(command.validateEvent(event)) {
-
-        if(event.message.channelId.value == musicChannelId) {
-          command.handleEvent(event, _musicQueue);
-        } else {
+        
+        if(event.guild!.voiceStates[event.member?.id]?.channel == null) {
+          ChatAlert.sendAlert(event.message, Bot().config.noVoiceChannelMessage);
+        } else if(event.message.channelId.value != musicChannelId) {
           ChatAlert.sendAlert(event.message, Bot().config.invalidMusicCommandChannelMessage.replaceAll('\$channel\$', "<#$musicChannelId>"));
+        } else {
+          command.handleEvent(event, _musicQueue);
         }
         
         return true;

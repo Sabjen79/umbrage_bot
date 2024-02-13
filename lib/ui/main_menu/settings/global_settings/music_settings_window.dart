@@ -30,6 +30,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
   late TextEditingController _errorLoadingTrackMessageController;
   late TextEditingController _duplicateTrackMessageController;
   late TextEditingController _emptyQueueMessageController;
+  late TextEditingController _noVoiceChannelMessageController;
   late bool _unskippableSongs;
   late double _userUnskippableChance;
   late double _botUnskippableChance;
@@ -52,6 +53,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
     _errorLoadingTrackMessageController = TextEditingController(text: config.errorLoadingTrackMessage);
     _duplicateTrackMessageController = TextEditingController(text: config.duplicateTrackMessage);
     _emptyQueueMessageController = TextEditingController(text: config.emptyQueueMessage);
+    _noVoiceChannelMessageController = TextEditingController(text: config.noVoiceChannelMessage);
     _unskippableSongs = config.unskippableSongs;
     _userUnskippableChance = config.userUnskippableChance;
     _botUnskippableChance = config.botUnskippableChance;
@@ -77,6 +79,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
         ..errorLoadingTrackMessage = _errorLoadingTrackMessageController.text
         ..duplicateTrackMessage = _duplicateTrackMessageController.text
         ..emptyQueueMessage = _emptyQueueMessageController.text
+        ..noVoiceChannelMessage = _noVoiceChannelMessageController.text
         ..unskippableSongs = _unskippableSongs
         ..userUnskippableChance = _userUnskippableChance
         ..botUnskippableChance = _botUnskippableChance
@@ -98,7 +101,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
         var list = <Widget>[];
 
         // AUTO-CONNECT
-        list.add(titleRow("AUTO-CONNECT", false));
+        list.add(titleRow("Auto-Connect", false));
 
         list.addAll(
           settingsRow(
@@ -140,7 +143,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
         }
 
         // UNSKIPPABLE SONGS
-        list.add(titleRow("UNSKIPPABLE SONGS"));
+        list.add(titleRow("Unskippable Songs"));
 
         list.addAll(
           settingsRow(
@@ -236,7 +239,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
         }
 
         // MUSIC TEXT CHANNEL
-        list.add(titleRow("MUSIC TEXT CHANNEL"));
+        list.add(titleRow("Music Text Channel"));
 
         list.addAll(
           settingsRow(
@@ -317,6 +320,19 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
             description: "The message that the bot will send when a user fails to skip a song because the queue is empty.",
             child: TextField(
               controller: _emptyQueueMessageController,
+              onChanged: (v) {
+                _showSaveChanges();
+              },
+            )
+          )
+        );
+
+        list.addAll(
+          settingsRow(
+            name: "No Voice Channel Message",
+            description: "The message that the bot will send when a user tries to queue a music command while not in a voice channel.",
+            child: TextField(
+              controller: _noVoiceChannelMessageController,
               onChanged: (v) {
                 _showSaveChanges();
               },
