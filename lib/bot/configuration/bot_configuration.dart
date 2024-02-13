@@ -17,6 +17,20 @@ class BotConfiguration with JsonSerializable {
   late bool autoConnectVoice;
   late bool autoConnectVoicePersist;
   late String invalidMusicCommandChannelMessage;
+  late String errorLoadingTrackMessage;
+  late String duplicateTrackMessage;
+  late String emptyQueueMessage;
+
+  late bool unskippableSongs;
+  late double userUnskippableChance;
+  late double botUnskippableChance;
+  late String unskippableMessage;
+  late int unskippableMinDuration;
+  late int unskippableMaxDuration;
+
+  int get randomUnskippableDuration => unskippableMinDuration == unskippableMaxDuration ? unskippableMinDuration : unskippableMinDuration + Random().nextInt(unskippableMaxDuration - unskippableMinDuration);
+  bool get userUnskippable => unskippableSongs && Random().nextDouble() < userUnskippableChance;
+  bool get botUnskippable => unskippableSongs && Random().nextDouble() < botUnskippableChance;
 
   BotConfiguration(List<PartialGuild> guilds) {
     for(var g in guilds) {
@@ -38,6 +52,16 @@ class BotConfiguration with JsonSerializable {
     autoConnectVoice = (json['autoConnectVoice'] ?? true) as bool;
     autoConnectVoicePersist = (json['autoConnectVoicePersist'] ?? false) as bool;
     invalidMusicCommandChannelMessage = (json['invalidMusicCommandChannelMessage'] ?? "Music Commands can only be used in \$channel\$") as String;
+    errorLoadingTrackMessage = (json['errorLoadingTrackMessage'] ?? "Error loading track!") as String;
+    duplicateTrackMessage = (json['duplicateTrackMessage'] ?? "This track is already in queue") as String;
+    emptyQueueMessage = (json['emptyQueueMessage'] ?? "There is nothing to skip!") as String;
+
+    unskippableSongs = (json['unskippableSongs'] ?? false) as bool;
+    userUnskippableChance = (json['userUnskippableChance'] ?? 0.1) as double;
+    botUnskippableChance = (json['botUnskippableChance'] ?? 0.3) as double;
+    unskippableMessage = (json['unskippableMessage'] ?? "I won't skip that!") as String;
+    unskippableMinDuration = (json['unskippableMinDuration'] ?? 300000) as int;
+    unskippableMaxDuration = (json['unskippableMaxDuration'] ?? 600000) as int;
   }
 
   @override
@@ -49,7 +73,16 @@ class BotConfiguration with JsonSerializable {
     'restrictMusicChannelMessage': restrictMusicChannelMessage,
     'autoConnectVoice': autoConnectVoice,
     'autoConnectVoicePersist': autoConnectVoicePersist,
-    'invalidMusicCommandChannelMessage': invalidMusicCommandChannelMessage
+    'invalidMusicCommandChannelMessage': invalidMusicCommandChannelMessage,
+    'errorLoadingTrackMessage': errorLoadingTrackMessage,
+    'duplicateTrackMessage': duplicateTrackMessage,
+    'emptyQueueMessage': emptyQueueMessage,
+    'unskippableSongs': unskippableSongs,
+    'userUnskippableChance': userUnskippableChance,
+    'botUnskippableChance': botUnskippableChance,
+    'unskippableMessage': unskippableMessage,
+    'unskippableMinDuration': unskippableMinDuration,
+    'unskippableMaxDuration': unskippableMaxDuration
   };
 
   @override

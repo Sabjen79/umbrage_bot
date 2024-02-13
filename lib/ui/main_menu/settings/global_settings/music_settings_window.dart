@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/configuration/bot_configuration.dart';
+import 'package:umbrage_bot/ui/components/simple_chance_field.dart';
 import 'package:umbrage_bot/ui/components/simple_switch.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
@@ -26,6 +27,15 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
   late bool _autoConnectVoice;
   late bool _autoConnectVoicePersist;
   late TextEditingController _invalidMusicCommandChannelMessageController;
+  late TextEditingController _errorLoadingTrackMessageController;
+  late TextEditingController _duplicateTrackMessageController;
+  late TextEditingController _emptyQueueMessageController;
+  late bool _unskippableSongs;
+  late double _userUnskippableChance;
+  late double _botUnskippableChance;
+  late TextEditingController _unskippableMessageController;
+  late int _unskippableMinDuration;
+  late int _unskippableMaxDuration;
 
   @override
   void initState() {
@@ -39,6 +49,15 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
     _autoConnectVoice = config.autoConnectVoice;
     _autoConnectVoicePersist = config.autoConnectVoicePersist;
     _invalidMusicCommandChannelMessageController = TextEditingController(text: config.invalidMusicCommandChannelMessage);
+    _errorLoadingTrackMessageController = TextEditingController(text: config.errorLoadingTrackMessage);
+    _duplicateTrackMessageController = TextEditingController(text: config.duplicateTrackMessage);
+    _emptyQueueMessageController = TextEditingController(text: config.emptyQueueMessage);
+    _unskippableSongs = config.unskippableSongs;
+    _userUnskippableChance = config.userUnskippableChance;
+    _botUnskippableChance = config.botUnskippableChance;
+    _unskippableMessageController = TextEditingController(text: config.unskippableMessage);
+    _unskippableMinDuration = config.unskippableMinDuration;
+    _unskippableMaxDuration = config.unskippableMaxDuration;
   }
 
   void _showSaveChanges() {
@@ -49,11 +68,21 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
 
       MainMenuRouter().unblock();
     }, () async {
-      config.restrictMusicChannel = _restrictMusicChannel;
-      config.restrictMusicChannelMessage = _restrictMusicChannelTextController.text;
-      config.autoConnectVoice = _autoConnectVoice;
-      config.autoConnectVoicePersist = _autoConnectVoicePersist;
-      config.invalidMusicCommandChannelMessage = _invalidMusicCommandChannelMessageController.text;
+      config
+        ..restrictMusicChannel = _restrictMusicChannel
+        ..restrictMusicChannelMessage = _restrictMusicChannelTextController.text
+        ..autoConnectVoice = _autoConnectVoice
+        ..autoConnectVoicePersist = _autoConnectVoicePersist
+        ..invalidMusicCommandChannelMessage = _invalidMusicCommandChannelMessageController.text
+        ..errorLoadingTrackMessage = _errorLoadingTrackMessageController.text
+        ..duplicateTrackMessage = _duplicateTrackMessageController.text
+        ..emptyQueueMessage = _emptyQueueMessageController.text
+        ..unskippableSongs = _unskippableSongs
+        ..userUnskippableChance = _userUnskippableChance
+        ..botUnskippableChance = _botUnskippableChance
+        ..unskippableMessage = _unskippableMessageController.text
+        ..unskippableMinDuration = _unskippableMinDuration
+        ..unskippableMaxDuration = _unskippableMaxDuration;
 
       config.saveToJson();
 
@@ -68,7 +97,146 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
       children: () {
         var list = <Widget>[];
 
-        list.add(titleRow("MUSIC", false));
+        // AUTO-CONNECT
+        list.add(titleRow("AUTO-CONNECT", false));
+
+        list.addAll(
+          settingsRow(
+            first: true,
+            name: "Auto Connect to Voice Channels",
+            description: "If enabled, the bot will automatically join or leave voice channels as he pleases.",
+            child: SimpleSwitch(
+              size: 45,
+              value: _autoConnectVoice,
+              onChanged: (b) {
+                setState(() {
+                  _autoConnectVoice = b;
+                });
+
+                _showSaveChanges();
+              }
+            )
+          )
+        );
+
+        if(_autoConnectVoice) {
+          list.addAll(
+            settingsRow(
+              name: "Solitude in Voice Channels",
+              description: "If enabled, the bot will not leave voice channels when left alone and will mute himself to not talk by his own.",
+              child: SimpleSwitch(
+                size: 45,
+                value: _autoConnectVoicePersist,
+                onChanged: (b) {
+                  setState(() {
+                    _autoConnectVoicePersist = b;
+                  });
+
+                  _showSaveChanges();
+                }
+              )
+            )
+          );
+        }
+
+        // UNSKIPPABLE SONGS
+        list.add(titleRow("UNSKIPPABLE SONGS"));
+
+        list.addAll(
+          settingsRow(
+            first: true,
+            name: "Unskippable Songs",
+            description: "If enabled, some queued songs will be unskippable by any user (except the bot, of course)",
+            child: SimpleSwitch(
+              size: 45,
+              value: _unskippableSongs,
+              onChanged: (b) {
+                setState(() {
+                  _unskippableSongs = b;
+                });
+
+                _showSaveChanges();
+              }
+            )
+          )
+        );
+
+        if(_unskippableSongs) {
+          list.addAll(
+            settingsRow(
+              name: "User Unskippable Chance",
+              description: "The chance that a song queued by an user will be unskippable",
+              child: SimpleChanceField(
+                chance: _userUnskippableChance,
+                onChanged: (v) {
+                  setState(() {
+                    _userUnskippableChance = v;
+                  });
+
+                  _showSaveChanges();
+                }
+              )
+            )
+          );
+
+          list.addAll(
+            settingsRow(
+              name: "Bot Unskippable Chance",
+              description: "The chance that a song queued by the bot will be unskippable",
+              child: SimpleChanceField(
+                chance: _botUnskippableChance,
+                onChanged: (v) {
+                  setState(() {
+                    _botUnskippableChance = v;
+                  });
+
+                  _showSaveChanges();
+                }
+              )
+            )
+          );
+
+          list.addAll(
+            settingsRow(
+              name: "Max Unskippable Duration",
+              description: "If a song has been playing for too long, the bot will secretly remove its unskippable behaviour after a random set time.",
+              child: RangeSlider(
+                divisions: 60,
+                min: 0,
+                max: 3600000,
+                labels: RangeLabels(
+                  "${(_unskippableMinDuration/60000).toStringAsFixed(0)} minutes", 
+                  "${(_unskippableMaxDuration/60000).toStringAsFixed(0)} minutes"
+                ),
+                values: RangeValues(_unskippableMinDuration.toDouble(), _unskippableMaxDuration.toDouble()),
+                onChanged: (v) {
+                  setState(() {
+                    _unskippableMinDuration = v.start.toInt();
+                    _unskippableMaxDuration = v.end.toInt();
+                  });
+
+                  _showSaveChanges();
+                }
+              )
+            )
+          );
+
+          list.addAll(
+            settingsRow(
+              name: "Unskippable Message",
+              description: "The message that the bot will send when a user fails to skip a song.",
+              child: TextField(
+                controller: _unskippableMessageController,
+                onChanged: (v) {
+                  _showSaveChanges();
+                },
+              )
+            )
+          );
+        }
+
+        // MUSIC TEXT CHANNEL
+        list.add(titleRow("MUSIC TEXT CHANNEL"));
 
         list.addAll(
           settingsRow(
@@ -117,46 +285,44 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
           )
         );
 
-        list.add(titleRow("AUTO-CONNECT"));
-
         list.addAll(
           settingsRow(
-            first: true,
-            name: "Auto Connect to Voice Channels",
-            description: "If enabled, the bot will automatically join or leave voice channels as he pleases.",
-            child: SimpleSwitch(
-              size: 45,
-              value: _autoConnectVoice,
-              onChanged: (b) {
-                setState(() {
-                  _autoConnectVoice = b;
-                });
-
+            name: "Error Loading Track Message",
+            description: "The message that the bot will send when a track that a user queued is invalid.",
+            child: TextField(
+              controller: _errorLoadingTrackMessageController,
+              onChanged: (v) {
                 _showSaveChanges();
-              }
+              },
             )
           )
         );
 
-        if(_autoConnectVoice) {
-          list.addAll(
-            settingsRow(
-              name: "Solitude in Voice Channels",
-              description: "If enabled, the bot will not leave voice channels when left alone and will mute himself to not talk by his own.",
-              child: SimpleSwitch(
-                size: 45,
-                value: _autoConnectVoicePersist,
-                onChanged: (b) {
-                  setState(() {
-                    _autoConnectVoicePersist = b;
-                  });
-
-                  _showSaveChanges();
-                }
-              )
+        list.addAll(
+          settingsRow(
+            name: "Duplicate Track Error Message",
+            description: "The message that the bot will send when a user fails to queue a song because it is already in the queue.",
+            child: TextField(
+              controller: _duplicateTrackMessageController,
+              onChanged: (v) {
+                _showSaveChanges();
+              },
             )
-          );
-        }
+          )
+        );
+
+        list.addAll(
+          settingsRow(
+            name: "Empty Queue Skip Message",
+            description: "The message that the bot will send when a user fails to skip a song because the queue is empty.",
+            child: TextField(
+              controller: _emptyQueueMessageController,
+              onChanged: (v) {
+                _showSaveChanges();
+              },
+            )
+          )
+        );
 
         return list;
       }(),

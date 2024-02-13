@@ -12,6 +12,7 @@ class MusicQueue {
   final Snowflake guildId;
   late final LavalinkPlayer _player;
   final Queue<MusicTrack> _queue = Queue();
+  Timer? unskipTimer;
   MusicTrack? currentTrack;
   bool _loop = false;
 
@@ -52,6 +53,19 @@ class MusicQueue {
     }
   }
 
+  bool containsTrack(MusicTrack track) {
+    final list = _queue.toList();
+    if(currentTrack != null) {
+      list.add(currentTrack!);
+    }
+
+    for(var t in list) {
+      if(t.track.encoded == track.track.encoded) return true;
+    }
+
+    return false;
+  }
+
   void skip(Member member) {
     if(currentTrack == null) return;
 
@@ -67,17 +81,33 @@ class MusicQueue {
     _loopChangedStream.add(Pair(member, _loop));
   }
 
+  void replayCurrentTrack() {
+    if(currentTrack == null || _player.currentTrack != null) return;
+
+    _player.playEncoded(currentTrack!.track.encoded);
+    _player.seekTo(_player.state.position);
+  }
+
   void _nextTrack([bool forced = false]) {
     _player.stopPlaying().then((v) {
       if(_loop && !forced) {
         _player.playEncoded(currentTrack!.track.encoded);
         return;
       }
+
       currentTrack = null;
+      unskipTimer?.cancel();
 
       if(_queue.isNotEmpty) {
         currentTrack = _queue.removeLast();
         _player.playEncoded(currentTrack!.track.encoded);
+
+        // Unskip timer
+        if(currentTrack!.isUnskippable) {
+          unskipTimer = Timer(Duration(milliseconds: Bot().config.randomUnskippableDuration), () {
+            currentTrack?.isUnskippable = false;
+          });
+        }
       }
     });
   }

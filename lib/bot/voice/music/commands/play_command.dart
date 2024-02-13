@@ -1,5 +1,6 @@
 import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_lavalink/nyxx_lavalink.dart';
+import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/conversation/chat_alert.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/music_command.dart';
 import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
@@ -23,11 +24,22 @@ class PlayCommand extends MusicCommand {
     try {
       track = await queue.lavalinkClient.loadTrack(event.message.content.split(' ')[1]) as TrackLoadResult;
     } catch(e) {
-      ChatAlert.sendAlert(event.message, "Error loading track!");
+      ChatAlert.sendAlert(event.message, Bot().config.errorLoadingTrackMessage);
+      return;
+    }
+
+    var musicTrack = MusicTrack(
+      track.data, 
+      member: await event.member!.get(),
+      isUnskippable: Bot().config.userUnskippable
+    );
+
+    if(queue.containsTrack(musicTrack)) {
+      ChatAlert.sendAlert(event.message, Bot().config.duplicateTrackMessage);
       return;
     }
 
     event.message.delete();
-    queue.queueSong(MusicTrack(track.data, member: await event.member!.get()));
+    queue.queueSong(musicTrack);
   }
 }

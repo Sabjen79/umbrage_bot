@@ -4,7 +4,7 @@ import 'package:umbrage_bot/ui/discord_theme.dart';
 mixin SettingsRow {
   Widget titleRow(String text, [bool topPadding = true]) {
     return Padding(
-      padding: EdgeInsets.only(left: 35, bottom: 5, top: topPadding ? 30 : 5),
+      padding: EdgeInsets.only(left: 35, bottom: 5, top: topPadding ? 50 : 5),
       child: Text(
         text,
         style: const TextStyle(

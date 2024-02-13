@@ -18,6 +18,10 @@ class GuildMusicManager {
 
   GuildMusicManager(this.guild) : _musicQueue = MusicQueue(guild.id);
 
+  void replayCurrentTrack() {
+    _musicQueue.replayCurrentTrack();
+  }
+
   bool handleEvent(MessageCreateEvent event) {
     final config = Bot().config[event.guildId!];
     final musicChannelId = config.musicChannelId;

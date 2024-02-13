@@ -5,6 +5,7 @@ import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/conversation/conversation_delimiters.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
+import 'package:umbrage_bot/ui/components/simple_chance_field.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/components/simple_switch.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
@@ -36,10 +37,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
   late List<String> _phrases;
 
   late final List<LexiconVariable> _variables;
-
-  late TextEditingController _chanceController;
-  String _chanceString() => _chance > 0.999 ? (_chance*100).toStringAsFixed(0) : (_chance*100).toStringAsFixed(2);
-
+  
   late TextEditingController _cooldownControllerHour, _cooldownControllerMinutes, _cooldownControllerSeconds;
 
   void init() {
@@ -48,7 +46,6 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
     _cooldown = widget.event.cooldown;
     _phrases = widget.event.phrases.toList();
 
-    _chanceController = TextEditingController(text: (_chance*100).toString());
     _cooldownControllerHour = TextEditingController();
     _cooldownControllerMinutes = TextEditingController();
     _cooldownControllerSeconds = TextEditingController();
@@ -136,12 +133,6 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
     super.didUpdateWidget(oldWidget);
 
     init();
-  }
-
-  @override
-  void dispose() {
-    _chanceController.dispose();
-    super.dispose();
   }
 
   void _showSaveChanges() {
@@ -392,54 +383,15 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                     ...(!_enabled ? [] : _settingRow(
                       name: "Chance",
                       description: "The chance that the bot will respond when the event is triggered.",
-                      child: SizedBox(
-                        width: 300,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Expanded(
-                              child: Slider(
-                                value: _chance,
-                                max: 1.0,
-                                onChanged: (v) {
-                                  setState(() {
-                                    _chance = double.parse(v.toStringAsFixed(2));
-                                    _chanceController.text = _chanceString();
-                                  });
-                                  _showSaveChanges();
-                                },
-                              )
-                            ),
-                            SizedBox(
-                              width: 75,
-                              child: TextField(
-                                maxLength: 5,
-                                textAlign: TextAlign.end,
-                                controller: _chanceController,
-                                decoration: const InputDecoration(
-                                  suffixText: "%",
-                                  counter: SizedBox(),
-                                ),
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.allow(RegExp(r'^(100(?:\.(0)*)?|\d?\d(?:\.\d*?)?)$'), replacementString: "error"),
-                                ],
-                                onChanged: (v) {
-                                  if(v == "error") {
-                                    _chanceController.text = _chanceString();
-                                    return;
-                                  }
+                      child: SimpleChanceField(
+                        chance: _chance,
+                        onChanged: (v) {
+                          setState(() {
+                            _chance = v;
+                          });
 
-                                  setState(() {
-                                    _chance = v.isEmpty ? 0 : double.parse(v)/100.0;
-                                  });
-
-                                  _showSaveChanges();
-                                },
-                              ),
-                            )
-                            
-                          ]
-                        )
+                          _showSaveChanges();
+                        },
                       )
                     )),
 

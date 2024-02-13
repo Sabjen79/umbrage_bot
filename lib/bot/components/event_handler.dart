@@ -36,6 +36,12 @@ class EventHandler {
     final oldState = voiceStates[event.state.guildId]?[event.state.userId];
     voiceStates[event.state.guildId!] = Map.from(client.guilds[event.state.guildId!].voiceStates);
 
+    if(event.state.user == Bot().user && event.state.channel != null) {
+      // When the bot disconnects from a voice channel, the player stops.
+      // This is to ensure the player starts again when reconnecting.
+      Bot().voiceManager[event.state.guildId!].music.replayCurrentTrack();
+    }
+
     if(event.state.member == null || event.state.user == Bot().user) return;
     
     Bot().voiceManager[event.state.guildId!].handleEvent(event);
