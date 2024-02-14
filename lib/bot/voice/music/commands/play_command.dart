@@ -29,7 +29,7 @@ class PlayCommand extends MusicCommand {
   Future<void> handleEvent(MessageCreateEvent event, final MusicQueue queue) async {
     Track track;
 
-    if(url == null) {
+    if(url == null || url == "") {
       ChatAlert.sendAlert(event.message, Bot().config.ytNotFoundMessage);
       return;
     }

@@ -32,6 +32,12 @@ class BotConfiguration with JsonSerializable {
   late int unskippableMinDuration;
   late int unskippableMaxDuration;
 
+  late bool randomMusicEnable;
+  late int randomMusicMinCooldown;
+  late int randomMusicMaxCooldown;
+
+  int get randomMusicCooldown => randomMusicMinCooldown == randomMusicMaxCooldown ? randomMusicMinCooldown : randomMusicMinCooldown + Random().nextInt(randomMusicMaxCooldown - randomMusicMinCooldown);
+
   int get randomUnskippableDuration => unskippableMinDuration == unskippableMaxDuration ? unskippableMinDuration : unskippableMinDuration + Random().nextInt(unskippableMaxDuration - unskippableMinDuration);
   bool get userUnskippable => unskippableSongs && Random().nextDouble() < userUnskippableChance;
   bool get botUnskippable => unskippableSongs && Random().nextDouble() < botUnskippableChance;
@@ -70,6 +76,9 @@ class BotConfiguration with JsonSerializable {
     unskippableMinDuration = (json['unskippableMinDuration'] ?? 300000) as int;
     unskippableMaxDuration = (json['unskippableMaxDuration'] ?? 600000) as int;
     
+    randomMusicEnable = (json['randomMusicEnable'] ?? false) as bool;
+    randomMusicMinCooldown = (json['randomMusicMinCooldown'] ?? 600000) as int;
+    randomMusicMaxCooldown = (json['randomMusicMaxCooldown'] ?? 1200000) as int;
   }
 
   @override
@@ -93,7 +102,10 @@ class BotConfiguration with JsonSerializable {
     'botUnskippableChance': botUnskippableChance,
     'unskippableMessage': unskippableMessage,
     'unskippableMinDuration': unskippableMinDuration,
-    'unskippableMaxDuration': unskippableMaxDuration
+    'unskippableMaxDuration': unskippableMaxDuration,
+    'randomMusicEnable': randomMusicEnable,
+    'randomMusicMinCooldown': randomMusicMinCooldown,
+    'randomMusicMaxCooldown': randomMusicMaxCooldown
   };
 
   @override

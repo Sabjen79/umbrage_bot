@@ -64,6 +64,11 @@ class Bot {
 
   //==============================================================================
 
+  Future<Member> getBotMember(Snowflake guildId) async {
+    Guild g = await client.guilds.get(guildId);
+    return await g.members.get(user.id);
+  }
+
   Future<void> close() async {
     await client.close();
   }

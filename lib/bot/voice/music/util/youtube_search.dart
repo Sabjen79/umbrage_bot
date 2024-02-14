@@ -9,7 +9,7 @@ class YoutubeSearch {
       var videoResult = await yt.search.list(q: query, part: 'snippet', type: 'video', maxResults: 1);
       for(var element in videoResult.items) {
         if(element.id.videoId != null) {
-          return "https://www.youtube.com/watch?v=${element.id.videoId}";
+          return "https://youtu.be/${element.id.videoId}";
         }
       }
     } catch(e) {

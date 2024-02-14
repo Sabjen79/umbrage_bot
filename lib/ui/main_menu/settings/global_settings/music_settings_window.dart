@@ -39,6 +39,9 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
   late TextEditingController _unskippableMessageController;
   late int _unskippableMinDuration;
   late int _unskippableMaxDuration;
+  late bool _randomMusicEnable;
+  late int _randomMusicMinCooldown;
+  late int _randomMusicMaxCooldown;
 
   @override
   void initState() {
@@ -64,6 +67,9 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
     _unskippableMessageController = TextEditingController(text: config.unskippableMessage);
     _unskippableMinDuration = config.unskippableMinDuration;
     _unskippableMaxDuration = config.unskippableMaxDuration;
+    _randomMusicEnable = config.randomMusicEnable;
+    _randomMusicMinCooldown = config.randomMusicMinCooldown;
+    _randomMusicMaxCooldown = config.randomMusicMaxCooldown;
   }
 
   void _showSaveChanges() {
@@ -91,7 +97,10 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
         ..botUnskippableChance = _botUnskippableChance
         ..unskippableMessage = _unskippableMessageController.text
         ..unskippableMinDuration = _unskippableMinDuration
-        ..unskippableMaxDuration = _unskippableMaxDuration;
+        ..unskippableMaxDuration = _unskippableMaxDuration
+        ..randomMusicEnable = _randomMusicEnable
+        ..randomMusicMinCooldown = _randomMusicMinCooldown
+        ..randomMusicMaxCooldown = _randomMusicMaxCooldown;
 
       config.saveToJson();
 
@@ -177,6 +186,56 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
             )
           );
         }
+
+        // RANDOM MUSIC
+        list.add(titleRow("Random Music Timer"));
+
+        list.addAll(
+          settingsRow(
+            first: true,
+            name: "Random Music",
+            description: "If enabled, the bot will periodically queue music by his own, based on what was previously queued by other users.\nThe bot will memorize songs even if this feature is disabled.",
+            child: SimpleSwitch(
+              size: 45,
+              value: _randomMusicEnable,
+              onChanged: (b) {
+                setState(() {
+                  _randomMusicEnable = b;
+                });
+
+                _showSaveChanges();
+              }
+            )
+          )
+        );
+
+        if(_randomMusicEnable) {
+          list.addAll(
+            settingsRow(
+              name: "Random Music Cooldown",
+              description: "The time period that the bot will wait before queueing another song.",
+              child: RangeSlider(
+                divisions: 55,
+                min: 300000,
+                max: 3600000,
+                labels: RangeLabels(
+                  "${(_randomMusicMinCooldown/60000).toStringAsFixed(0)} minutes", 
+                  "${(_randomMusicMaxCooldown/60000).toStringAsFixed(0)} minutes"
+                ),
+                values: RangeValues(_randomMusicMinCooldown.toDouble(), _randomMusicMaxCooldown.toDouble()),
+                onChanged: (v) {
+                  setState(() {
+                    _randomMusicMinCooldown = v.start.toInt();
+                    _randomMusicMaxCooldown = v.end.toInt();
+                  });
+
+                  _showSaveChanges();
+                }
+              )
+            )
+          );
+        }
+
 
         // UNSKIPPABLE SONGS
         list.add(titleRow("Unskippable Songs"));

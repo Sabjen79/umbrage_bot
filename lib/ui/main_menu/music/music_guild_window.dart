@@ -7,6 +7,7 @@ import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/music/music_current_track_widget.dart';
 import 'package:umbrage_bot/ui/main_menu/music/music_queue_widget.dart';
+import 'package:umbrage_bot/ui/main_menu/music/music_timer_widget.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 
 class MusicGuildWindow extends MainWindow {
@@ -72,6 +73,23 @@ class _MusicGuildWindowState extends State<MusicGuildWindow> {
                   Expanded(
                     child: Column(
                       children: [
+                        Expanded(
+                          child: MusicTimerWidget(
+                            name: "Random Music",
+                            isEnabled: Bot().config.randomMusicEnable,
+                            getDurationString: () {
+                              final timer = Bot().voiceManager[widget.guild.id].music.randomMusicManager.timer;
+                              if(timer == null) return "";
+                              final duration = timer.runTime.millisecondsSinceEpoch - DateTime.now().millisecondsSinceEpoch;
+                              return Duration(milliseconds: duration).toString().split('.')[0];
+                            },
+                            onRunEarly: () {
+                              final timer = Bot().voiceManager[widget.guild.id].music.randomMusicManager.timer;
+                              timer?.runEarly();
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 5),
                         Expanded(
                           child: _wip(),
                         ),

@@ -91,7 +91,7 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
           ),
 
           SizedBox(
-            width: 100,
+            width: 135,
             child: Text(
               track == null ? "Added By" : track.member.effectiveName,
               style: TextStyle(
@@ -105,6 +105,7 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
             width: 110,
             child: Text(
               track == null ? "Unskippable" : track.isUnskippable ? "✅" : "⛔",
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: DiscordTheme.white2,
                 fontWeight: track == null ? FontWeight.w500 : FontWeight.normal
