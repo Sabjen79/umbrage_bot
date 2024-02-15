@@ -62,7 +62,7 @@ class MusicCommandMessage {
         thumbnail: track.info.artworkUrl == null ? null : EmbedThumbnailBuilder(url: track.info.artworkUrl!),
         author: EmbedAuthorBuilder(
           name: "${member.effectiveName} skipped:",
-          iconUrl: skippedTrack.member.user!.avatar.url
+          iconUrl: member.user!.avatar.url
         ),
       )
     ]));

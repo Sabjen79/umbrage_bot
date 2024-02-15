@@ -11,7 +11,7 @@ import 'package:umbrage_bot/bot/voice/music/music_track.dart';
 
 class MusicQueue {
   final Snowflake guildId;
-  late final LavalinkPlayer _player;
+  late final LavalinkPlayer player;
   final Queue<MusicTrack> _queue = Queue();
   BotTimer? unskipTimer;
   MusicTrack? currentTrack;
@@ -31,20 +31,20 @@ class MusicQueue {
   Stream<MusicTrack?> get onCurrentTrackChanged => _currentTrackChangedStream.stream.asBroadcastStream();
   //
 
-  LavalinkClient get lavalinkClient => _player.lavalinkClient;
+  LavalinkClient get lavalinkClient => player.lavalinkClient;
   List<MusicTrack> get list => _queue.toList();
   bool get loop => _loop;
 
   MusicQueue(this.guildId) {
     var plugin = Bot().client.options.plugins.firstWhere((element) => element is LavalinkPlugin) as LavalinkPlugin;
-    plugin.onPlayerConnected.firstWhere((player) => player.guildId == guildId).then((player) {
-      _player = player;
+    plugin.onPlayerConnected.firstWhere((p) => p.guildId == guildId).then((p) {
+      player = p;
 
-      _player.onTrackEnd.listen((e) {
+      player.onTrackEnd.listen((e) {
         if(e.reason == "finished") _nextTrack();
       });
-      _player.onTrackStuck.listen((e) {_nextTrack();});
-      _player.onTrackException.listen(_trackException);
+      player.onTrackStuck.listen((e) {_nextTrack();});
+      player.onTrackException.listen(_trackException);
     });
 
     Bot().client.onVoiceStateUpdate.listen((event) {
@@ -53,9 +53,9 @@ class MusicQueue {
       if(botState == null || currentTrack == null) return;
 
       if(botState.channel == null || botState.isMuted) {
-        _player.pause();
+        player.pause();
       } else {
-        _player.resume();
+        player.resume();
       }
     });
 
@@ -101,16 +101,16 @@ class MusicQueue {
   }
 
   void replayCurrentTrack() {
-    if(currentTrack == null || _player.currentTrack != null) return;
+    if(currentTrack == null || player.currentTrack != null) return;
 
-    _player.playEncoded(currentTrack!.track.encoded);
-    _player.seekTo(_player.state.position);
+    player.playEncoded(currentTrack!.track.encoded);
+    player.seekTo(player.state.position);
   }
 
   void _nextTrack([bool forced = false]) {
-    _player.stopPlaying().then((v) {
+    player.stopPlaying().then((v) {
       if(_loop && !forced) {
-        _player.playEncoded(currentTrack!.track.encoded);
+        player.playEncoded(currentTrack!.track.encoded);
         return;
       }
 
@@ -119,13 +119,13 @@ class MusicQueue {
 
       if(_queue.isNotEmpty) {
         currentTrack = _queue.removeFirst();
-        _player.playEncoded(currentTrack!.track.encoded);
+        player.playEncoded(currentTrack!.track.encoded);
 
         _queueChangedStream.add(null);
 
         // Unskip timer
         if(currentTrack!.isUnskippable) {
-          unskipTimer = BotTimer(Duration(milliseconds: Bot().config.randomUnskippableDuration), () {
+          unskipTimer = BotTimer.delayed(Bot().config.randomUnskippableDuration, () {
             currentTrack?.isUnskippable = false;
           });
         }

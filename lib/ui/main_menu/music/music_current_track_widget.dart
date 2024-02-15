@@ -7,11 +7,12 @@ import 'package:umbrage_bot/bot/util/member_name.dart';
 import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
 import 'package:umbrage_bot/bot/voice/music/music_track.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
-import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
 
 class MusicCurrentTrackWidget extends StatefulWidget {
   final Snowflake guildId;
-  const MusicCurrentTrackWidget(this.guildId, {super.key});
+  final double width;
+
+  const MusicCurrentTrackWidget(this.guildId, {required this.width, super.key});
 
   @override
   State<MusicCurrentTrackWidget> createState() => _MusicCurrentTrackWidgetState();
@@ -94,7 +95,7 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
             ),
         ),
         SizedBox(
-          width: MainMenu.getMainWindowWidth(context)*0.65 - 240,
+          width: widget.width - 240,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +168,7 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.only(right: 5),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      width: MainMenu.getMainWindowWidth(context)*0.65,
+      width: widget.width,
       height: 200,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),

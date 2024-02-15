@@ -3,7 +3,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_button.dart';
-import 'package:umbrage_bot/ui/discord_theme.dart';
+import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/music/music_current_track_widget.dart';
 import 'package:umbrage_bot/ui/main_menu/music/music_queue_widget.dart';
@@ -25,18 +25,40 @@ class MusicGuildWindow extends MainWindow {
 
 class _MusicGuildWindowState extends State<MusicGuildWindow> {
 
-  Widget _wip() {
-    return Container(
-      decoration: BoxDecoration(
-        color: DiscordTheme.black,
-        borderRadius: BorderRadius.circular(10)
-      ),
-      child: const Center(child: Text("WIP")),
-    );
+  List<Widget> _sideWidgets() {
+    var list = <Widget>[];
+
+    if(Bot().config.randomMusicEnable) {
+      list.add(
+        Expanded(
+          child: MusicTimerWidget(
+            name: "Random Music",
+            timer: Bot().voiceManager[widget.guild.id].music.randomMusicManager.timer
+          ),
+        )
+      );
+    }
+    
+    if(Bot().config.volumeBoostEnable) {
+      if(list.isNotEmpty) list.add(const SizedBox(height: 5));
+
+      list.add(
+        Expanded(
+          child: MusicTimerWidget(
+            name: "Volume Boost",
+            timer: Bot().voiceManager[widget.guild.id].music.volumeBoostManager.timer
+          ),
+        )
+      );
+    }
+    
+    return list;
   }
 
   @override
   Widget build(BuildContext context) {
+    var sideWidgets = _sideWidgets();
+
     return Bot().config[widget.guild.id].musicChannelId == 0 ?
     Center( // No Music Channel
       child: Column(
@@ -69,35 +91,13 @@ class _MusicGuildWindowState extends State<MusicGuildWindow> {
               height: 200,
               child: Row(
                 children: [
-                  MusicCurrentTrackWidget(widget.guild.id),
-                  Expanded(
+                  MusicCurrentTrackWidget(
+                    widget.guild.id,
+                    width: MainMenu.getMainWindowWidth(context)*0.65,
+                  ),
+                  sideWidgets.isEmpty ? Container() : Expanded(
                     child: Column(
-                      children: [
-                        Expanded(
-                          child: MusicTimerWidget(
-                            name: "Random Music",
-                            isEnabled: Bot().config.randomMusicEnable,
-                            getDurationString: () {
-                              final timer = Bot().voiceManager[widget.guild.id].music.randomMusicManager.timer;
-                              if(timer == null) return "";
-                              final duration = timer.runTime.millisecondsSinceEpoch - DateTime.now().millisecondsSinceEpoch;
-                              return Duration(milliseconds: duration).toString().split('.')[0];
-                            },
-                            onRunEarly: () {
-                              final timer = Bot().voiceManager[widget.guild.id].music.randomMusicManager.timer;
-                              timer?.runEarly();
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Expanded(
-                          child: _wip(),
-                        ),
-                        const SizedBox(height: 5),
-                        Expanded(
-                          child: _wip(),
-                        )
-                      ],
+                      children: sideWidgets,
                     )
                   ),
                 ],

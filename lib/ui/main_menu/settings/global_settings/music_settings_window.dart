@@ -42,6 +42,11 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
   late bool _randomMusicEnable;
   late int _randomMusicMinCooldown;
   late int _randomMusicMaxCooldown;
+  late double _randomMusicSkipChance;
+  late bool _volumeBoostEnable;
+  late int _volumeBoostMinCooldown;
+  late int _volumeBoostMaxCooldown;
+  late int _volumeBoostAmplitude;
 
   @override
   void initState() {
@@ -70,6 +75,11 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
     _randomMusicEnable = config.randomMusicEnable;
     _randomMusicMinCooldown = config.randomMusicMinCooldown;
     _randomMusicMaxCooldown = config.randomMusicMaxCooldown;
+    _randomMusicSkipChance = config.randomMusicSkipChance;
+    _volumeBoostEnable = config.volumeBoostEnable;
+    _volumeBoostMinCooldown = config.volumeBoostMinCooldown;
+    _volumeBoostMaxCooldown = config.volumeBoostMaxCooldown;
+    _volumeBoostAmplitude = config.volumeBoostAmplitude;
   }
 
   void _showSaveChanges() {
@@ -100,7 +110,12 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
         ..unskippableMaxDuration = _unskippableMaxDuration
         ..randomMusicEnable = _randomMusicEnable
         ..randomMusicMinCooldown = _randomMusicMinCooldown
-        ..randomMusicMaxCooldown = _randomMusicMaxCooldown;
+        ..randomMusicMaxCooldown = _randomMusicMaxCooldown
+        ..randomMusicSkipChance = _randomMusicSkipChance
+        ..volumeBoostEnable = _volumeBoostEnable
+        ..volumeBoostMinCooldown = _volumeBoostMinCooldown
+        ..volumeBoostMaxCooldown = _volumeBoostMaxCooldown
+        ..volumeBoostAmplitude = _volumeBoostAmplitude;
 
       config.saveToJson();
 
@@ -234,8 +249,94 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
               )
             )
           );
+
+          list.addAll(
+            settingsRow(
+              name: "Random Music Skip Chance",
+              description: "If there is a song queued by an user and the bot queues a song by his own, there is a chance that the bot will skip the user's song to listen to his own quicker. Leave at 0% to disable.",
+              child: SimpleChanceField(
+                chance: _randomMusicSkipChance,
+                onChanged: (v) {
+                  setState(() {
+                    _randomMusicSkipChance = v;
+                  });
+
+                  _showSaveChanges();
+                }
+              )
+            )
+          );
         }
 
+        // VOLUME BOOST
+        list.add(titleRow("Volume Boost"));
+
+        list.addAll(
+          settingsRow(
+            first: true,
+            name: "Random Volume Boost",
+            description: "If enabled, the bot will periodically boost the volume of the music for a very short while, to annoy everyone listening to him.",
+            child: SimpleSwitch(
+              size: 45,
+              value: _volumeBoostEnable,
+              onChanged: (b) {
+                setState(() {
+                  _volumeBoostEnable = b;
+                });
+
+                _showSaveChanges();
+              }
+            )
+          )
+        );
+
+        if(_volumeBoostEnable) {
+          list.addAll(
+            settingsRow(
+              name: "Volume Boost Cooldown",
+              description: "The time period that the bot will wait before boosting the volume again.",
+              child: RangeSlider(
+                divisions: 30,
+                min: 1800000,
+                max: 10800000,
+                labels: RangeLabels(
+                  "${(_volumeBoostMinCooldown/60000).toStringAsFixed(0)} minutes", 
+                  "${(_volumeBoostMaxCooldown/60000).toStringAsFixed(0)} minutes"
+                ),
+                values: RangeValues(_volumeBoostMinCooldown.toDouble(), _volumeBoostMaxCooldown.toDouble()),
+                onChanged: (v) {
+                  setState(() {
+                    _volumeBoostMinCooldown = v.start.toInt();
+                    _volumeBoostMaxCooldown = v.end.toInt();
+                  });
+
+                  _showSaveChanges();
+                }
+              )
+            )
+          );
+
+          list.addAll(
+            settingsRow(
+              name: "Volume Boost Amplitude",
+              description: "The volume amplitude of the boost. 100% is normal volume.",
+              child: Slider(
+                divisions: 16,
+                min: 100,
+                max: 500,
+                label: "${_volumeBoostAmplitude.toString()}%",
+                value: _volumeBoostAmplitude.toDouble(),
+                onChanged: (v) {
+                  setState(() {
+                    _volumeBoostAmplitude = v.toInt();
+                  });
+
+                  _showSaveChanges();
+                }
+              )
+            )
+          );
+        }
 
         // UNSKIPPABLE SONGS
         list.add(titleRow("Unskippable Songs"));

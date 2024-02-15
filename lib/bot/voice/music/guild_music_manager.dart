@@ -6,6 +6,7 @@ import 'package:umbrage_bot/bot/voice/music/commands/music_command.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/play_command.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/skip_command.dart';
 import 'package:umbrage_bot/bot/voice/music/features/random_music_manager.dart';
+import 'package:umbrage_bot/bot/voice/music/features/volume_boost_manager.dart';
 import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
 
 class GuildMusicManager {
@@ -17,9 +18,11 @@ class GuildMusicManager {
     LoopCommand()
   ];
   late final RandomMusicManager randomMusicManager;
+  late final VolumeBoostManager volumeBoostManager;
 
   GuildMusicManager(this.guild) : _musicQueue = MusicQueue(guild.id) {
     randomMusicManager = RandomMusicManager(_musicQueue);
+    volumeBoostManager = VolumeBoostManager(_musicQueue);
   }
 
   void replayCurrentTrack() {

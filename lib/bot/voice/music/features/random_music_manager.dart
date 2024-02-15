@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:nyxx/nyxx.dart';
@@ -22,15 +23,7 @@ class RandomMusicManager with JsonSerializable {
       _addToList(track);
     });
 
-    _startTimer();
-  }
-
-  void _startTimer() {
-    if(timer != null) {
-      timer!.timer.cancel();
-    }
-
-    timer = BotTimer(Duration(milliseconds: Bot().config.randomMusicCooldown), () async {
+    timer = BotTimer.periodic(() => Bot().config.randomMusicCooldown, () async {
       String url = "";
       while(url.isEmpty && _songList.isNotEmpty && Bot().config.randomMusicEnable) {
         url = _songList[Random().nextInt(_songList.length)];
@@ -48,8 +41,6 @@ class RandomMusicManager with JsonSerializable {
           url = "";
         }
       }
-
-      _startTimer();
     });
   }
 
@@ -58,11 +49,26 @@ class RandomMusicManager with JsonSerializable {
     final botVoiceState = guild.voiceStates[Bot().user.id];
     if(botVoiceState == null || botVoiceState.channel == null || botVoiceState.isMuted) return; // Don't queue music if alone
 
+    // Check if skip
+    bool skip = false;
+    if(_queue.currentTrack != null && _queue.currentTrack!.member.id != Bot().user.id 
+      && _queue.list.isEmpty && Random().nextDouble() < Bot().config.randomMusicSkipChance) {
+      skip = true;
+    }
+
     _queue.queueSong(MusicTrack(
       result.data,
       member: await Bot().getBotMember(guildId),
       isUnskippable: Bot().config.botUnskippable
     ));
+
+    if(skip) {
+      Timer(const Duration(seconds: 5), () async {
+        if(_queue.currentTrack?.member.id == Bot().user.id) return;
+
+        _queue.skip(await Bot().getBotMember(guildId));
+      });
+    }
   }
 
   void _addToList(MusicTrack track) {

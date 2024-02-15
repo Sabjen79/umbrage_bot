@@ -10,7 +10,7 @@ class BotConfiguration with JsonSerializable {
   late int typingSpeed;
   late int reactionSpeedMin;
   late int reactionSpeedMax;
-  int get randomReactionSpeed => reactionSpeedMin == reactionSpeedMax ? reactionSpeedMin : reactionSpeedMin + Random().nextInt(reactionSpeedMax - reactionSpeedMin);
+  int get randomReactionSpeed => _randomCooldown(reactionSpeedMin, reactionSpeedMax);
 
   late String ytApiKey;
   late String ytNotFoundMessage;
@@ -31,16 +31,25 @@ class BotConfiguration with JsonSerializable {
   late String unskippableMessage;
   late int unskippableMinDuration;
   late int unskippableMaxDuration;
+  int get randomUnskippableDuration => _randomCooldown(unskippableMinDuration, unskippableMaxDuration);
+  bool get userUnskippable => unskippableSongs && Random().nextDouble() < userUnskippableChance;
+  bool get botUnskippable => unskippableSongs && Random().nextDouble() < botUnskippableChance;
 
   late bool randomMusicEnable;
   late int randomMusicMinCooldown;
   late int randomMusicMaxCooldown;
+  late double randomMusicSkipChance;
+  int get randomMusicCooldown => _randomCooldown(randomMusicMinCooldown, randomMusicMaxCooldown);
 
-  int get randomMusicCooldown => randomMusicMinCooldown == randomMusicMaxCooldown ? randomMusicMinCooldown : randomMusicMinCooldown + Random().nextInt(randomMusicMaxCooldown - randomMusicMinCooldown);
-
-  int get randomUnskippableDuration => unskippableMinDuration == unskippableMaxDuration ? unskippableMinDuration : unskippableMinDuration + Random().nextInt(unskippableMaxDuration - unskippableMinDuration);
-  bool get userUnskippable => unskippableSongs && Random().nextDouble() < userUnskippableChance;
-  bool get botUnskippable => unskippableSongs && Random().nextDouble() < botUnskippableChance;
+  late bool volumeBoostEnable;
+  late int volumeBoostMinCooldown;
+  late int volumeBoostMaxCooldown;
+  late int volumeBoostAmplitude;
+  int get volumeBoostCooldown => _randomCooldown(volumeBoostMinCooldown, volumeBoostMaxCooldown);
+  
+  int _randomCooldown(int min, int max) {
+    return min == max ? min : min + Random().nextInt(max - min);
+  }
 
   BotConfiguration(List<PartialGuild> guilds) {
     for(var g in guilds) {
@@ -79,6 +88,12 @@ class BotConfiguration with JsonSerializable {
     randomMusicEnable = (json['randomMusicEnable'] ?? false) as bool;
     randomMusicMinCooldown = (json['randomMusicMinCooldown'] ?? 600000) as int;
     randomMusicMaxCooldown = (json['randomMusicMaxCooldown'] ?? 1200000) as int;
+    randomMusicSkipChance = (json['randomMusicSkipChance'] ?? 0.3) as double;
+
+    volumeBoostEnable = (json['volumeBoostEnable'] ?? false) as bool;
+    volumeBoostMinCooldown = (json['volumeBoostMinCooldown'] ?? 3600000) as int;
+    volumeBoostMaxCooldown = (json['volumeBoostMaxCooldown'] ?? 7200000) as int;
+    volumeBoostAmplitude = (json['volumeBoostAmplitude'] ?? 200) as int;
   }
 
   @override
@@ -105,7 +120,12 @@ class BotConfiguration with JsonSerializable {
     'unskippableMaxDuration': unskippableMaxDuration,
     'randomMusicEnable': randomMusicEnable,
     'randomMusicMinCooldown': randomMusicMinCooldown,
-    'randomMusicMaxCooldown': randomMusicMaxCooldown
+    'randomMusicMaxCooldown': randomMusicMaxCooldown,
+    'randomMusicSkipChance': randomMusicSkipChance,
+    'volumeBoostEnable': volumeBoostEnable,
+    'volumeBoostMinCooldown': volumeBoostMinCooldown,
+    'volumeBoostMaxCooldown': volumeBoostMaxCooldown,
+    'volumeBoostAmplitude': volumeBoostAmplitude
   };
 
   @override

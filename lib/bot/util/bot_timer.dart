@@ -2,16 +2,46 @@ import 'dart:async';
 
 class BotTimer {
   final void Function() _callback;
-  final Timer timer;
-  late final DateTime runTime;
+  final int Function() _getDuration;
+  final bool _periodic;
 
-  BotTimer(Duration duration, this._callback) : timer = Timer(duration, _callback) {
-    runTime = DateTime.fromMillisecondsSinceEpoch(duration.inMilliseconds + DateTime.now().millisecondsSinceEpoch);
+  late Timer timer;
+  late DateTime runTime;
+
+  BotTimer._(this._getDuration, this._callback, this._periodic) {
+    timer = Timer(Duration.zero, () {});
+    _createTimer();
+  }
+
+  static BotTimer delayed(int duration, Function() callback) {
+    return BotTimer._(() => duration, callback, false);
+  }
+
+  static BotTimer periodic(int Function() getDuration, Function() callback) {
+    return BotTimer._(getDuration, callback, true);
+  }
+
+  void _createTimer() {
+    var duration = _getDuration();
+    runTime = DateTime.fromMillisecondsSinceEpoch(DateTime.now().millisecondsSinceEpoch + duration);
+    if(_periodic) {
+      if(timer.isActive) timer.cancel();
+      timer = Timer(Duration(milliseconds: duration), () {
+        _callback();
+
+        _createTimer();
+      });
+    } else {
+      timer = Timer(Duration(milliseconds: duration), _callback); 
+    }
   }
 
   void runEarly() {
+    _callback();
     timer.cancel();
 
-    _callback();
+    if(_periodic) {
+      _createTimer();
+    }
   }
 }
