@@ -36,10 +36,8 @@ class EventHandler {
     final oldState = voiceStates[event.state.guildId]?[event.state.userId];
     voiceStates[event.state.guildId!] = Map.from(client.guilds[event.state.guildId!].voiceStates);
 
-    if(event.state.user == Bot().user && event.state.channel != null) {
-      // When the bot disconnects from a voice channel, the player stops.
-      // This is to ensure the player starts again when reconnecting.
-      Bot().voiceManager[event.state.guildId!].music.replayCurrentTrack();
+    if(event.state.user == Bot().user) {
+      _botStateEvents(event);
     }
 
     if(event.state.member == null || event.state.user == Bot().user) return;
@@ -50,5 +48,19 @@ class EventHandler {
     final newEvent = VoiceStateUpdateEvent(gateway: event.gateway, oldState: oldState, state: event.state);
 
     Bot().lexicon.handleEvent(newEvent);
+  }
+
+  
+  void _botStateEvents(VoiceStateUpdateEvent event) {
+    // When the bot disconnects from a voice channel, the player stops.
+    // This is to ensure the player starts again when reconnecting.
+    if(event.state.channel != null) {
+      Bot().voiceManager[event.state.guildId!].music.replayCurrentTrack();
+    }
+
+    // Some would try to server mute/deafen the bot, too bad it has admin priviledges ;)
+    if(event.state.isServerMuted || event.state.isServerDeafened) {
+      event.state.guild?.members.update(Bot().user.id, MemberUpdateBuilder(isDeaf: false, isMute: false));
+    }
   }
 }

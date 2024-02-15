@@ -15,9 +15,15 @@ class GuildVoiceManager {
   }
 
   void handleEvent(VoiceStateUpdateEvent event) async {
-    var botState = guild.voiceStates[Bot().user.id];
+    final botState = guild.voiceStates[Bot().user.id];
 
     _autoConnect(botState);
+  }
+
+  bool get isBotReadyForAudio {
+    final botState = guild.voiceStates[Bot().user.id];
+    if(botState == null || botState.channel == null || botState.isSelfMuted) return false;
+    return true;
   }
 
   void connectTo(Snowflake? id, [bool muted = false]) async {

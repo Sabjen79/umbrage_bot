@@ -38,6 +38,10 @@ class BotTimer {
 
   void runEarly() {
     _callback();
+    restart();
+  }
+
+  void restart() {
     timer.cancel();
 
     if(_periodic) {

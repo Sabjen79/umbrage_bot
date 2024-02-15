@@ -42,9 +42,24 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
     _queue = Bot().voiceManager[widget.guildId].music.queue;
   }
 
-  Widget listEntry(MusicTrack? track) {
+  Widget verticalDivider() {
     return Container(
-      color: track == null ? _queue.list.isEmpty ? DiscordTheme.black : DiscordTheme.backgroundColorDarkest : Colors.transparent,
+      width: 1.5,
+      height: 40,
+      margin: const EdgeInsets.symmetric(vertical: 7),
+      color: DiscordTheme.darkGray
+    );
+  }
+
+  Color entryColor(MusicTrack? track, bool even) {
+    if(track == null) return _queue.list.isEmpty ? DiscordTheme.black : DiscordTheme.backgroundColorDarkest;
+
+    return even ? Color.lerp(DiscordTheme.black, DiscordTheme.darkGray, 0.4)! : DiscordTheme.black;
+  }
+
+  Widget listEntry(MusicTrack? track, bool even) {
+    return Container(
+      color: entryColor(track, even),
       height: 40,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -53,7 +68,7 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
           Expanded(
             flex: 3,
             child: Padding(
-              padding: const EdgeInsets.only(left: 20),
+              padding: const EdgeInsets.only(left: 20, right: 10),
               child: Text(
                 track == null ? "Name" : track.track.info.title,
                 style: TextStyle(
@@ -65,10 +80,14 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
             ),
           ),
           
+          verticalDivider(),
+
           Expanded(
             flex: 1,
-            child: SizedBox(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               child: Text(
+                textAlign: TextAlign.center,
                 track == null ? "Author" : track.track.info.author,
                 style: TextStyle(
                   color: DiscordTheme.white2,
@@ -79,9 +98,12 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
             )
           ),
           
+          verticalDivider(),
+
           SizedBox(
             width: 90,
             child: Text(
+              textAlign: TextAlign.center,
               track == null ? "Duration" : track.track.info.length.toString().split('.')[0],
               style: TextStyle(
                 color: DiscordTheme.white2,
@@ -90,17 +112,24 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
             ),
           ),
 
-          SizedBox(
+          verticalDivider(),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
             width: 135,
             child: Text(
+              textAlign: TextAlign.center,
               track == null ? "Added By" : track.member.effectiveName,
               style: TextStyle(
-                color: DiscordTheme.white2,
-                fontWeight: track == null ? FontWeight.w500 : FontWeight.normal,
+                color: Bot().user.id == track?.member.id ? DiscordTheme.primaryColor : DiscordTheme.white2,
+                fontWeight: track == null || Bot().user.id == track.member.id ? FontWeight.w500 : FontWeight.normal,
                 overflow: TextOverflow.ellipsis
               ),
             ),
           ),
+
+          verticalDivider(),
+
           SizedBox(
             width: 110,
             child: Text(
@@ -131,10 +160,12 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: () {
           var list = <Widget>[];
-          list.add(listEntry(null));
+          list.add(listEntry(null, false));
 
+          bool even = false;
           for(var s in _queue.list) {
-            list.add(listEntry(s));
+            list.add(listEntry(s, even));
+            even = !even;
           }
 
           return list;

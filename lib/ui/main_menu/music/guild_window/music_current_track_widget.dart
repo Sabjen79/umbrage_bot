@@ -10,9 +10,8 @@ import 'package:umbrage_bot/ui/discord_theme.dart';
 
 class MusicCurrentTrackWidget extends StatefulWidget {
   final Snowflake guildId;
-  final double width;
 
-  const MusicCurrentTrackWidget(this.guildId, {required this.width, super.key});
+  const MusicCurrentTrackWidget(this.guildId, {super.key});
 
   @override
   State<MusicCurrentTrackWidget> createState() => _MusicCurrentTrackWidgetState();
@@ -78,6 +77,7 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
       children: [
         Container(
           decoration: BoxDecoration(
@@ -94,8 +94,7 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
               fit: BoxFit.cover,
             ),
         ),
-        SizedBox(
-          width: widget.width - 240,
+        Flexible(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,7 +125,13 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
                     ),
                     children: [
                       const TextSpan(text: "Added by: ", style: TextStyle(color: DiscordTheme.lightGray)),
-                      TextSpan(text: currentTrack!.member.effectiveName, style: const TextStyle(fontWeight: FontWeight.w500)),
+                      TextSpan(
+                        text: currentTrack!.member.effectiveName, 
+                        style: TextStyle(
+                          color: Bot().user.id == currentTrack?.member.id ? DiscordTheme.primaryColor : DiscordTheme.white2,
+                          fontWeight: FontWeight.w500,
+                        )
+                      ),
                     ]
                   ),
                 ),
@@ -150,7 +155,7 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
                     overflow: TextOverflow.ellipsis
                   ),
                   children: [
-                    const TextSpan(text: "Loop: ", style: TextStyle(color: DiscordTheme.primaryColor)),
+                    const TextSpan(text: "Loop: ", style: TextStyle(color: DiscordTheme.primaryColor, fontWeight: FontWeight.w500)),
                     TextSpan(text: _queue.loop ? "✅" : "⛔", style: const TextStyle(fontWeight: FontWeight.w500)),
                   ]
                 ),
@@ -168,7 +173,6 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.only(right: 5),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      width: widget.width,
       height: 200,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),

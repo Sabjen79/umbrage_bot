@@ -5,9 +5,9 @@ import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_button.dart';
 import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
-import 'package:umbrage_bot/ui/main_menu/music/music_current_track_widget.dart';
-import 'package:umbrage_bot/ui/main_menu/music/music_queue_widget.dart';
-import 'package:umbrage_bot/ui/main_menu/music/music_timer_widget.dart';
+import 'package:umbrage_bot/ui/main_menu/music/guild_window/music_current_track_widget.dart';
+import 'package:umbrage_bot/ui/main_menu/music/guild_window/music_queue_widget.dart';
+import 'package:umbrage_bot/ui/main_menu/music/guild_window/music_timer_widget.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 
 class MusicGuildWindow extends MainWindow {
@@ -30,25 +30,19 @@ class _MusicGuildWindowState extends State<MusicGuildWindow> {
 
     if(Bot().config.randomMusicEnable) {
       list.add(
-        Expanded(
-          child: MusicTimerWidget(
-            name: "Random Music",
-            timer: Bot().voiceManager[widget.guild.id].music.randomMusicManager.timer
-          ),
-        )
+        MusicTimerWidget(
+          name: "Random Music",
+          timer: Bot().voiceManager[widget.guild.id].music.randomMusicManager.timer
+        ),
       );
     }
     
     if(Bot().config.volumeBoostEnable) {
-      if(list.isNotEmpty) list.add(const SizedBox(height: 5));
-
       list.add(
-        Expanded(
-          child: MusicTimerWidget(
-            name: "Volume Boost",
-            timer: Bot().voiceManager[widget.guild.id].music.volumeBoostManager.timer
-          ),
-        )
+        MusicTimerWidget(
+          name: "Volume Boost",
+          timer: Bot().voiceManager[widget.guild.id].music.volumeBoostManager.timer
+        ),
       );
     }
     
@@ -87,21 +81,20 @@ class _MusicGuildWindowState extends State<MusicGuildWindow> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-              height: 200,
-              child: Row(
-                children: [
-                  MusicCurrentTrackWidget(
-                    widget.guild.id,
-                    width: MainMenu.getMainWindowWidth(context)*0.65,
-                  ),
-                  sideWidgets.isEmpty ? Container() : Expanded(
-                    child: Column(
-                      children: sideWidgets,
-                    )
-                  ),
-                ],
+              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+              child: Wrap(
+                direction: Axis.horizontal,
+                alignment: WrapAlignment.center,
+                children: sideWidgets,
               ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(bottom: 5, left: 20, right: 15),
+              width: MainMenu.getMainWindowWidth(context),
+              height: 200,
+              child: MusicCurrentTrackWidget(
+                widget.guild.id,
+              )
             ),
             MusicQueueWidget(widget.guild.id)
           ],

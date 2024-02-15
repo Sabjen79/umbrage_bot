@@ -26,6 +26,7 @@ class RandomMusicManager with JsonSerializable {
     timer = BotTimer.periodic(() => Bot().config.randomMusicCooldown, () async {
       String url = "";
       while(url.isEmpty && _songList.isNotEmpty && Bot().config.randomMusicEnable) {
+        if(!Bot().voiceManager[guildId].isBotReadyForAudio) return;
         url = _songList[Random().nextInt(_songList.length)];
 
         try {
