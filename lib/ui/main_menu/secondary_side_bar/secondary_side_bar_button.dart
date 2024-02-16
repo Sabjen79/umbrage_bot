@@ -45,11 +45,12 @@ class _SecondarySideBarButtonState extends State<SecondarySideBarButton> {
             _hover = b;
           });
         },
-        child: Stack(
-          alignment: Alignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Positioned(
-              left: 3,
+            Padding(
+              padding: const EdgeInsets.only(left: 3),
               child: Icon(
                 widget.icon,
                 fill: 1,
@@ -60,20 +61,22 @@ class _SecondarySideBarButtonState extends State<SecondarySideBarButton> {
                 color: DiscordTheme.lightGray,
               ),
             ),
-            Positioned(
-              left: 25,
-              top: 2,
-              child: Text(
-                widget.name,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  color: Color.lerp(DiscordTheme.lightGray, DiscordTheme.white2, hoverActiveValue()),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500
-                ),
-              ),
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 1, bottom: 1.5),
+                child: Text(
+                  widget.name,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    color: Color.lerp(DiscordTheme.lightGray, DiscordTheme.white2, hoverActiveValue()),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500
+                  )
+                )
+              )
             )
+            
           ],
         ),
       ),

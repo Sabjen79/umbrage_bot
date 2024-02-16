@@ -1,4 +1,5 @@
 import 'package:nyxx/nyxx.dart';
+import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
@@ -33,7 +34,7 @@ class LexiconVoiceJoinEvent extends LexiconEvent<VoiceStateUpdateEvent> {
   Future<Conversation> buildConversation(VoiceStateUpdateEvent event) async {
     return Conversation(
       content: getPhrase(),
-      channel: (await event.state.guild!.get()).systemChannel!,
+      channel: await Bot().config[event.state.guildId!].mainMessageChannel as PartialTextChannel,
       user: (await event.state.member!.get()).user
     );
   }

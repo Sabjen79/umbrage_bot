@@ -14,7 +14,7 @@ class VolumeBoostManager {
 
   VolumeBoostManager(this._queue) : _guildId = _queue.guildId {
     timer = BotTimer.periodic(() => Bot().config.volumeBoostCooldown, () async {
-      if(!Bot().config.volumeBoostEnable) return;
+      if(!Bot().config.volumeBoostEnable || !Bot().voiceManager[_guildId].isBotReadyForAudio) return;
 
       _ascendVolume();
       

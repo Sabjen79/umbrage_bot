@@ -49,7 +49,6 @@ class EventHandler {
 
     Bot().lexicon.handleEvent(newEvent);
   }
-
   
   void _botStateEvents(VoiceStateUpdateEvent event) {
     // When the bot disconnects from a voice channel, the player stops.

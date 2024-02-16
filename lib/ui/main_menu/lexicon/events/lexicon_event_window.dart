@@ -107,7 +107,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
       ));
     }
 
-    list.add(_getVariableListDivider("CUSTOM VARIABLES"));
+    if(Bot().lexicon.customVariables.isNotEmpty) list.add(_getVariableListDivider("CUSTOM VARIABLES"));
 
     for(var v in Bot().lexicon.customVariables) {
       list.add(LexiconEventVariableButton(

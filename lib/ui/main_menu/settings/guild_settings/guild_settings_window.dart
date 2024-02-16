@@ -22,17 +22,20 @@ class GuildSettingsWindow extends MainWindow {
   State<GuildSettingsWindow> createState() => _GuildSettingsWindowState();
 }
 
-class _MusicChannel {
+class _Channel {
   final String name;
   final int id;
 
-  _MusicChannel(this.name, this.id);
+  _Channel(this.name, this.id);
 }
 
 class _GuildSettingsWindowState extends State<GuildSettingsWindow> with SettingsRow {
   late final BotGuildConfiguration config;
-  final List<_MusicChannel> _musicChannels = [];
-  late _MusicChannel? _musicChannel;
+  final List<_Channel> _textChannels = [];
+  late _Channel? _mainTextChannel;
+
+  final List<_Channel> _musicChannels = [];
+  late _Channel? _musicChannel;
 
   @override
   void initState() {
@@ -43,22 +46,39 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
     reset();
   }
 
+  @override
+  void didUpdateWidget(covariant GuildSettingsWindow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    reset();
+  }
+
   void reset() {
-    _musicChannels..clear()..add(_MusicChannel("No Music Channel", 0));
+    _musicChannels..clear()..add(_Channel("No Music Channel", 0));
     _musicChannel = null;
+
+    _textChannels.clear();
+    _mainTextChannel = null;
 
     widget.guild.fetchChannels().then((v) {
       for(var channel in v) {
         if(channel is TextChannel && channel is! VoiceChannel) {
-          var mc = _MusicChannel(channel.name, channel.id.value);
+          var mc = _Channel(channel.name, channel.id.value);
+
           _musicChannels.add(mc);
           if(config.musicChannelId == mc.id) _musicChannel = mc;
+
+          _textChannels.add(mc);
+          if(config.mainMessageChannelId == mc.id) _mainTextChannel = mc;
         }
       }
 
       _musicChannel ??= _musicChannels[0];
+      _mainTextChannel ??= _textChannels[0];
 
-      setState(() {});
+      if(mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -70,7 +90,9 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
 
       MainMenuRouter().unblock();
     }, () async {
-      config.musicChannelId = _musicChannel!.id;
+      config
+        ..mainMessageChannelId = _mainTextChannel!.id
+        ..musicChannelId = _musicChannel!.id;
 
       config.saveToJson();
 
@@ -85,11 +107,46 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
       children: () {
         var list = <Widget>[];
 
-        list.add(titleRow("Music", false));
+        list.add(titleRow("Channels", false));
 
         list.addAll(
           settingsRow(
             first: true,
+            name: "Main Text Channel",
+            description: "The text channel where the bot will send messages when it doesn't have a text channel to respond to. For example, in Lexicon's Voice Join Event",
+            child: Container(
+              width: 200,
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: DiscordTheme.black,
+                borderRadius: BorderRadius.circular(5)
+              ),
+              child: DropdownButton<_Channel>(
+                items: _textChannels.map<DropdownMenuItem<_Channel>>((item) {
+                  return DropdownMenuItem(
+                    value: item,
+                    child: Text(item.name, textAlign: TextAlign.center),
+                  );
+                }).toList(),
+                value: _mainTextChannel,
+                underline: Container(),
+                dropdownColor: DiscordTheme.black,
+                isExpanded: true,
+                onChanged: (v) {
+                  if(v != _mainTextChannel) _showSaveChanges();
+
+                  setState(() {
+                    if(v != null) _mainTextChannel = v;
+                  });
+                },
+              ),
+            )
+          )
+        );
+
+        list.addAll(
+          settingsRow(
             name: "Music Channel",
             description: "The text channel where users can queue music\nIf set to 'No Music Channel', music will be disabled for that guild",
             child: Container(
@@ -100,8 +157,8 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
                 color: DiscordTheme.black,
                 borderRadius: BorderRadius.circular(5)
               ),
-              child: DropdownButton<_MusicChannel>(
-                items: _musicChannels.map<DropdownMenuItem<_MusicChannel>>((item) {
+              child: DropdownButton<_Channel>(
+                items: _musicChannels.map<DropdownMenuItem<_Channel>>((item) {
                   return DropdownMenuItem(
                     value: item,
                     child: Text(item.name, textAlign: TextAlign.center),

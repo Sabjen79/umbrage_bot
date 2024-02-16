@@ -54,9 +54,9 @@ class _StartMenuState extends State<StartMenu> {
 
       var router = MainMenuRouter();
       router.addRoute(BotProfileWindow());
-      router.addRoute(MusicWindow(guilds));
+      router.addRoute(MusicWindow());
       router.addRoute(LexiconWindow());
-      router.addRoute(SettingsWindow(guilds));
+      router.addRoute(SettingsWindow());
 
     }).then((_) {
       Navigator.pushReplacement(

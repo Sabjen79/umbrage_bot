@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:nyxx/nyxx.dart';
+import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/configuration/bot_guild_configuration.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
 import 'package:umbrage_bot/bot/util/json_serializable.dart';
@@ -55,6 +56,10 @@ class BotConfiguration with JsonSerializable {
     for(var g in guilds) {
       _guilds[g.id.toString()] = BotGuildConfiguration(g.id.toString());
     }
+
+    Bot().client.onGuildCreate.listen((event) {
+      _guilds[event.guild.id.toString()] = BotGuildConfiguration(event.guild.id.toString());
+    });
 
     reset();
   }
