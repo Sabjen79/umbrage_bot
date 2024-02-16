@@ -5,6 +5,7 @@ import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_extensions/nyxx_extensions.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/conversation/conversation_delimiters.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_private_event.dart';
 
 class Conversation {
   final List<String> messages;
@@ -30,6 +31,15 @@ class Conversation {
     if(user != null && eventUser != user) return;
 
     user ??= eventUser;
+    replyMessage = event.message;
+
+    sendMessage();
+  }
+
+  Future<void> advancePrivate(PrivateMessageEvent event) async {
+    if(event.message.author is! User || user?.id != event.message.author.id) return;
+
+    user ??= event.message.author as User;
     replyMessage = event.message;
 
     sendMessage();

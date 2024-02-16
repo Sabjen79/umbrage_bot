@@ -11,8 +11,6 @@ abstract class MainRoute {
   String _activeSubRoute = "";
 
   MainRoute(this.routeName, this.name, this.icon, [this.showSidebar = true]) {
-    refreshWindows();
-
     Bot().client.onGuildCreate.listen((event) {
       refreshWindows();
     });

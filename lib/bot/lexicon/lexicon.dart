@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/conversation/conversation_delimiters.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_announce_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_everyone_event.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_image_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_mention_event.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_private_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_voice_join_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_voice_leave_event.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_custom_variable.dart';
@@ -23,8 +26,11 @@ class Lexicon with ChangeNotifier {
     final BotFiles files = BotFiles();
 
     _events.addAll([
+      LexiconAnnounceEvent(this),
       LexiconMentionEvent(this),
       LexiconEveryoneEvent(this),
+      LexiconImageEvent(this),
+      LexiconPrivateEvent(this),
       LexiconVoiceJoinEvent(this),
       LexiconVoiceLeaveEvent(this)
     ]);
@@ -46,6 +52,11 @@ class Lexicon with ChangeNotifier {
 
     if(dispatchEvent is MessageCreateEvent) {
       conversations[dispatchEvent.message.channelId]?.advance(dispatchEvent);
+      return true;
+    }
+
+    if(dispatchEvent is PrivateMessageEvent) {
+      conversations[dispatchEvent.message.channelId]?.advancePrivate(dispatchEvent);
       return true;
     }
 

@@ -15,7 +15,7 @@ mixin JsonSerializable {
     File file = File(jsonFilepath);
 
     if(!file.existsSync()) {
-      saveToJson();
+      File(jsonFilepath)..createSync(recursive: true)..writeAsStringSync("{}");
       return {};
     }
 

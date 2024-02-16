@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
@@ -24,6 +23,7 @@ class _StartMenuState extends State<StartMenu> {
   List<Widget> profileWidgets = [];
   bool _loaded = false;
   bool _connecting = false;
+  String? _botName;
 
   @override
   void initState() {
@@ -43,20 +43,21 @@ class _StartMenuState extends State<StartMenu> {
 
   void connectBot(BotProfile profile) {
     setState(() {
+      _botName = profile.getUsername();
       _connecting = true;
     });
 
     Bot.create(profile).then((_) async {
-      List<Guild> guilds = [];
-      for(var pg in await Bot().client.listGuilds()) {
-        guilds.add(await pg.get());
-      }
 
       var router = MainMenuRouter();
       router.addRoute(BotProfileWindow());
       router.addRoute(MusicWindow());
       router.addRoute(LexiconWindow());
       router.addRoute(SettingsWindow());
+
+      for(final route in router.getMainRoutes()) {
+        await route.refreshWindows();
+      }
 
     }).then((_) {
       Navigator.pushReplacement(
@@ -98,9 +99,25 @@ class _StartMenuState extends State<StartMenu> {
   @override
   Widget build(BuildContext context) {
     if(!_loaded || _connecting) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
-          child: CircularProgressIndicator(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _connecting ? Padding(
+                padding: const EdgeInsets.only(bottom: 15),
+                child: Text(
+                  "$_botName is waking up. Please wait!", 
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500, 
+                    fontSize: 16
+                  )
+                )
+              ) : Container(),
+              const CircularProgressIndicator()
+            ],
+          ),
         ),
       );
     } else {

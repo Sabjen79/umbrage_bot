@@ -33,8 +33,8 @@ class BotGuildConfiguration with JsonSerializable {
   void reset() async {
     var json = loadFromJson();
 
-    musicChannelId = (json['musicChannelId'] ?? 0) as int;
     mainMessageChannelId = (json['mainMessageChannelId'] ?? await _defaultMainMessageChannel()) as int;
+    musicChannelId = (json['musicChannelId'] ?? 0) as int;
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_private_event.dart';
 
 class EventHandler {
   final NyxxGateway client;
@@ -23,7 +24,13 @@ class EventHandler {
   }
 
   void onMessageCreate(MessageCreateEvent event) async {
-    if(event.member == null) return;
+    if(event.member == null) {
+      if(event.message.author is User) {
+        Bot().lexicon.handleEvent(PrivateMessageEvent(event.message));
+      }
+      
+      return;
+    }
     final user = (await event.member!.get()).user!;
     if(user == Bot().user) return;
 
