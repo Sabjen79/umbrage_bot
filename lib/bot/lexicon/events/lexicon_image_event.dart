@@ -1,3 +1,4 @@
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
@@ -9,7 +10,7 @@ class LexiconImageEvent extends LexiconEvent<MessageCreateEvent> {
   LexiconMentionVariable mentionVariable = LexiconMentionVariable("Mentions the user that sent the message.");
 
   LexiconImageEvent(Lexicon l) :
-  super(l, "image", "Image Event", "When someone sends a message or video, the bot will respond") {
+  super(l, Symbols.image, "image", "Image Event", "When someone sends a message or video, the bot will respond") {
     variables.addAll([
       mentionVariable,
       LexiconEveryoneVariable()

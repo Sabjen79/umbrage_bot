@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_extensions/nyxx_extensions.dart';
 import 'package:umbrage_bot/bot/bot.dart';
@@ -62,12 +61,13 @@ class Conversation {
       for(var match in regex.allMatches(content)) {
         content = content.replaceAll(match[0]!, "");
 
+        var textEmoji = match[0]!.substring(ConversationDelimiters.reaction.delimiter.length);
         try {
-          var emoji = Bot().client.getTextEmoji(match[0]!.substring(ConversationDelimiters.reaction.delimiter.length));
+          var emoji = Bot().client.getTextEmoji(textEmoji);
           await replyMessage?.react(ReactionBuilder.fromEmoji(emoji));
           
         } catch (e) {
-          debugPrint("Unkown emoji");
+          Bot().logging.logger.warning("Unkown emoji: $textEmoji");
         }
       }
       
@@ -79,6 +79,8 @@ class Conversation {
           replyId: isReply ? replyMessage?.id : null
 
         ));
+      } else {
+        Bot().logging.logger.warning("Bot tried to send an empty message!");
       }
 
       isReply = false;

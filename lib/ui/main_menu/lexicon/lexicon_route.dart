@@ -5,8 +5,8 @@ import 'package:umbrage_bot/ui/main_menu/lexicon/events/lexicon_event_window.dar
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_route.dart';
 
-class LexiconWindow extends MainRoute {
-  LexiconWindow() : super("lexicon", "Lexicon", Symbols.quick_phrases) {
+class LexiconRoute extends MainRoute {
+  LexiconRoute() : super("lexicon", "Lexicon", Symbols.quick_phrases) {
     Bot().lexicon.addListener(() {
       refreshWindows();
     });

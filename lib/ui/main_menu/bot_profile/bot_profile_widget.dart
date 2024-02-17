@@ -83,7 +83,8 @@ class _BotProfileWidgetState extends State<BotProfileWidget> {
                   )
                 ]
               ),
-            )
+            ),
+            const SizedBox(height: 50),
           ],
         )
       ],

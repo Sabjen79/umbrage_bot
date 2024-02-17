@@ -22,7 +22,7 @@ class LexiconEventWindow extends MainWindow {
   LexiconEventWindow(this.event, {super.key}) : super(
     name: event.name,
     route: event.filename,
-    sideBarIcon: Symbols.event_upcoming,
+    sideBarIcon: event.sidebarIcon,
     category: "EVENTS",
   );
 

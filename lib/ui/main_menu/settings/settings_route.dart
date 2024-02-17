@@ -6,8 +6,8 @@ import 'package:umbrage_bot/ui/main_menu/settings/global_settings/conversation_s
 import 'package:umbrage_bot/ui/main_menu/settings/global_settings/music_settings_window.dart';
 import 'package:umbrage_bot/ui/main_menu/settings/guild_settings/guild_settings_window.dart';
 
-class SettingsWindow extends MainRoute {
-  SettingsWindow() : super("settings", "Settings", Symbols.settings);
+class SettingsRoute extends MainRoute {
+  SettingsRoute() : super("settings", "Settings", Symbols.settings);
 
   @override
   Future<List<MainWindow>> defineWindows() async {

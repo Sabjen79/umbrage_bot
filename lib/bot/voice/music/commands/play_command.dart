@@ -34,6 +34,11 @@ class PlayCommand extends MusicCommand {
       return;
     }
 
+    if(event.guild!.voiceStates[Bot().user.id]?.channel == null) {
+      final userState = event.guild!.voiceStates[event.member!.id]!;
+      Bot().voiceManager[event.guildId!].connectTo(userState.channelId);
+    }
+
     try {
       var result = await queue.lavalinkClient.loadTrack(url!);
       if(result is TrackLoadResult) {

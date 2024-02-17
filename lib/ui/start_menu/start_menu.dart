@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
-import 'package:umbrage_bot/ui/main_menu/bot_profile/bot_profile_window.dart';
-import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_window.dart';
+import 'package:umbrage_bot/ui/main_menu/bot_profile/bot_profile_route.dart';
+import 'package:umbrage_bot/ui/main_menu/console/console_route.dart';
+import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_route.dart';
 import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
-import 'package:umbrage_bot/ui/main_menu/music/music_window.dart';
+import 'package:umbrage_bot/ui/main_menu/music/music_route.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
-import 'package:umbrage_bot/ui/main_menu/settings/settings_window.dart';
+import 'package:umbrage_bot/ui/main_menu/settings/settings_route.dart';
 import 'package:umbrage_bot/ui/start_menu/add_profile.dart';
 import 'package:umbrage_bot/ui/start_menu/profile_widget.dart';
 
@@ -50,10 +51,11 @@ class _StartMenuState extends State<StartMenu> {
     Bot.create(profile).then((_) async {
 
       var router = MainMenuRouter();
-      router.addRoute(BotProfileWindow());
-      router.addRoute(MusicWindow());
-      router.addRoute(LexiconWindow());
-      router.addRoute(SettingsWindow());
+      router.addRoute(BotProfileRoute());
+      router.addRoute(ConsoleRoute());
+      router.addRoute(MusicRoute());
+      router.addRoute(LexiconRoute());
+      router.addRoute(SettingsRoute());
 
       for(final route in router.getMainRoutes()) {
         await route.refreshWindows();
@@ -108,7 +110,7 @@ class _StartMenuState extends State<StartMenu> {
               _connecting ? Padding(
                 padding: const EdgeInsets.only(bottom: 15),
                 child: Text(
-                  "$_botName is waking up. Please wait!", 
+                  "$_botName is waking up...", 
                   style: const TextStyle(
                     fontWeight: FontWeight.w500, 
                     fontSize: 16

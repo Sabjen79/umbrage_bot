@@ -1,3 +1,4 @@
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/conversation/conversation.dart';
@@ -9,7 +10,7 @@ class LexiconPrivateEvent extends LexiconEvent<PrivateMessageEvent> {
   LexiconMentionVariable mentionVariable = LexiconMentionVariable("Mentions the user that sent the message.");
 
   LexiconPrivateEvent(Lexicon l) :
-  super(l, "private", "Private Message Event", "When someone sends a private message to the bot, it will respond.") {
+  super(l, Symbols.lock, "private", "Private Message Event", "When someone sends a private message to the bot, it will respond.") {
     variables.addAll([
       mentionVariable,
     ]);

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/conversation/conversation.dart';
@@ -10,7 +11,7 @@ import 'package:umbrage_bot/bot/lexicon/variables/predefined/lexicon_everyone_va
 class LexiconAnnounceEvent extends LexiconEvent<AnnounceEvent> {
 
   LexiconAnnounceEvent(Lexicon l) :
-  super(l, "announce", "Announce Event", "Every 10 minutes, the bot will try to send a message to the main text channel. Consider a high cooldown and low chance to not make the bot spammy.") {
+  super(l, Symbols.event_upcoming, "announce", "Announce Event", "Every 10 minutes, the bot will try to send a message to the main text channel. Consider a high cooldown and low chance to not make the bot spammy.") {
     variables.addAll([
       LexiconEveryoneVariable()
     ]);

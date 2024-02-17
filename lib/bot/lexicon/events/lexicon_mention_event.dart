@@ -1,3 +1,4 @@
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/conversation/conversation.dart';
@@ -10,7 +11,7 @@ class LexiconMentionEvent extends LexiconEvent<MessageCreateEvent> {
   LexiconMentionVariable mentionVariable = LexiconMentionVariable("Mentions the user that sent the message.");
 
   LexiconMentionEvent(Lexicon l) :
-  super(l, "mention_bot", "Mention Event", "When someone mentions the bot's name, it will sometimes reply back.") {
+  super(l, Symbols.alternate_email, "mention_bot", "Mention Event", "When someone mentions the bot's name, it will sometimes reply back.") {
     variables.addAll([
       mentionVariable,
       LexiconEveryoneVariable()

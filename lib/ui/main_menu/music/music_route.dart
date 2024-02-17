@@ -4,8 +4,8 @@ import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/music/guild_window/music_guild_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_route.dart';
 
-class MusicWindow extends MainRoute {
-  MusicWindow() : super("music", "Music", Symbols.music_note);
+class MusicRoute extends MainRoute {
+  MusicRoute() : super("music", "Music", Symbols.music_note);
 
   @override
   Future<List<MainWindow>> defineWindows() async {

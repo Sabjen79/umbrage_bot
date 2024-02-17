@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
@@ -12,6 +13,7 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   final String _filename;
   final String _name;
   final String _description;
+  final IconData sidebarIcon;
   bool enabled = false;
   int cooldown = 600;
   double chance = 0.5;
@@ -21,7 +23,7 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   List<int> _phrasesRandomIndexes = [];
   int _cooldownEnd = 0;
 
-  LexiconEvent(this._lexicon, this._filename, this._name, this._description) {
+  LexiconEvent(this._lexicon, this.sidebarIcon, this._filename, this._name, this._description) {
     var json = loadFromJson();
 
     enabled = (json['enabled'] ?? false) as bool;
