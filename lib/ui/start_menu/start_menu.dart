@@ -4,6 +4,7 @@ import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
 import 'package:umbrage_bot/ui/main_menu/bot_profile/bot_profile_route.dart';
 import 'package:umbrage_bot/ui/main_menu/console/console_route.dart';
+import 'package:umbrage_bot/ui/main_menu/extensions/extensions_route.dart';
 import 'package:umbrage_bot/ui/main_menu/lexicon/lexicon_route.dart';
 import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
 import 'package:umbrage_bot/ui/main_menu/music/music_route.dart';
@@ -55,6 +56,7 @@ class _StartMenuState extends State<StartMenu> {
       router.addRoute(ConsoleRoute());
       router.addRoute(MusicRoute());
       router.addRoute(LexiconRoute());
+      router.addRoute(ExtensionsRoute());
       router.addRoute(SettingsRoute());
 
       for(final route in router.getMainRoutes()) {

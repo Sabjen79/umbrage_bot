@@ -61,7 +61,7 @@ class _ConsoleWindowState extends State<ConsoleWindow> {
       child: ListView(
         controller: _controller,
         children: [
-          Text(buffer.toString())
+          SelectableText(buffer.toString())
         ],
       )
     );
