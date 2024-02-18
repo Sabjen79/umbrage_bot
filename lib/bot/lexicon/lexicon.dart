@@ -7,6 +7,7 @@ import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_everyone_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_image_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_mention_event.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_mute_kick_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_private_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_voice_join_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_voice_leave_event.dart';
@@ -32,7 +33,8 @@ class Lexicon with ChangeNotifier {
       LexiconImageEvent(this),
       LexiconPrivateEvent(this),
       LexiconVoiceJoinEvent(this),
-      LexiconVoiceLeaveEvent(this)
+      LexiconVoiceLeaveEvent(this),
+      LexiconMuteKickEvent(this)
     ]);
 
     for(var file in files.getDir("lexicon/variables").listSync()) {

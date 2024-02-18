@@ -39,14 +39,6 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
   late TextEditingController _unskippableMessageController;
   late int _unskippableMinDuration;
   late int _unskippableMaxDuration;
-  late bool _randomMusicEnable;
-  late int _randomMusicMinCooldown;
-  late int _randomMusicMaxCooldown;
-  late double _randomMusicSkipChance;
-  late bool _volumeBoostEnable;
-  late int _volumeBoostMinCooldown;
-  late int _volumeBoostMaxCooldown;
-  late int _volumeBoostAmplitude;
 
   @override
   void initState() {
@@ -72,14 +64,6 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
     _unskippableMessageController = TextEditingController(text: config.unskippableMessage);
     _unskippableMinDuration = config.unskippableMinDuration;
     _unskippableMaxDuration = config.unskippableMaxDuration;
-    _randomMusicEnable = config.randomMusicEnable;
-    _randomMusicMinCooldown = config.randomMusicMinCooldown;
-    _randomMusicMaxCooldown = config.randomMusicMaxCooldown;
-    _randomMusicSkipChance = config.randomMusicSkipChance;
-    _volumeBoostEnable = config.volumeBoostEnable;
-    _volumeBoostMinCooldown = config.volumeBoostMinCooldown;
-    _volumeBoostMaxCooldown = config.volumeBoostMaxCooldown;
-    _volumeBoostAmplitude = config.volumeBoostAmplitude;
   }
 
   void _showSaveChanges() {
@@ -107,15 +91,7 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
         ..botUnskippableChance = _botUnskippableChance
         ..unskippableMessage = _unskippableMessageController.text
         ..unskippableMinDuration = _unskippableMinDuration
-        ..unskippableMaxDuration = _unskippableMaxDuration
-        ..randomMusicEnable = _randomMusicEnable
-        ..randomMusicMinCooldown = _randomMusicMinCooldown
-        ..randomMusicMaxCooldown = _randomMusicMaxCooldown
-        ..randomMusicSkipChance = _randomMusicSkipChance
-        ..volumeBoostEnable = _volumeBoostEnable
-        ..volumeBoostMinCooldown = _volumeBoostMinCooldown
-        ..volumeBoostMaxCooldown = _volumeBoostMaxCooldown
-        ..volumeBoostAmplitude = _volumeBoostAmplitude;
+        ..unskippableMaxDuration = _unskippableMaxDuration;
 
       config.saveToJson();
 
@@ -193,142 +169,6 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
                 onChanged: (b) {
                   setState(() {
                     _autoConnectVoicePersist = b;
-                  });
-
-                  _showSaveChanges();
-                }
-              )
-            )
-          );
-        }
-
-        // RANDOM MUSIC
-        list.add(titleRow("Random Music Timer"));
-
-        list.addAll(
-          settingsRow(
-            first: true,
-            name: "Random Music",
-            description: "If enabled, the bot will periodically queue music by his own, based on what was previously queued by other users.\nThe bot will memorize songs even if this feature is disabled.",
-            child: SimpleSwitch(
-              size: 45,
-              value: _randomMusicEnable,
-              onChanged: (b) {
-                setState(() {
-                  _randomMusicEnable = b;
-                });
-
-                _showSaveChanges();
-              }
-            )
-          )
-        );
-
-        if(_randomMusicEnable) {
-          list.addAll(
-            settingsRow(
-              name: "Random Music Cooldown",
-              description: "The time period that the bot will wait before queueing another song.",
-              child: RangeSlider(
-                divisions: 55,
-                min: 300000,
-                max: 3600000,
-                labels: RangeLabels(
-                  "${(_randomMusicMinCooldown/60000).toStringAsFixed(0)} minutes", 
-                  "${(_randomMusicMaxCooldown/60000).toStringAsFixed(0)} minutes"
-                ),
-                values: RangeValues(_randomMusicMinCooldown.toDouble(), _randomMusicMaxCooldown.toDouble()),
-                onChanged: (v) {
-                  setState(() {
-                    _randomMusicMinCooldown = v.start.toInt();
-                    _randomMusicMaxCooldown = v.end.toInt();
-                  });
-
-                  _showSaveChanges();
-                }
-              )
-            )
-          );
-
-          list.addAll(
-            settingsRow(
-              name: "Random Music Skip Chance",
-              description: "If there is a song queued by an user and the bot queues a song by his own, there is a chance that the bot will skip the user's song to listen to his own quicker. Leave at 0% to disable.",
-              child: SimpleChanceField(
-                chance: _randomMusicSkipChance,
-                onChanged: (v) {
-                  setState(() {
-                    _randomMusicSkipChance = v;
-                  });
-
-                  _showSaveChanges();
-                }
-              )
-            )
-          );
-        }
-
-        // VOLUME BOOST
-        list.add(titleRow("Volume Boost"));
-
-        list.addAll(
-          settingsRow(
-            first: true,
-            name: "Random Volume Boost",
-            description: "If enabled, the bot will periodically boost the volume of the music for a very short while, to annoy everyone listening to him.",
-            child: SimpleSwitch(
-              size: 45,
-              value: _volumeBoostEnable,
-              onChanged: (b) {
-                setState(() {
-                  _volumeBoostEnable = b;
-                });
-
-                _showSaveChanges();
-              }
-            )
-          )
-        );
-
-        if(_volumeBoostEnable) {
-          list.addAll(
-            settingsRow(
-              name: "Volume Boost Cooldown",
-              description: "The time period that the bot will wait before boosting the volume again.",
-              child: RangeSlider(
-                divisions: 30,
-                min: 1800000,
-                max: 10800000,
-                labels: RangeLabels(
-                  "${(_volumeBoostMinCooldown/60000).toStringAsFixed(0)} minutes", 
-                  "${(_volumeBoostMaxCooldown/60000).toStringAsFixed(0)} minutes"
-                ),
-                values: RangeValues(_volumeBoostMinCooldown.toDouble(), _volumeBoostMaxCooldown.toDouble()),
-                onChanged: (v) {
-                  setState(() {
-                    _volumeBoostMinCooldown = v.start.toInt();
-                    _volumeBoostMaxCooldown = v.end.toInt();
-                  });
-
-                  _showSaveChanges();
-                }
-              )
-            )
-          );
-
-          list.addAll(
-            settingsRow(
-              name: "Volume Boost Amplitude",
-              description: "The volume amplitude of the boost. 100% is normal volume.",
-              child: Slider(
-                divisions: 16,
-                min: 100,
-                max: 500,
-                label: "${_volumeBoostAmplitude.toString()}%",
-                value: _volumeBoostAmplitude.toDouble(),
-                onChanged: (v) {
-                  setState(() {
-                    _volumeBoostAmplitude = v.toInt();
                   });
 
                   _showSaveChanges();

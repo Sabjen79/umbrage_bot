@@ -47,6 +47,11 @@ class BotConfiguration with JsonSerializable {
   late int volumeBoostMaxCooldown;
   late int volumeBoostAmplitude;
   int get volumeBoostCooldown => _randomCooldown(volumeBoostMinCooldown, volumeBoostMaxCooldown);
+
+  late bool muteKickEnable;
+  late bool muteKickOnlyMute;
+  late bool muteKickIgnoreAfk;
+  late int muteKickDuration;
   
   int _randomCooldown(int min, int max) {
     return min == max ? min : min + Random().nextInt(max - min);
@@ -99,6 +104,11 @@ class BotConfiguration with JsonSerializable {
     volumeBoostMinCooldown = (json['volumeBoostMinCooldown'] ?? 3600000) as int;
     volumeBoostMaxCooldown = (json['volumeBoostMaxCooldown'] ?? 7200000) as int;
     volumeBoostAmplitude = (json['volumeBoostAmplitude'] ?? 200) as int;
+
+    muteKickEnable = (json['muteKickEnable'] ?? false) as bool;
+    muteKickOnlyMute = (json['muteKickOnlyMute'] ?? true) as bool;
+    muteKickIgnoreAfk = (json['muteKickIgnoreAfk'] ?? true) as bool;
+    muteKickDuration = (json['muteKickDuration'] ?? 300000) as int;
   }
 
   @override
@@ -130,7 +140,11 @@ class BotConfiguration with JsonSerializable {
     'volumeBoostEnable': volumeBoostEnable,
     'volumeBoostMinCooldown': volumeBoostMinCooldown,
     'volumeBoostMaxCooldown': volumeBoostMaxCooldown,
-    'volumeBoostAmplitude': volumeBoostAmplitude
+    'volumeBoostAmplitude': volumeBoostAmplitude,
+    'muteKickEnable': muteKickEnable,
+    'muteKickOnlyMute': muteKickOnlyMute,
+    'muteKickIgnoreAfk': muteKickIgnoreAfk,
+    'muteKickDuration': muteKickDuration,
   };
 
   @override
