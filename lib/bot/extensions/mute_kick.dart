@@ -20,7 +20,7 @@ class MuteKick {
     if(status == 0) {
       _timers[member]?.cancel();
     } else if(status == 1) {
-      _timers[member] = Timer(Duration(seconds: 3), () {
+      _timers[member] = Timer(Duration(milliseconds: Bot().config.muteKickDuration), () {
         _disconnectMember(member);
       });
     }
