@@ -19,8 +19,7 @@ class LexiconImageEvent extends LexiconEvent<MessageCreateEvent> {
 
   @override
   Future<bool> validateEvent(MessageCreateEvent event) async {
-    var user = (await event.member!.get()).user!;
-    mentionVariable.setSecondaryValue(user);
+    mentionVariable.setSecondaryValue(event.member!.id);
 
     final list = event.message.attachments;
 
@@ -40,6 +39,7 @@ class LexiconImageEvent extends LexiconEvent<MessageCreateEvent> {
       content: getPhrase(),
       channel: event.message.channel,
       replyMessage: event.message,
+      user: event.message.author as User,
       isReply: true
     );
   }

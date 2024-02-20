@@ -68,7 +68,7 @@ class Lexicon with ChangeNotifier {
   // Events
   List<LexiconEvent> get events => _events;
 
-  LexiconEvent getEvent<T extends LexiconEvent>() {
+  LexiconEvent getLexiconEvent<T extends LexiconEvent>() {
     if(T.toString() == "LexiconEvent") throw Exception("Lexicon.getEvent() should be called with a generic type included");
 
     for(var event in _events) {
@@ -80,7 +80,7 @@ class Lexicon with ChangeNotifier {
     throw Exception("Event does not exist.");
   }
 
-  Result<LexiconEvent> updateEvent(String filename, bool enabled, double chance, int cooldown, List<String> phrases) {
+  Result<LexiconEvent> updateLexiconEvent(String filename, bool enabled, double chance, int cooldown, List<String> phrases) {
     if(enabled && chance == 0) return Result.failure("Chance is 0. Disable the event instead.");
 
     for(var p in phrases) {

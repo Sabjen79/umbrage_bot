@@ -9,6 +9,7 @@ import 'package:umbrage_bot/bot/lexicon/variables/predefined/lexicon_mention_var
 
 class LexiconVoiceLeaveEvent extends LexiconEvent<VoiceStateUpdateEvent> {
   LexiconMentionVariable mentionVariable = LexiconMentionVariable("Mentions the user that joined the voice channel.");
+  bool disableFutureEvent = false;
 
   LexiconVoiceLeaveEvent(Lexicon l) :
   super(l, Symbols.phone_forwarded, "voice_leave", "Voice Leave Event", "When someone leaves the voice channel that the bot is in, it will respond.") {
@@ -21,13 +22,17 @@ class LexiconVoiceLeaveEvent extends LexiconEvent<VoiceStateUpdateEvent> {
   @override
   Future<bool> validateEvent(VoiceStateUpdateEvent event) async {
     var textChannel = (await event.state.guild?.get())?.systemChannel;
-    var user = (await event.state.member?.get())?.user;
 
-    if(textChannel == null || user == null) return false;
+    if(textChannel == null || event.state.member == null) return false;
     if(event.state.channelId != null || event.oldState!.channelId == null) return false;
     if(event.oldState!.channelId != event.state.guild?.voiceStates[Bot().user.id]?.channelId) return false;
       
-    mentionVariable.setSecondaryValue(user);
+    mentionVariable.setSecondaryValue(event.state.userId);
+
+    if(disableFutureEvent) {
+      disableFutureEvent = false;
+      return false;
+    }
 
     return true;
   }

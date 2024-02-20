@@ -143,7 +143,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
 
       MainMenuRouter().unblock();
     }, () async {
-      var result = Bot().lexicon.updateEvent(widget.event.filename, _enabled, _chance, _cooldown, _phrases);
+      var result = Bot().lexicon.updateLexiconEvent(widget.event.filename, _enabled, _chance, _cooldown, _phrases);
 
       if(!result.isSuccess) {
         showDialog(

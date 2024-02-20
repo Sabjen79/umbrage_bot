@@ -19,11 +19,10 @@ class LexiconEveryoneEvent extends LexiconEvent<MessageCreateEvent> {
 
   @override
   Future<bool> validateEvent(MessageCreateEvent event) async {
-    var user = (await event.member!.get()).user!;
     var content = event.message.content;
     if(!content.contains("@everyone") && !content.contains("@here")) return false;
       
-    mentionVariable.setSecondaryValue(user);
+    mentionVariable.setSecondaryValue(event.member!.id);
 
     return true;
   }
@@ -34,6 +33,7 @@ class LexiconEveryoneEvent extends LexiconEvent<MessageCreateEvent> {
       content: getPhrase(),
       channel: event.message.channel,
       replyMessage: event.message,
+      user: event.message.author as User,
       isReply: true
     );
   }

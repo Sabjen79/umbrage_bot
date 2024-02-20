@@ -21,13 +21,12 @@ class LexiconVoiceJoinEvent extends LexiconEvent<VoiceStateUpdateEvent> {
   @override
   Future<bool> validateEvent(VoiceStateUpdateEvent event) async {
     var textChannel = (await event.state.guild?.get())?.systemChannel;
-    var user = (await event.state.member?.get())?.user;
 
-    if(textChannel == null || user == null) return false;
+    if(textChannel == null || event.state.member == null) return false;
     if(event.state.channelId == null || event.oldState!.channelId != null) return false;
     if(event.state.channelId != event.state.guild?.voiceStates[Bot().user.id]?.channelId) return false;
       
-    mentionVariable.setSecondaryValue(user);
+    mentionVariable.setSecondaryValue(event.state.userId);
 
     return true;
   }

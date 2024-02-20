@@ -1,12 +1,12 @@
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/conversation/chat_alert.dart';
+import 'package:umbrage_bot/bot/extensions/random_music_manager.dart';
+import 'package:umbrage_bot/bot/extensions/volume_boost_manager.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/loop_command.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/music_command.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/play_command.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/skip_command.dart';
-import 'package:umbrage_bot/bot/voice/music/features/random_music_manager.dart';
-import 'package:umbrage_bot/bot/voice/music/features/volume_boost_manager.dart';
 import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
 
 class GuildMusicManager {

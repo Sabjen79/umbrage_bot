@@ -4,6 +4,7 @@ import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_lavalink/nyxx_lavalink.dart';
 import 'package:umbrage_bot/bot/components/event_handler.dart';
 import 'package:umbrage_bot/bot/configuration/bot_configuration.dart';
+import 'package:umbrage_bot/bot/extensions/mute_kick.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
@@ -19,6 +20,7 @@ class Bot {
   late final Lexicon lexicon;
   late final EventHandler eventHandler;
   late final BotVoiceManager voiceManager;
+  late final MuteKick muteKick;
   //final ProfilePictureChanger _pfpChanger = ProfilePictureChanger();
 
   // Singleton
@@ -64,8 +66,8 @@ class Bot {
       ..config = BotConfiguration(guilds)
       ..lexicon = Lexicon()
       ..eventHandler = EventHandler(_instance.client)
-      ..voiceManager = BotVoiceManager(guilds);
-      
+      ..voiceManager = BotVoiceManager(guilds)
+      ..muteKick = MuteKick();
   }
 
   //==============================================================================

@@ -21,7 +21,7 @@ class LexiconPrivateEvent extends LexiconEvent<PrivateMessageEvent> {
     var user = event.message.author as User;
     if(user.id == Bot().user.id) return false;
       
-    mentionVariable.setSecondaryValue(user);
+    mentionVariable.setSecondaryValue(user.id);
 
     return true;
   }
@@ -32,8 +32,8 @@ class LexiconPrivateEvent extends LexiconEvent<PrivateMessageEvent> {
       content: getPhrase(),
       channel: event.message.channel,
       replyMessage: event.message,
-      isReply: true,
-      user: event.message.author as User
+      user: event.message.author as User,
+      isReply: true
     );
   }
 

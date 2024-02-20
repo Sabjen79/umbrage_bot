@@ -24,7 +24,7 @@ class EventHandler {
   }
 
   void onMessageCreate(MessageCreateEvent event) async {
-    if(event.member == null) {
+    if(event.member == null || event.message.author is WebhookAuthor) {
       if(event.message.author is User) {
         Bot().lexicon.handleEvent(PrivateMessageEvent(event.message));
       }
@@ -45,16 +45,19 @@ class EventHandler {
 
     if(event.state.user == Bot().user) {
       _botStateEvents(event);
+      return;
     }
 
-    if(event.state.member == null || event.state.user == Bot().user) return;
-    
+    if(event.state.member == null) return;
+
     Bot().voiceManager[event.state.guildId!].handleEvent(event);
 
     if(oldState == null) return;
     final newEvent = VoiceStateUpdateEvent(gateway: event.gateway, oldState: oldState, state: event.state);
 
-    Bot().lexicon.handleEvent(newEvent);
+    Bot()
+    ..lexicon.handleEvent(newEvent)
+    ..muteKick.handleEvent(newEvent);
   }
   
   void _botStateEvents(VoiceStateUpdateEvent event) {
