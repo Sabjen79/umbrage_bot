@@ -109,5 +109,5 @@ class RandomMusicManager with JsonSerializable {
   }
   
   @override
-  String get jsonFilepath => "${BotFiles().getMainDir().path}/guilds/${guildId.toString()}/saved_songs.json";
+  String get jsonFilepath => "${BotFiles().getDirForGuild(guildId.toString()).path}/saved_songs.json";
 }

@@ -33,7 +33,7 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   }
 
   @override
-  String get jsonFilepath => "${BotFiles().getMainDir().path}/lexicon/events/$filename.json";
+  String get jsonFilepath => "${BotFiles().getDir("lexicon/events").path}/$filename.json";
 
   @override
   Map<String, dynamic> toJson() => {

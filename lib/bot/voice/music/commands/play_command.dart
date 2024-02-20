@@ -14,7 +14,7 @@ class PlayCommand extends MusicCommand {
   Future<bool> validateEvent(MessageCreateEvent event) async {
     final String content = event.message.content;
 
-    if(!content.startsWith("-p ") && !content.startsWith("-play ") || content.split(' ').length != 2) return false;
+    if(!content.startsWith("-p ") && !content.startsWith("-play ") || content.split(' ').length < 2) return false;
 
     url = event.message.content.substring(event.message.content.indexOf(" ") + 1).trim();
 

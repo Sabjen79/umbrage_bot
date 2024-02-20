@@ -7,8 +7,8 @@ import 'package:umbrage_bot/ui/main_menu/router/main_route.dart';
 
 class LexiconRoute extends MainRoute {
   LexiconRoute() : super("lexicon", "Lexicon", Symbols.quick_phrases) {
-    Bot().lexicon.addListener(() {
-      refreshWindows();
+    Bot().lexicon.addListener(() async {
+      await refreshWindows();
     });
   }
 

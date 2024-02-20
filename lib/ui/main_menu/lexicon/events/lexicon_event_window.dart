@@ -36,11 +36,12 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
   late int _cooldown;
   late List<String> _phrases;
 
-  late final List<LexiconVariable> _variables;
+  late List<LexiconVariable> _variables;
   
   late TextEditingController _cooldownControllerHour, _cooldownControllerMinutes, _cooldownControllerSeconds;
 
   void init() {
+    _variables = [...widget.event.variables, ...Bot().lexicon.customVariables];
     _enabled = widget.event.enabled;
     _chance = widget.event.chance;
     _cooldown = widget.event.cooldown;
@@ -124,7 +125,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
   @override
   void initState() {
     super.initState();
-    _variables = [...widget.event.variables, ...Bot().lexicon.customVariables];
+    
     init();
   }
 

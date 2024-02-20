@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:nyxx/nyxx.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 
@@ -45,8 +44,8 @@ class BotFiles {
   }
 
   // If additional dir is not passed, returns 'guilds/$id', otherwise it returns 'guilds/$id/$dir'
-  Directory getDirForGuild(PartialGuild g, {String dir = ""}) {
-    return getDir("guilds/${g.id}${dir == "" ? "" : "/$dir"}"); 
+  Directory getDirForGuild(String id, [String dir = ""]) {
+    return getDir("guilds/$id${dir.isEmpty ? "" : "/$dir"}"); 
   }
 
   void deleteFile(String path) {

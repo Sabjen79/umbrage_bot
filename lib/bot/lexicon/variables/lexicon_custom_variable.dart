@@ -17,7 +17,7 @@ class LexiconCustomVariable extends LexiconVariable with JsonSerializable {
   }
 
   static LexiconCustomVariable fromJson(String filename) {
-    File f = File("${BotFiles().getMainDir().path}/lexicon/variables/$filename");
+    File f = File("${BotFiles().getDir("lexicon/variables").path}/$filename");
     var json = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
 
     return LexiconCustomVariable(filename.split('.').first, json['name'], json['description'], json['color'], List<String>.from(json['words']));
@@ -33,7 +33,7 @@ class LexiconCustomVariable extends LexiconVariable with JsonSerializable {
   }
   
   @override
-  String get jsonFilepath => "${BotFiles().getMainDir().path}/lexicon/variables/$keyword.json";
+  String get jsonFilepath => "${BotFiles().getDir("lexicon/variables").path}/$keyword.json";
   
   @override
   Map<String, dynamic> toJson() => {

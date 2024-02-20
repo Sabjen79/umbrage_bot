@@ -11,8 +11,8 @@ abstract class MainRoute {
   String _activeSubRoute = "";
 
   MainRoute(this.routeName, this.name, this.icon, [this.showSidebar = true]) {
-    Bot().client.onGuildCreate.listen((event) {
-      refreshWindows();
+    Bot().client.onGuildCreate.listen((event) async {
+      await refreshWindows();
     });
   }
 
@@ -24,8 +24,9 @@ abstract class MainRoute {
   Future<List<MainWindow>> defineWindows();
 
   Future<void> refreshWindows() async {
+    final windows = await defineWindows();
     _windows.clear();
-    for(final window in await defineWindows()) {
+    for(final window in windows) {
       _windows[window.route] = window;
 
       if(_activeSubRoute.isEmpty) _activeSubRoute = window.route;
@@ -33,7 +34,7 @@ abstract class MainRoute {
   }
 
   void routeTo(String route) {
-    if(!_windows.containsKey(route)) throw Exception("Subroute doesn't exist: $route");
+    //if(!_windows.containsKey(route)) throw Exception("Subroute doesn't exist: $route");
 
     _activeSubRoute = route;
   }

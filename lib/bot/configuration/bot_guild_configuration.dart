@@ -44,5 +44,5 @@ class BotGuildConfiguration with JsonSerializable {
   };
 
   @override
-  String get jsonFilepath => "${BotFiles().getMainDir().path}/guilds/$guildId/config.json";
+  String get jsonFilepath => "${BotFiles().getDirForGuild(guildId).path}/config.json";
 }
