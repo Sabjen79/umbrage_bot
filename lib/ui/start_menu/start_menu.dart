@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
+import 'package:umbrage_bot/ui/components/simple_discord_button.dart';
 import 'package:umbrage_bot/ui/main_menu/bot_profile/bot_profile_route.dart';
 import 'package:umbrage_bot/ui/main_menu/console/console_route.dart';
 import 'package:umbrage_bot/ui/main_menu/extensions/extensions_route.dart';
@@ -129,13 +130,15 @@ class _StartMenuState extends State<StartMenu> {
         floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
         floatingActionButton: Padding(
           padding: const EdgeInsets.only(top: 25, right: 13),
-          child: ElevatedButton(
-            onPressed: () => showDialog(
+          child: SimpleDiscordButton(
+            width: 70,
+            height: 30,
+            text: "Add Bot",
+            onTap: () => showDialog(
               context: context, 
               builder: (BuildContext context) => AddProfile(addProfile)
             ),
-            child: const Text("Add New Bot"),
-          ),
+          )
         ),
         body: Center(
           child: () {

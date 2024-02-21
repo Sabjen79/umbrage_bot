@@ -1,7 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AddProfile extends StatefulWidget {
   final Function(BotProfile) _addProfileFunction;
@@ -67,18 +69,34 @@ class _AddProfileState extends State<AddProfile> {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 30),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
             child: SizedBox(
               width: 250,
-              child: Text(
-                "Go to Discord Developer Portal and create a new Application. In the 'Bot' panel, copy your bot token and insert it below.",
+              child: RichText(
                 textAlign: TextAlign.center,
+                text: TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: "Go to "
+                    ),
+                    TextSpan(
+                      text: 'Discord Developer Portal',
+                      style: const TextStyle(color: Colors.blue),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () { launchUrl(Uri.parse('https://discord.com/developers/applications'));
+                      },
+                    ),
+                    const TextSpan(
+                      text: " and create a new Application. In the 'Bot' panel, copy your bot token and insert it below."
+                    )
+                  ]
+                )
               )
             )
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 30),
+            padding: const EdgeInsets.only(bottom: 10),
             child: SizedBox(
               width: 250,
               child: TextField(
