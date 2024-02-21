@@ -10,12 +10,11 @@ import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
-import 'package:umbrage_bot/bot/util/streamable_string_buffer.dart';
 import 'package:umbrage_bot/bot/voice/bot_voice_manager.dart';
+import 'package:umbrage_bot/ui/main_menu/console/console_window.dart';
 
 class Bot {
   late final NyxxGateway client; // Discord Client
-  late final Logging logging;
   late User user;
   late final BotConfiguration config;
   late final Lexicon lexicon;
@@ -37,9 +36,12 @@ class Bot {
   //==============================================================================
 
   static Future<void> create(BotProfile profile) async {
-    final buffer = StreamableStringBuffer();
-    _instance.logging = Logging(stdout: buffer, stderr: buffer);
-
+    // Console Output
+    ConsoleWindow.buffer = StringBuffer();
+    logging.logger.onRecord.listen((event) {
+      ConsoleWindow.buffer.writeln("[${event.time.toString()}] ${event.toString()}");
+    });
+    
     _instance.client = await Nyxx.connectGateway(
       profile.getToken(),
       GatewayIntents.all,
@@ -47,7 +49,7 @@ class Bot {
         loggerName: 'Umbrage',
         plugins: [
           LavalinkPlugin(base: Uri.http("lavalink-v4.teramont.net:25569"), password: "eHKuFcz67k4lBS64"),
-          _instance.logging, 
+          logging, 
           cliIntegration
         ]
       ),

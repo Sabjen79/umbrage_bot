@@ -90,7 +90,7 @@ mixin ExtensionCover {
         Padding(
           padding: const EdgeInsets.only(top: 130),
           child: ListView(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             children: children ?? [],
           )
         )

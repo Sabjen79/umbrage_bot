@@ -33,6 +33,7 @@ class ProfilePictureManager {
 
       if(image != null) {
         Bot().client.user.manager.updateCurrentUser(UserUpdateBuilder(avatar: image));
+        logging.logger.info("Bot updated his profile picture.");
       }
     });
   }
@@ -59,7 +60,7 @@ class ProfilePictureManager {
 
     for(final file in newFiles) {
       if(_pictures.contains(file)) continue;
-      final name = file.readAsBytesSync().hashCode.toString();
+      final name = file.path.hashCode.toString();
       final extension = file.path.split('.').last;
 
       file.copySync("${_directory.path}\\$name.$extension");

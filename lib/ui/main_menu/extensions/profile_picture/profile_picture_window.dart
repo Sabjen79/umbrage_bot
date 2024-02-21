@@ -7,6 +7,7 @@ import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/configuration/bot_configuration.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/main_menu/extensions/extension_cover.dart';
+import 'package:umbrage_bot/ui/main_menu/extensions/profile_picture/profile_picture_cooldown.dart';
 import 'package:umbrage_bot/ui/main_menu/extensions/profile_picture/profile_picture_image.dart';
 import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
@@ -100,6 +101,8 @@ class _ProfilePictureWindowState extends State<ProfilePictureWindow> with Extens
       allowMultiple: true
     );
 
+    windowManager.setIgnoreMouseEvents(false);
+
     if (result != null) {
       List<File> files = result.paths.map((path) => File(path!)).toList();
 
@@ -118,8 +121,6 @@ class _ProfilePictureWindowState extends State<ProfilePictureWindow> with Extens
     } else {
       // User canceled the picker
     }
-
-    windowManager.setIgnoreMouseEvents(false);
   }
 
   @override
@@ -138,6 +139,11 @@ class _ProfilePictureWindowState extends State<ProfilePictureWindow> with Extens
       children: [
         Column(
           children: [
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: ProfilePictureCooldown(),
+            ),
+            
             SizedBox(
               width: MainMenu.getMainWindowWidth(context),
               child: Wrap(

@@ -67,7 +67,7 @@ class Conversation {
           await replyMessage?.react(ReactionBuilder.fromEmoji(emoji));
           
         } catch (e) {
-          Bot().logging.logger.warning("Unkown emoji: $textEmoji");
+          logging.logger.warning("Unkown emoji: $textEmoji");
         }
       }
       
@@ -80,7 +80,7 @@ class Conversation {
 
         ));
       } else {
-        Bot().logging.logger.warning("Bot tried to send an empty message!");
+        logging.logger.warning("Bot tried to send an empty message!");
       }
 
       isReply = false;

@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/bot/util/streamable_string_buffer.dart';
+import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 
 class ConsoleWindow extends MainWindow {
+  static late StringBuffer buffer;
+
   const ConsoleWindow({super.key}) : super(
     name: "console",
     route: "console"
@@ -18,27 +19,27 @@ class ConsoleWindow extends MainWindow {
 }
 
 class _ConsoleWindowState extends State<ConsoleWindow> {
-  final StreamableStringBuffer buffer = Bot().logging.stdout as StreamableStringBuffer;
-  late final StreamSubscription _streamSubscription;
   late final ScrollController _controller;
+  late final StreamSubscription _subscription;
   bool _firstBuild = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = ScrollController();
-
-    _streamSubscription = buffer.onChanged.listen((event) {
+    _subscription = logging.logger.onRecord.listen((event) {
       if(_controller.position.maxScrollExtent - _controller.position.pixels < 60) {
         _controller.jumpTo(_controller.position.maxScrollExtent);
       }
       setState(() {});
     });
+
+    _controller = ScrollController();
   }
 
   @override
   void dispose() {
-    _streamSubscription.cancel();
+    _subscription.cancel();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -61,7 +62,7 @@ class _ConsoleWindowState extends State<ConsoleWindow> {
       child: ListView(
         controller: _controller,
         children: [
-          SelectableText(buffer.toString())
+          SelectableText(ConsoleWindow.buffer.toString())
         ],
       )
     );

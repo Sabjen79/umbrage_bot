@@ -89,7 +89,7 @@ class RandomMusicManager with JsonSerializable {
 
   void _removeFromList(String url) {
     if(_songList.contains(url)) {
-      Bot().logging.logger.warning("Removed $url from Saved Music List since it is not working anymore.");
+      logging.logger.warning("Removed $url from Saved Music List since it is not working anymore.");
       _songList.remove(url);
       saveToJson();
     }

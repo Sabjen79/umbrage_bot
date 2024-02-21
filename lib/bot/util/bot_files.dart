@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:nyxx/nyxx.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 
@@ -28,7 +29,7 @@ class BotFiles {
     _mainDir = Directory("${dir.path}/$_botId");
     _mainDir.createSync();
 
-    Bot().logging.logger.info("BotFiles initialized.");
+    logging.logger.info("BotFiles initialized.");
   }
 
   Directory getMainDir() {
