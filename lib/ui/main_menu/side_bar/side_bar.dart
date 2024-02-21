@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
@@ -14,6 +16,8 @@ class SideBar extends StatefulWidget {
 }
 
 class _SideBarState extends State<SideBar> {
+  late StreamSubscription _streamSubscription;
+
   void _onRouteChanged(bool b) {
     if(!b) setState(() {});
   }
@@ -21,12 +25,17 @@ class _SideBarState extends State<SideBar> {
   @override
   void initState() {
     super.initState();
+
+    _streamSubscription = Bot().eventHandler.onBotUserUpdate.listen((e) {
+      setState(() {});
+    });
     
     MainMenuRouter().onRouteChanged(_onRouteChanged);
   }
 
   @override
   void dispose() {
+    _streamSubscription.cancel();
     MainMenuRouter().removeListener(_onRouteChanged);
 
     super.dispose();

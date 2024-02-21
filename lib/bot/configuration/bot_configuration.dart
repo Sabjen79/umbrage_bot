@@ -52,6 +52,11 @@ class BotConfiguration with JsonSerializable {
   late bool muteKickOnlyMute;
   late bool muteKickIgnoreAfk;
   late int muteKickDuration;
+
+  late bool profilePictureEnable;
+  late int profilePictureMinCooldown;
+  late int profilePictureMaxCooldown;
+  int get profilePictureCooldown => _randomCooldown(profilePictureMinCooldown, profilePictureMaxCooldown);
   
   int _randomCooldown(int min, int max) {
     return min == max ? min : min + Random().nextInt(max - min);
@@ -109,6 +114,10 @@ class BotConfiguration with JsonSerializable {
     muteKickOnlyMute = (json['muteKickOnlyMute'] ?? true) as bool;
     muteKickIgnoreAfk = (json['muteKickIgnoreAfk'] ?? true) as bool;
     muteKickDuration = (json['muteKickDuration'] ?? 300000) as int;
+
+    profilePictureEnable = (json['profilePictureEnable'] ?? false) as bool;
+    profilePictureMinCooldown = (json['profilePictureMinCooldown'] ?? 1800000) as int;
+    profilePictureMaxCooldown = (json['profilePictureMaxCooldown'] ?? 3600000) as int;
   }
 
   @override
@@ -145,6 +154,9 @@ class BotConfiguration with JsonSerializable {
     'muteKickOnlyMute': muteKickOnlyMute,
     'muteKickIgnoreAfk': muteKickIgnoreAfk,
     'muteKickDuration': muteKickDuration,
+    'profilePictureEnable': profilePictureEnable,
+    'profilePictureMinCooldown': profilePictureMinCooldown,
+    'profilePictureMaxCooldown': profilePictureMinCooldown
   };
 
   @override

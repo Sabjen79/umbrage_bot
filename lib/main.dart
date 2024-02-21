@@ -7,6 +7,7 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
+  windowManager.setIgnoreMouseEvents(false);
   if (Platform.isWindows) {
     WindowManager.instance.setMinimumSize(const Size(1000, 600));
   }

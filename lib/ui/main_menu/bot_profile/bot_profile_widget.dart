@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_button.dart';
@@ -13,6 +15,24 @@ class BotProfileWidget extends MainWindow {
 }
 
 class _BotProfileWidgetState extends State<BotProfileWidget> {
+  late StreamSubscription _streamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _streamSubscription = Bot().eventHandler.onBotUserUpdate.listen((e) {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription.cancel();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(

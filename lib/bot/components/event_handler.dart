@@ -1,14 +1,22 @@
+import 'dart:async';
+
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_private_event.dart';
+import 'package:umbrage_bot/bot/profile/bot_profile_list.dart';
 
 class EventHandler {
   final NyxxGateway client;
   Map<Snowflake, Map<Snowflake, VoiceState>> voiceStates = {};
 
+  final StreamController<User> _botUserUpdate = StreamController<User>.broadcast();
+  Stream<User> get onBotUserUpdate => _botUserUpdate.stream;
+
   EventHandler(this.client) {
     client.onMessageCreate.listen(onMessageCreate);
     client.onVoiceStateUpdate.listen(onVoiceStateUpdate);
+
+    client.onUserUpdate.listen(onUserUpdate);
 
     client.listGuilds().then((list) async {
       for(final g in list) {
@@ -21,6 +29,16 @@ class EventHandler {
         ));
       }
     });
+  }
+
+  void onUserUpdate(UserUpdateEvent event) {
+    if(event.user.id != Bot().user.id) return;
+
+    Bot().user = event.user;
+    final profile = BotProfileList().getProfileForId(event.user.id.toString());
+    BotProfileList().updateProfile(profile!.getToken());
+
+    _botUserUpdate.add(event.user);
   }
 
   void onMessageCreate(MessageCreateEvent event) async {

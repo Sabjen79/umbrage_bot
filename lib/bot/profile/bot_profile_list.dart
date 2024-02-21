@@ -88,6 +88,16 @@ class BotProfileList {
     }    
   }
 
+  BotProfile? getProfileForId(String id) {
+    for(final profile in _profiles) {
+      if(profile.getId() == id) {
+        return profile;
+      }
+    }
+
+    return null;
+  }
+
   // Only called after Bot is connected
   Future<void> updateProfile(String token) async {
     var newProfile = BotProfile.create(token, Bot().user.id.toString(), Bot().user.username, Bot().user.avatar.url.toString());
