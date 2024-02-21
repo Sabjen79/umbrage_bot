@@ -156,7 +156,7 @@ class BotConfiguration with JsonSerializable {
     'muteKickDuration': muteKickDuration,
     'profilePictureEnable': profilePictureEnable,
     'profilePictureMinCooldown': profilePictureMinCooldown,
-    'profilePictureMaxCooldown': profilePictureMinCooldown
+    'profilePictureMaxCooldown': profilePictureMaxCooldown
   };
 
   @override
