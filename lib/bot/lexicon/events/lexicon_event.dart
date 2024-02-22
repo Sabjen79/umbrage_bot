@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:nyxx/nyxx.dart';
-import 'package:umbrage_bot/bot/conversation/conversation.dart';
+import 'package:umbrage_bot/bot/lexicon/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';

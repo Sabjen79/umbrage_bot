@@ -1,6 +1,6 @@
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/bot/conversation/chat_alert.dart';
+import 'package:umbrage_bot/bot/util/chat_alert.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/music_command.dart';
 import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
 

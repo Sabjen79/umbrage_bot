@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nyxx/nyxx.dart';
-import 'package:umbrage_bot/bot/conversation/conversation.dart';
-import 'package:umbrage_bot/bot/conversation/conversation_delimiters.dart';
+import 'package:umbrage_bot/bot/lexicon/conversation/conversation.dart';
+import 'package:umbrage_bot/bot/lexicon/conversation/conversation_delimiters.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_announce_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_everyone_event.dart';
@@ -14,7 +14,7 @@ import 'package:umbrage_bot/bot/lexicon/events/lexicon_voice_leave_event.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_custom_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
 import 'package:umbrage_bot/bot/util/result.dart';
-import 'package:umbrage_bot/ui/main_menu/lexicon/custom_variables/lexicon_variable_window.dart';
+import 'package:umbrage_bot/ui/main_menu/windows/lexicon/custom_variables/lexicon_variable_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 
 class Lexicon with ChangeNotifier {

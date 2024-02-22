@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:umbrage_bot/bot/profile/bot_profile.dart';
+import 'package:umbrage_bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 

@@ -1,6 +1,6 @@
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:nyxx/nyxx.dart';
-import 'package:umbrage_bot/bot/conversation/conversation.dart';
+import 'package:umbrage_bot/bot/lexicon/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/predefined/lexicon_everyone_variable.dart';

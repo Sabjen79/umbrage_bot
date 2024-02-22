@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/bot/conversation/conversation.dart';
+import 'package:umbrage_bot/bot/lexicon/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/predefined/lexicon_everyone_variable.dart';
@@ -17,7 +17,7 @@ class LexiconAnnounceEvent extends LexiconEvent<AnnounceEvent> {
     ]);
 
     Timer.periodic(const Duration(minutes: 10), (timer) async {
-      for(final g in await Bot().client.listGuilds()) {
+      for(final g in Bot().guildList) {
         handleEvent(AnnounceEvent(g.id));
       }
     });
