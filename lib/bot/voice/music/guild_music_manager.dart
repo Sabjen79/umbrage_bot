@@ -3,6 +3,7 @@ import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/conversation/chat_alert.dart';
 import 'package:umbrage_bot/bot/extensions/random_music_manager.dart';
 import 'package:umbrage_bot/bot/extensions/volume_boost_manager.dart';
+import 'package:umbrage_bot/bot/voice/music/commands/clear_command.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/loop_command.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/music_command.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/play_command.dart';
@@ -15,7 +16,8 @@ class GuildMusicManager {
   final List<MusicCommand> _commands = [
     PlayCommand(),
     SkipCommand(),
-    LoopCommand()
+    LoopCommand(),
+    ClearCommand()
   ];
   late final RandomMusicManager randomMusicManager;
   late final VolumeBoostManager volumeBoostManager;

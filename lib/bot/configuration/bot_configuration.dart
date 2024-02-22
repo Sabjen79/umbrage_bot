@@ -25,6 +25,10 @@ class BotConfiguration with JsonSerializable {
   late String duplicateTrackMessage;
   late String emptyQueueMessage;
   late String noVoiceChannelMessage;
+  late String noLoopMessage;
+  late String noClearMessage;
+  late String clearMessage;
+  late String clearPartialMessage;
 
   late bool unskippableSongs;
   late double userUnskippableChance;
@@ -32,6 +36,7 @@ class BotConfiguration with JsonSerializable {
   late String unskippableMessage;
   late int unskippableMinDuration;
   late int unskippableMaxDuration;
+  late bool unskippableClearImmunity;
   int get randomUnskippableDuration => _randomCooldown(unskippableMinDuration, unskippableMaxDuration);
   bool get userUnskippable => unskippableSongs && Random().nextDouble() < userUnskippableChance;
   bool get botUnskippable => unskippableSongs && Random().nextDouble() < botUnskippableChance;
@@ -92,6 +97,10 @@ class BotConfiguration with JsonSerializable {
     duplicateTrackMessage = (json['duplicateTrackMessage'] ?? "This track is already in queue") as String;
     emptyQueueMessage = (json['emptyQueueMessage'] ?? "There is nothing to skip!") as String;
     noVoiceChannelMessage = (json['noVoiceChannelMessage'] ?? "You must be connected to a voice channel!") as String;
+    noLoopMessage = (json['noLoopMessage'] ?? "There is nothing to loop!") as String;
+    noClearMessage = (json['noClearMessage'] ?? "There is nothing to clear!") as String;
+    clearMessage = (json['clearMessage'] ?? "\$ cleared the queue") as String;
+    clearPartialMessage = (json['clearPartialMessage'] ?? "\$ cleared the queue. But some songs remain...") as String;
 
     unskippableSongs = (json['unskippableSongs'] ?? false) as bool;
     userUnskippableChance = (json['userUnskippableChance'] ?? 0.1) as double;
@@ -99,6 +108,7 @@ class BotConfiguration with JsonSerializable {
     unskippableMessage = (json['unskippableMessage'] ?? "I won't skip that!") as String;
     unskippableMinDuration = (json['unskippableMinDuration'] ?? 300000) as int;
     unskippableMaxDuration = (json['unskippableMaxDuration'] ?? 600000) as int;
+    unskippableClearImmunity = (json['unskippableClearImmunity'] ?? true) as bool;
     
     randomMusicEnable = (json['randomMusicEnable'] ?? false) as bool;
     randomMusicMinCooldown = (json['randomMusicMinCooldown'] ?? 600000) as int;
@@ -136,12 +146,17 @@ class BotConfiguration with JsonSerializable {
     'duplicateTrackMessage': duplicateTrackMessage,
     'emptyQueueMessage': emptyQueueMessage,
     'noVoiceChannelMessage': noVoiceChannelMessage,
+    'noLoopMessage': noLoopMessage,
+    'noClearMessage': noClearMessage,
+    'clearMessage': clearMessage,
+    'clearPartialMessage': clearPartialMessage,
     'unskippableSongs': unskippableSongs,
     'userUnskippableChance': userUnskippableChance,
     'botUnskippableChance': botUnskippableChance,
     'unskippableMessage': unskippableMessage,
     'unskippableMinDuration': unskippableMinDuration,
     'unskippableMaxDuration': unskippableMaxDuration,
+    'unskippableClearImmunity': unskippableClearImmunity,
     'randomMusicEnable': randomMusicEnable,
     'randomMusicMinCooldown': randomMusicMinCooldown,
     'randomMusicMaxCooldown': randomMusicMaxCooldown,

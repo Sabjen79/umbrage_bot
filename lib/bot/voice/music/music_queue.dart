@@ -21,12 +21,14 @@ class MusicQueue {
   final StreamController<MusicTrack> _queuedTrackStream = StreamController<MusicTrack>.broadcast();
   final StreamController<Pair<MusicTrack, Member>> _skippedTrackStream = StreamController<Pair<MusicTrack, Member>>.broadcast();
   final StreamController<Pair<Member, bool>> _loopChangedStream = StreamController<Pair<Member, bool>>.broadcast();
+  final StreamController<Pair<Member, bool>> _clearedQueueStream = StreamController<Pair<Member, bool>>.broadcast();
   final StreamController<void> _queueChangedStream = StreamController<void>.broadcast();
   final StreamController<MusicTrack?> _currentTrackChangedStream = StreamController<MusicTrack?>.broadcast();
 
   Stream<MusicTrack> get onTrackQueued => _queuedTrackStream.stream.asBroadcastStream();
   Stream<Pair<MusicTrack, Member>> get onTrackSkipped => _skippedTrackStream.stream.asBroadcastStream();
   Stream<Pair<Member, bool>> get onLoopChanged => _loopChangedStream.stream.asBroadcastStream();
+  Stream<Pair<Member, bool>> get onClearedQueue => _clearedQueueStream.stream.asBroadcastStream();
   Stream<void> get onQueueChanged => _queueChangedStream.stream.asBroadcastStream();
   Stream<MusicTrack?> get onCurrentTrackChanged => _currentTrackChangedStream.stream.asBroadcastStream();
   //
@@ -100,42 +102,55 @@ class MusicQueue {
     _loopChangedStream.add(Pair(member, _loop));
   }
 
+  void clear(Member member) {
+    if(currentTrack == null) return;
+
+    if(Bot().config.unskippableClearImmunity) {
+      _queue.removeWhere((track) => !track.isUnskippable);
+    } else {
+      _queue.clear();
+    }
+
+    _queueChangedStream.add(null);
+    _clearedQueueStream.add(Pair(member, _queue.isNotEmpty));
+  }
+
+  void _nextTrack([bool forced = false]) {
+    if(_loop && !forced) {
+      player.playEncoded(currentTrack!.track.encoded);
+      return;
+    }
+
+    currentTrack = null;
+    unskipTimer?.timer.cancel();
+
+    if(_queue.isNotEmpty) {
+      currentTrack = _queue.removeFirst();
+      player.playEncoded(currentTrack!.track.encoded);
+
+      _queueChangedStream.add(null);
+
+      // Unskip timer
+      if(currentTrack!.isUnskippable) {
+        unskipTimer = BotTimer.delayed(Bot().config.randomUnskippableDuration, () {
+          currentTrack?.isUnskippable = false;
+        });
+      }
+    } else {
+      player.stopPlaying();
+    }
+
+    _currentTrackChangedStream.add(currentTrack);
+  }
+
   void replayCurrentTrack() {
     if(currentTrack == null || player.currentTrack != null) return;
 
     player.playEncoded(currentTrack!.track.encoded);
     player.seekTo(player.state.position);
   }
-
-  void _nextTrack([bool forced = false]) {
-    player.stopPlaying().then((v) {
-      if(_loop && !forced) {
-        player.playEncoded(currentTrack!.track.encoded);
-        return;
-      }
-
-      currentTrack = null;
-      unskipTimer?.timer.cancel();
-
-      if(_queue.isNotEmpty) {
-        currentTrack = _queue.removeFirst();
-        player.playEncoded(currentTrack!.track.encoded);
-
-        _queueChangedStream.add(null);
-
-        // Unskip timer
-        if(currentTrack!.isUnskippable) {
-          unskipTimer = BotTimer.delayed(Bot().config.randomUnskippableDuration, () {
-            currentTrack?.isUnskippable = false;
-          });
-        }
-      }
-
-      _currentTrackChangedStream.add(currentTrack);
-    });
-  }
-
+  
   void _trackException(TrackExceptionEvent event) {
-
+    logging.logger.severe("[${event.exception.severity}] [${event.exception.cause}] Error on track ${event.track.info.title}: ${event.exception.message}");
   }
 }

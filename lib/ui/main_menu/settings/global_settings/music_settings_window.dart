@@ -33,12 +33,17 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
   late TextEditingController _duplicateTrackMessageController;
   late TextEditingController _emptyQueueMessageController;
   late TextEditingController _noVoiceChannelMessageController;
+  late TextEditingController _noLoopMessageController;
+  late TextEditingController _noClearMessageController;
+  late TextEditingController _clearMessageController;
+  late TextEditingController _clearPartialMessageController;
   late bool _unskippableSongs;
   late double _userUnskippableChance;
   late double _botUnskippableChance;
   late TextEditingController _unskippableMessageController;
   late int _unskippableMinDuration;
   late int _unskippableMaxDuration;
+  late bool _unskippableClearImmunity;
 
   @override
   void initState() {
@@ -58,12 +63,17 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
     _duplicateTrackMessageController = TextEditingController(text: config.duplicateTrackMessage);
     _emptyQueueMessageController = TextEditingController(text: config.emptyQueueMessage);
     _noVoiceChannelMessageController = TextEditingController(text: config.noVoiceChannelMessage);
+    _noLoopMessageController = TextEditingController(text: config.noLoopMessage);
+    _noClearMessageController = TextEditingController(text: config.noClearMessage);
+    _clearMessageController = TextEditingController(text: config.clearMessage);
+    _clearPartialMessageController = TextEditingController(text: config.clearPartialMessage);
     _unskippableSongs = config.unskippableSongs;
     _userUnskippableChance = config.userUnskippableChance;
     _botUnskippableChance = config.botUnskippableChance;
     _unskippableMessageController = TextEditingController(text: config.unskippableMessage);
     _unskippableMinDuration = config.unskippableMinDuration;
     _unskippableMaxDuration = config.unskippableMaxDuration;
+    _unskippableClearImmunity = config.unskippableClearImmunity;
   }
 
   void _showSaveChanges() {
@@ -85,13 +95,18 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
         ..errorLoadingTrackMessage = _errorLoadingTrackMessageController.text
         ..duplicateTrackMessage = _duplicateTrackMessageController.text
         ..emptyQueueMessage = _emptyQueueMessageController.text
+        ..noLoopMessage = _noLoopMessageController.text
+        ..noClearMessage = _noClearMessageController.text
+        ..clearMessage = _clearMessageController.text
+        ..clearPartialMessage = _clearPartialMessageController.text
         ..noVoiceChannelMessage = _noVoiceChannelMessageController.text
         ..unskippableSongs = _unskippableSongs
         ..userUnskippableChance = _userUnskippableChance
         ..botUnskippableChance = _botUnskippableChance
         ..unskippableMessage = _unskippableMessageController.text
         ..unskippableMinDuration = _unskippableMinDuration
-        ..unskippableMaxDuration = _unskippableMaxDuration;
+        ..unskippableMaxDuration = _unskippableMaxDuration
+        ..unskippableClearImmunity = _unskippableClearImmunity;
 
       config.saveToJson();
 
@@ -272,6 +287,24 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
               )
             )
           );
+
+          list.addAll(
+            settingsRow(
+              name: "Unskippable Songs Clear Immunity",
+              description: "If enabled, unskippable songs will not be cleared by the clear command.",
+              child: SimpleSwitch(
+                size: 45,
+                value: _unskippableClearImmunity,
+                onChanged: (b) {
+                  setState(() {
+                    _unskippableClearImmunity = b;
+                  });
+
+                  _showSaveChanges();
+                }
+              )
+            )
+          );
         }
 
         // MUSIC TEXT CHANNEL
@@ -356,6 +389,58 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
             description: "The message that the bot will send when a user fails to skip a song because the queue is empty.",
             child: TextField(
               controller: _emptyQueueMessageController,
+              onChanged: (v) {
+                _showSaveChanges();
+              },
+            )
+          )
+        );
+
+        list.addAll(
+          settingsRow(
+            name: "No Loop Channel Message",
+            description: "The message that the bot will send when a user tries to loop music while the queue is empty",
+            child: TextField(
+              controller: _noLoopMessageController,
+              onChanged: (v) {
+                _showSaveChanges();
+              },
+            )
+          )
+        );
+
+        list.addAll(
+          settingsRow(
+            name: "No Clear Channel Message",
+            description: "The message that the bot will send when a user tries to clear the music queue while it is empty.",
+            child: TextField(
+              controller: _noClearMessageController,
+              onChanged: (v) {
+                _showSaveChanges();
+              },
+            )
+          )
+        );
+
+        list.addAll(
+          settingsRow(
+            name: "Clear Messsage",
+            description: "The message that the bot will send when a user clears the queue. '\$' will be replaced with the user's name.",
+            child: TextField(
+              controller: _clearMessageController,
+              onChanged: (v) {
+                _showSaveChanges();
+              },
+            )
+          )
+        );
+
+        list.addAll(
+          settingsRow(
+            name: "Partial Clear Message",
+            description: "Same as above, but when the queue is not fully cleared",
+            child: TextField(
+              controller: _clearPartialMessageController,
               onChanged: (v) {
                 _showSaveChanges();
               },

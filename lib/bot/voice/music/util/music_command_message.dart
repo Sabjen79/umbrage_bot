@@ -11,19 +11,23 @@ class MusicCommandMessage {
     guildId = queue.guildId;
 
     queue.onTrackQueued.listen((track) {
-      playCommandMessage(track);
+      _playCommandMessage(track);
     });
 
     queue.onTrackSkipped.listen((pair) {
-      skipCommandMessage(pair.first, pair.second);
+      _skipCommandMessage(pair.first, pair.second);
     });
 
     queue.onLoopChanged.listen((pair) {
-      loopCommandMessage(pair.first, pair.second);
+      _loopCommandMessage(pair.first, pair.second);
+    });
+
+    queue.onClearedQueue.listen((pair) {
+      _clearCommandMessage(pair.first, pair.second);
     });
   }
 
-  void playCommandMessage(MusicTrack musicTrack) async {
+  void _playCommandMessage(MusicTrack musicTrack) async {
     var track = musicTrack.track;
     var channel = await _getChannel(guildId);
     channel.sendMessage(MessageBuilder(embeds: [
@@ -52,7 +56,7 @@ class MusicCommandMessage {
     ]));
   }
 
-  void skipCommandMessage(MusicTrack skippedTrack, Member member) async {
+  void _skipCommandMessage(MusicTrack skippedTrack, Member member) async {
     var track = skippedTrack.track;
     var channel = await _getChannel(guildId);
     channel.sendMessage(MessageBuilder(embeds: [
@@ -68,7 +72,7 @@ class MusicCommandMessage {
     ]));
   }
 
-  void loopCommandMessage(Member member, bool b) async {
+  void _loopCommandMessage(Member member, bool b) async {
     var channel = await _getChannel(guildId);
     channel.sendMessage(MessageBuilder(embeds: [
       EmbedBuilder(
@@ -76,6 +80,20 @@ class MusicCommandMessage {
         color: const DiscordColor(0x0000ff),
         author: EmbedAuthorBuilder(
           name: member.effectiveName,
+          iconUrl: member.user!.avatar.url
+        ),
+      )
+    ]));
+  }
+
+  void _clearCommandMessage(Member member, bool b) async {
+    var channel = await _getChannel(guildId);
+    var message = b ? Bot().config.clearPartialMessage : Bot().config.clearMessage;
+    channel.sendMessage(MessageBuilder(embeds: [
+      EmbedBuilder(
+        color: const DiscordColor(0x00ff00),
+        author: EmbedAuthorBuilder(
+          name: message.replaceAll('\$', member.effectiveName),
           iconUrl: member.user!.avatar.url
         ),
       )
