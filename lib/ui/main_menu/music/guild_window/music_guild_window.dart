@@ -16,6 +16,7 @@ class MusicGuildWindow extends MainWindow {
   MusicGuildWindow(this.guild, {super.key}) : super(
     name: guild.name,
     route: guild.id.toString(),
+    category: "GUILDS",
     sideBarIcon: Symbols.groups,
   );
 
