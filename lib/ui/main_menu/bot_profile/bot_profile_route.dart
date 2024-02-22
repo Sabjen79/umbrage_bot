@@ -6,7 +6,7 @@ class BotProfileRoute extends MainRoute {
   BotProfileRoute() : super("profile", "Bot Profile", null, false);
 
   @override
-  Future<List<MainWindow>> defineWindows() async {
+  List<MainWindow> defineWindows() {
     var list  = <MainWindow>[];
 
     list.add(const BotProfileWidget());

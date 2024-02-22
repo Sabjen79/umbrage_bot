@@ -7,7 +7,7 @@ class ConsoleRoute extends MainRoute {
   ConsoleRoute() : super("console", "Console", Symbols.terminal, false);
 
   @override
-  Future<List<MainWindow>> defineWindows() async {
+  List<MainWindow> defineWindows() {
     return [const ConsoleWindow()];
   }
 }

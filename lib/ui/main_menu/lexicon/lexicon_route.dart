@@ -8,12 +8,12 @@ import 'package:umbrage_bot/ui/main_menu/router/main_route.dart';
 class LexiconRoute extends MainRoute {
   LexiconRoute() : super("lexicon", "Lexicon", Symbols.quick_phrases) {
     Bot().lexicon.addListener(() async {
-      await refreshWindows();
+      refreshWindows();
     });
   }
 
   @override
-  Future<List<MainWindow>> defineWindows() async {
+  List<MainWindow> defineWindows() {
     var list  = <MainWindow>[];
     var lexicon = Bot().lexicon;
 
@@ -26,7 +26,10 @@ class LexiconRoute extends MainRoute {
     var events = lexicon.events;
 
     for(var e in events) {
-      list.add(LexiconEventWindow(e));
+      final window = LexiconEventWindow(e);
+      list.add(window);
+
+      if(defaultRoute.isEmpty) defaultRoute = window.route;
     }
 
     return list;

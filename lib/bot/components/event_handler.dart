@@ -18,17 +18,15 @@ class EventHandler {
 
     client.onUserUpdate.listen(onUserUpdate);
 
-    client.listGuilds().then((list) async {
-      for(final g in list) {
-        voiceStates[g.id] = Map.from(g.voiceStates);
+    for(final g in Bot().guildList) {
+      voiceStates[g.id] = Map.from(g.voiceStates);
 
-        client.updateVoiceState(g.id, GatewayVoiceStateBuilder(
-          channelId: null,
-          isMuted: false,
-          isDeafened: false
-        ));
-      }
-    });
+      client.updateVoiceState(g.id, GatewayVoiceStateBuilder(
+        channelId: null,
+        isMuted: false,
+        isDeafened: false
+      ));
+    }
   }
 
   void onUserUpdate(UserUpdateEvent event) {

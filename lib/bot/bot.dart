@@ -22,7 +22,9 @@ class Bot {
   late final BotVoiceManager voiceManager;
   late final MuteKick muteKick;
   late final ProfilePictureManager profilePictureManager;
-  //final ProfilePictureChanger _pfpChanger = ProfilePictureChanger();
+
+  final List<Guild> _guildList = [];
+  List<Guild> get guildList => _guildList;
 
   // Singleton
   static final Bot _instance = Bot._init();
@@ -61,21 +63,28 @@ class Bot {
     // Updates the username and avatar
     BotProfileList().updateProfile(profile.getToken());
 
-    // Initializes BotFiles
     await BotFiles().initialize();
 
-    var guilds = await _instance.client.listGuilds();
+    await _instance.refreshGuildList();
     
     _instance
-      ..config = BotConfiguration(guilds)
+      ..config = BotConfiguration(_instance._guildList)
       ..lexicon = Lexicon()
       ..eventHandler = EventHandler(_instance.client)
-      ..voiceManager = BotVoiceManager(guilds)
+      ..voiceManager = BotVoiceManager(_instance._guildList)
       ..muteKick = MuteKick()
       ..profilePictureManager = ProfilePictureManager();
   }
 
   //==============================================================================
+
+  Future<void> refreshGuildList() async {
+    guildList.clear();
+
+    for(final partialGuild in await client.listGuilds()) {
+      guildList.add(await partialGuild.get());
+    }
+  }
 
   Future<Member> getBotMember(Snowflake guildId) async {
     Guild g = await client.guilds.get(guildId);

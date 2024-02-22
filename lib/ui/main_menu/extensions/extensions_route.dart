@@ -10,7 +10,7 @@ class ExtensionsRoute extends MainRoute {
   ExtensionsRoute() : super("extensions", "Extensions", Symbols.mindfulness);
 
   @override
-  Future<List<MainWindow>> defineWindows() async {
+  List<MainWindow> defineWindows() {
     var list  = <MainWindow>[];
 
     list.addAll(const [

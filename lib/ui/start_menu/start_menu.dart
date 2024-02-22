@@ -61,7 +61,7 @@ class _StartMenuState extends State<StartMenu> {
       router.addRoute(SettingsRoute());
 
       for(final route in router.getMainRoutes()) {
-        await route.refreshWindows();
+        route.refreshWindows();
       }
 
     }).then((_) {

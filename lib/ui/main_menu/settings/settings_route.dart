@@ -10,14 +10,14 @@ class SettingsRoute extends MainRoute {
   SettingsRoute() : super("settings", "Settings", Symbols.settings);
 
   @override
-  Future<List<MainWindow>> defineWindows() async {
+  List<MainWindow> defineWindows() {
     var list  = <MainWindow>[];
 
     list.add(const MusicSettingsWindow());
     list.add(const ConversationSettingsWindow());
 
-    for(var guild in await Bot().client.listGuilds()) {
-      list.add(GuildSettingsWindow(await guild.get()));
+    for(var guild in Bot().guildList) {
+      list.add(GuildSettingsWindow(guild));
     }
 
     return list;

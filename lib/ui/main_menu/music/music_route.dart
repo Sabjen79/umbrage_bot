@@ -9,13 +9,16 @@ class MusicRoute extends MainRoute {
   MusicRoute() : super("music", "Music", Symbols.music_note);
 
   @override
-  Future<List<MainWindow>> defineWindows() async {
+  List<MainWindow> defineWindows() {
     var list  = <MainWindow>[];
 
     list.add(const MusicHelpWindow());
 
-    for(var guild in await Bot().client.listGuilds()) {
-      list.add(MusicGuildWindow(await guild.get()));
+    for(var guild in Bot().guildList) {
+      final window = MusicGuildWindow(guild);
+      list.add(window);
+
+      if(defaultRoute.isEmpty) defaultRoute = window.route;
     }
 
     return list;
