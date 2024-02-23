@@ -21,7 +21,7 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
 
   final List<String> _phrases = [];
   final List<LexiconVariable> _variables = [];
-  late final PseudoRandomIndex pseudoRandomIndex;
+  late PseudoRandomIndex pseudoRandomIndex;
   int _cooldownEnd = 0;
 
   LexiconEvent(this._lexicon, this.sidebarIcon, this._filename, this._name, this._description) {
