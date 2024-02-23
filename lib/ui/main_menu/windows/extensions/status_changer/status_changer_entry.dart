@@ -32,7 +32,7 @@ class _StatusChangerEntryState extends State<StatusChangerEntry> with SingleTick
     _textField = TextField(
       controller: _textController,
       inputFormatters: [
-        LengthLimitingTextInputFormatter(60),
+        LengthLimitingTextInputFormatter(150),
         FilteringTextInputFormatter.deny(RegExp(r"\n"))
       ],
       decoration: const InputDecoration(
