@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/extensions/status_changer_manager.dart';
+import 'package:umbrage_bot/bot/util/pseudo_random_index.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/extension_cooldown_widget.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/extension_cover.dart';
@@ -59,13 +60,18 @@ class _StatusChangerWindowState extends State<StatusChangerWindow> with Extensio
 
       manager
         ..enable = _enable
-        ..statusList = _statusList
+        ..statusList = _statusList.toList()
         ..minCooldown = _minCooldown
-        ..maxCooldown = _maxCooldown;
+        ..maxCooldown = _maxCooldown
+        ..pseudoRandomIndex = PseudoRandomIndex(_statusList.length);
 
       if(!_enable) manager.clearStatus(); 
 
       manager.saveToJson();
+
+      setState(() {
+        reset();
+      });
 
       MainMenuRouter().unblock();
     });

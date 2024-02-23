@@ -5,10 +5,12 @@ import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
 import 'package:umbrage_bot/bot/util/bot_timer.dart';
 import 'package:umbrage_bot/bot/util/json_serializable.dart';
+import 'package:umbrage_bot/bot/util/pseudo_random_index.dart';
 import 'package:umbrage_bot/bot/util/random_cooldown.dart';
 
 class StatusChangerManager with JsonSerializable {
   late List<String> statusList;
+  late PseudoRandomIndex pseudoRandomIndex;
   late bool enable;
   late int minCooldown;
   late int maxCooldown;
@@ -25,7 +27,7 @@ class StatusChangerManager with JsonSerializable {
       }
 
       ActivityBuilder? activity;
-      final randomStatus = statusList[Random().nextInt(statusList.length)];
+      final randomStatus = statusList[pseudoRandomIndex.getNextIndex()];
 
       switch(randomStatus[0]) {
         case '0':
@@ -44,6 +46,8 @@ class StatusChangerManager with JsonSerializable {
         case '5':
           activity = ActivityBuilder(name: randomStatus.substring(1), type: ActivityType.competing);
       }
+
+      print(randomStatus[0]);
 
       if(activity == null) {
         clearStatus();
@@ -74,6 +78,8 @@ class StatusChangerManager with JsonSerializable {
     enable = (json['enable'] ?? false) as bool;
     minCooldown = (json['minCooldown'] ?? 600000) as int;
     maxCooldown = (json['maxCooldown'] ?? 1200000) as int;
+
+    pseudoRandomIndex = PseudoRandomIndex(statusList.length);
   }
 
   @override

@@ -4,16 +4,17 @@ import 'dart:io';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
 import 'package:umbrage_bot/bot/util/json_serializable.dart';
+import 'package:umbrage_bot/bot/util/pseudo_random_index.dart';
 
 class LexiconCustomVariable extends LexiconVariable with JsonSerializable {
   final List<String> _words;
-  List<int> _randomizedWordsIndexes = [];
+  late final PseudoRandomIndex _pseudoRandomIndex;
   List<String> get words => _words;
   
   LexiconCustomVariable(super.keyword, super.name, super.description, super.color, this._words) {
     if(_words.isEmpty) return;
 
-    _randomizedWordsIndexes = List<int>.generate(_words.length, (index) => index)..shuffle();
+    _pseudoRandomIndex = PseudoRandomIndex(_words.length);
   }
 
   static LexiconCustomVariable fromJson(String filename) {
@@ -27,9 +28,7 @@ class LexiconCustomVariable extends LexiconVariable with JsonSerializable {
   String getValue() {
     if(words.isEmpty) return "";
 
-    if(_randomizedWordsIndexes.isEmpty) _randomizedWordsIndexes = List<int>.generate(_words.length, (index) => index)..shuffle();
-
-    return _words[_randomizedWordsIndexes.removeAt(0)];
+    return _words[_pseudoRandomIndex.getNextIndex()];
   }
   
   @override

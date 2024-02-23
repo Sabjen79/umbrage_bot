@@ -1,13 +1,14 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
 import 'package:umbrage_bot/bot/util/bot_timer.dart';
+import 'package:umbrage_bot/bot/util/pseudo_random_index.dart';
 
 class ProfilePictureManager {
   final List<File> _pictures = [];
+  late PseudoRandomIndex _pseudoRandomIndex;
   final _directory = BotFiles().getDir("profile_pictures");
   late final BotTimer timer;
 
@@ -18,7 +19,7 @@ class ProfilePictureManager {
 
     timer = BotTimer.periodic(() => Bot().config.profilePictureCooldown, () {
       if(!Bot().config.profilePictureEnable) return;
-      final file = _pictures[Random().nextInt(_pictures.length)];
+      final file = _pictures[_pseudoRandomIndex.getNextIndex()];
       
       ImageBuilder? image;
       switch(file.path.split('.').last.toLowerCase()) {
@@ -50,6 +51,8 @@ class ProfilePictureManager {
 
       _pictures.add(File(file.path));
     }
+
+    _pseudoRandomIndex = PseudoRandomIndex(_pictures.length);
   }
 
   void setImages(List<File> newFiles) {
@@ -67,7 +70,7 @@ class ProfilePictureManager {
         filename = '${filename}0';
         newPath = "${_directory.path}\\$filename.$extension";
       }
-      
+
       file.copySync(newPath);
     }
 

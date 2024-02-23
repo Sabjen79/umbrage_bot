@@ -13,6 +13,7 @@ import 'package:umbrage_bot/bot/lexicon/events/lexicon_voice_join_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_voice_leave_event.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_custom_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
+import 'package:umbrage_bot/bot/util/pseudo_random_index.dart';
 import 'package:umbrage_bot/bot/util/result.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/lexicon/custom_variables/lexicon_variable_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
@@ -93,6 +94,7 @@ class Lexicon with ChangeNotifier {
         event.cooldown = cooldown;
         event.chance = chance;
         event.phrases..clear()..addAll(phrases);
+        event.pseudoRandomIndex = PseudoRandomIndex(event.phrases.length);
 
         event.saveToJson();
 

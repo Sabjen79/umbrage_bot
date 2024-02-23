@@ -7,6 +7,7 @@ import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
 import 'package:umbrage_bot/bot/util/json_serializable.dart';
+import 'package:umbrage_bot/bot/util/pseudo_random_index.dart';
 
 abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   final Lexicon _lexicon;
@@ -20,7 +21,7 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
 
   final List<String> _phrases = [];
   final List<LexiconVariable> _variables = [];
-  List<int> _phrasesRandomIndexes = [];
+  late final PseudoRandomIndex pseudoRandomIndex;
   int _cooldownEnd = 0;
 
   LexiconEvent(this._lexicon, this.sidebarIcon, this._filename, this._name, this._description) {
@@ -30,6 +31,8 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
     cooldown = (json['cooldown'] ?? 600) as int;
     chance = (json['chance'] ?? 0.5) as double;
     _phrases..clear()..addAll(List<String>.from(json['phrases'] ?? []));
+
+    pseudoRandomIndex = PseudoRandomIndex(_phrases.length);
   }
 
   @override
@@ -75,11 +78,7 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   String getPhrase() {
     if(_phrases.isEmpty) return "";
 
-    if(_phrasesRandomIndexes.isEmpty) {
-      _phrasesRandomIndexes = List<int>.generate(_phrases.length, (index) => index)..shuffle();
-    }
-
-    String phrase = _phrases[_phrasesRandomIndexes.removeAt(0)].replaceAll("\\n", Platform.lineTerminator);
+    String phrase = _phrases[pseudoRandomIndex.getNextIndex()].replaceAll("\\n", Platform.lineTerminator);
 
     for(var v in _variables) {
       phrase = phrase.replaceAll("\$${v.keyword}\$", v.getValue());
