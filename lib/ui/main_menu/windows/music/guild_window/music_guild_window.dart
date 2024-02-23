@@ -26,6 +26,13 @@ class MusicGuildWindow extends MainWindow {
 
 class _MusicGuildWindowState extends State<MusicGuildWindow> {
 
+  @override
+  void didUpdateWidget(covariant MusicGuildWindow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if(mounted) setState(() {});
+  }
+
   List<Widget> _sideWidgets() {
     var list = <Widget>[];
 

@@ -17,19 +17,21 @@ class MusicQueueWidget extends StatefulWidget {
 }
 
 class _MusicQueueWidgetState extends State<MusicQueueWidget> {
-  late final MusicQueue _queue;
-  late final StreamSubscription _onQueueChanged;
+  late MusicQueue _queue;
+  late StreamSubscription _onQueueChanged;
 
   @override
   void initState() {
     super.initState();
 
-    _queue = Bot().voiceManager[widget.guildId].music.queue;
-    _onQueueChanged = _queue.onQueueChanged.listen((event) {
-      setState(() {
-        
-      });
-    });
+    refresh();
+  }
+
+  @override
+  void didUpdateWidget(covariant MusicQueueWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _onQueueChanged.cancel();
+    refresh();
   }
 
   @override
@@ -40,6 +42,10 @@ class _MusicQueueWidgetState extends State<MusicQueueWidget> {
 
   void refresh() {
     _queue = Bot().voiceManager[widget.guildId].music.queue;
+
+    _onQueueChanged = _queue.onQueueChanged.listen((event) {
+      setState(() {});
+    });
   }
 
   Widget verticalDivider() {

@@ -18,16 +18,32 @@ class MusicCurrentTrackWidget extends StatefulWidget {
 }
 
 class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
-  late final MusicQueue _queue;
+  late MusicQueue _queue;
   MusicTrack? currentTrack;
-  late final StreamSubscription _onCurrentTrackChanged;
-  late final StreamSubscription _onLoopChanged;
+  late StreamSubscription _onCurrentTrackChanged;
+  late StreamSubscription _onLoopChanged;
   late final Timer _unskipTimer;
 
   @override
   void initState() {
     super.initState();
     
+    _unskipTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {});
+    });
+
+    refresh();
+  }
+
+  @override
+  void didUpdateWidget(covariant MusicCurrentTrackWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _onCurrentTrackChanged.cancel();
+    _onLoopChanged.cancel();
+    refresh();
+  }
+
+  void refresh() {
     _queue = Bot().voiceManager[widget.guildId].music.queue;
     currentTrack = _queue.currentTrack;
     _onCurrentTrackChanged = _queue.onCurrentTrackChanged.listen((track) {
@@ -37,10 +53,6 @@ class _MusicCurrentTrackWidgetState extends State<MusicCurrentTrackWidget> {
     });
 
     _onLoopChanged = _queue.onLoopChanged.listen((_) {
-      setState(() {});
-    });
-
-    _unskipTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {});
     });
   }
