@@ -28,7 +28,7 @@ class ProfilePictureWindow extends MainWindow {
 
 class _ProfilePictureWindowState extends State<ProfilePictureWindow> with ExtensionCover, SettingsRow {
   final BotConfiguration config = Bot().config;
-  final List<File> _images = [];
+  List<File> _images = [];
   late final ExtensionCooldownWidget _cooldownWidget;
 
   late bool _profilePictureEnable;
@@ -46,8 +46,7 @@ class _ProfilePictureWindowState extends State<ProfilePictureWindow> with Extens
   }
 
   void reset() {
-    _images.clear();
-    _images.addAll(Bot().profilePictureManager.pictures);
+    _images = Bot().profilePictureManager.pictures.toList();
 
     _profilePictureEnable = config.profilePictureEnable;
     _profilePictureMinCooldown = config.profilePictureMinCooldown;
@@ -71,6 +70,10 @@ class _ProfilePictureWindowState extends State<ProfilePictureWindow> with Extens
         ..profilePictureMaxCooldown = _profilePictureMaxCooldown;
 
       config.saveToJson();
+
+      setState(() {
+        reset();
+      });
 
       MainMenuRouter().unblock();
     });

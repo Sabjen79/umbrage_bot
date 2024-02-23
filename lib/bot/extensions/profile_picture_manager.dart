@@ -54,16 +54,21 @@ class ProfilePictureManager {
 
   void setImages(List<File> newFiles) {
     for(final file in pictures) {
-      if(!newFiles.contains(file)) file.deleteSync();
+      if(!newFiles.map((e) => e.absolute.path).contains(file.absolute.path)) file.deleteSync();
     }
-
 
     for(final file in newFiles) {
       if(_pictures.contains(file)) continue;
-      final name = file.path.hashCode.toString();
+      String filename = file.path.split('\\').last.split('.').first;
       final extension = file.path.split('.').last;
+      String newPath = "${_directory.path}\\$filename.$extension";
 
-      file.copySync("${_directory.path}\\$name.$extension");
+      while(_directory.listSync().map((e) => e.path).contains(newPath)) {
+        filename = '${filename}0';
+        newPath = "${_directory.path}\\$filename.$extension";
+      }
+      
+      file.copySync(newPath);
     }
 
     loadPictures();
