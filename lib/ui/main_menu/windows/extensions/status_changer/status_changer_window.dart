@@ -3,6 +3,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/extensions/status_changer_manager.dart';
 import 'package:umbrage_bot/bot/util/pseudo_random_index.dart';
+import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/extension_cooldown_widget.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/extension_cover.dart';
@@ -57,6 +58,29 @@ class _StatusChangerWindowState extends State<StatusChangerWindow> with Extensio
 
       MainMenuRouter().unblock();
     }, () async {
+
+      if(_statusList.map((e) => e.substring(1)).contains("")) {
+        showDialog(
+          context: context, 
+          builder: (context) => SimpleDiscordDialog(
+            cancelText: "",
+            submitText: "OKAY, SORRY!",
+            onSubmit: () async => {
+              Navigator.pop(context, false)
+            },
+            content: Container(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+              width: 300,
+              child: const Text(
+                "ERROR: Statuses cannot be empty",
+                textAlign: TextAlign.center,
+              )
+            ),
+          )
+        );
+        
+        return;
+      }
 
       manager
         ..enable = _enable
