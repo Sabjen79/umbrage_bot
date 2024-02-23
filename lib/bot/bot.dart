@@ -6,6 +6,7 @@ import 'package:umbrage_bot/bot/event_handler.dart';
 import 'package:umbrage_bot/bot/configuration/bot_configuration.dart';
 import 'package:umbrage_bot/bot/extensions/mute_kick.dart';
 import 'package:umbrage_bot/bot/extensions/profile_picture_manager.dart';
+import 'package:umbrage_bot/bot/extensions/status_changer_manager.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/profile/bot_profile_list.dart';
@@ -22,6 +23,7 @@ class Bot {
   late final BotVoiceManager voiceManager;
   late final MuteKick muteKick;
   late final ProfilePictureManager profilePictureManager;
+  late final StatusChangerManager statusChangerManager;
 
   final List<Guild> _guildList = [];
   List<Guild> get guildList => _guildList;
@@ -73,7 +75,8 @@ class Bot {
       ..eventHandler = EventHandler(_instance.client)
       ..voiceManager = BotVoiceManager(_instance._guildList)
       ..muteKick = MuteKick()
-      ..profilePictureManager = ProfilePictureManager();
+      ..profilePictureManager = ProfilePictureManager()
+      ..statusChangerManager = StatusChangerManager();
   }
 
   //==============================================================================

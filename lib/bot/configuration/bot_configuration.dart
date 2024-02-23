@@ -5,13 +5,14 @@ import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/configuration/bot_guild_configuration.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
 import 'package:umbrage_bot/bot/util/json_serializable.dart';
+import 'package:umbrage_bot/bot/util/random_cooldown.dart';
 
 class BotConfiguration with JsonSerializable {
   final Map<String, BotGuildConfiguration> _guilds = {};
   late int typingSpeed;
   late int reactionSpeedMin;
   late int reactionSpeedMax;
-  int get randomReactionSpeed => _randomCooldown(reactionSpeedMin, reactionSpeedMax);
+  int get randomReactionSpeed => Random().randomCooldown(reactionSpeedMin, reactionSpeedMax);
 
   late String ytApiKey;
   late String ytNotFoundMessage;
@@ -37,7 +38,7 @@ class BotConfiguration with JsonSerializable {
   late int unskippableMinDuration;
   late int unskippableMaxDuration;
   late bool unskippableClearImmunity;
-  int get randomUnskippableDuration => _randomCooldown(unskippableMinDuration, unskippableMaxDuration);
+  int get randomUnskippableDuration => Random().randomCooldown(unskippableMinDuration, unskippableMaxDuration);
   bool get userUnskippable => unskippableSongs && Random().nextDouble() < userUnskippableChance;
   bool get botUnskippable => unskippableSongs && Random().nextDouble() < botUnskippableChance;
 
@@ -45,13 +46,13 @@ class BotConfiguration with JsonSerializable {
   late int randomMusicMinCooldown;
   late int randomMusicMaxCooldown;
   late double randomMusicSkipChance;
-  int get randomMusicCooldown => _randomCooldown(randomMusicMinCooldown, randomMusicMaxCooldown);
+  int get randomMusicCooldown => Random().randomCooldown(randomMusicMinCooldown, randomMusicMaxCooldown);
 
   late bool volumeBoostEnable;
   late int volumeBoostMinCooldown;
   late int volumeBoostMaxCooldown;
   late int volumeBoostAmplitude;
-  int get volumeBoostCooldown => _randomCooldown(volumeBoostMinCooldown, volumeBoostMaxCooldown);
+  int get volumeBoostCooldown => Random().randomCooldown(volumeBoostMinCooldown, volumeBoostMaxCooldown);
 
   late bool muteKickEnable;
   late bool muteKickOnlyMute;
@@ -61,11 +62,7 @@ class BotConfiguration with JsonSerializable {
   late bool profilePictureEnable;
   late int profilePictureMinCooldown;
   late int profilePictureMaxCooldown;
-  int get profilePictureCooldown => _randomCooldown(profilePictureMinCooldown, profilePictureMaxCooldown);
-  
-  int _randomCooldown(int min, int max) {
-    return min == max ? min : min + Random().nextInt(max - min);
-  }
+  int get profilePictureCooldown => Random().randomCooldown(profilePictureMinCooldown, profilePictureMaxCooldown);
 
   BotConfiguration(List<PartialGuild> guilds) {
     for(var g in guilds) {

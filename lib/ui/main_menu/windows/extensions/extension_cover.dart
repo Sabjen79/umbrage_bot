@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/ui/components/simple_switch.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
+import 'package:umbrage_bot/ui/main_menu/windows/extensions/extension_cooldown_widget.dart';
 
 mixin ExtensionCover {
   Widget extensionCover({
@@ -8,14 +9,34 @@ mixin ExtensionCover {
     required String description, 
     required bool switchValue, 
     required Function(bool) onSwitchChanged, 
+    ExtensionCooldownWidget? cooldownWidget,
+    double height = 130,
     List<Widget>? children
   }) {
     return Stack(
       children: [
+        cooldownWidget == null ? const SizedBox.shrink() : Positioned(
+          top: 125,
+          left: 30,
+          child: Container(
+            width: cooldownWidget.canTimerRunEarly ? 190 : 170,
+            height: 20,
+            decoration: const BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x77000000),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                  offset: Offset(0, 10)
+                )
+              ]
+            ),
+          ),
+        ),
         Container(
           alignment: Alignment.centerLeft,
           width: double.infinity,
-          height: 130,
+          height: height,
           decoration: const BoxDecoration(
             color: DiscordTheme.darkGray,
             boxShadow: [
@@ -45,7 +66,7 @@ mixin ExtensionCover {
                       size: 45,
                       value: switchValue,
                       onChanged: onSwitchChanged
-                    )
+                    ),
                   ],
                 )
               ),
@@ -82,13 +103,17 @@ mixin ExtensionCover {
                   ),
                 ),
               ),
-              
             ],
           ),
         ),
+        Positioned(
+          top: 125,
+          left: 25,
+          child: cooldownWidget ?? const SizedBox.shrink(),
+        ),
 
         Padding(
-          padding: const EdgeInsets.only(top: 130),
+          padding: EdgeInsets.only(top: cooldownWidget == null ? 130 : 145),
           child: ListView(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             children: children ?? [],

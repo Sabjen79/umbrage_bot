@@ -6,8 +6,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/configuration/bot_configuration.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
+import 'package:umbrage_bot/ui/main_menu/windows/extensions/extension_cooldown_widget.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/extension_cover.dart';
-import 'package:umbrage_bot/ui/main_menu/windows/extensions/profile_picture/profile_picture_cooldown.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/profile_picture/profile_picture_image.dart';
 import 'package:umbrage_bot/ui/main_menu/main_menu.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
@@ -29,6 +29,7 @@ class ProfilePictureWindow extends MainWindow {
 class _ProfilePictureWindowState extends State<ProfilePictureWindow> with ExtensionCover, SettingsRow {
   final BotConfiguration config = Bot().config;
   final List<File> _images = [];
+  late final ExtensionCooldownWidget _cooldownWidget;
 
   late bool _profilePictureEnable;
   late int _profilePictureMinCooldown;
@@ -37,6 +38,10 @@ class _ProfilePictureWindowState extends State<ProfilePictureWindow> with Extens
   @override
   void initState() {
     super.initState();
+    _cooldownWidget = ExtensionCooldownWidget(
+      timer: Bot().profilePictureManager.timer,
+      canTimerRunEarly: false,
+    );
     reset();
   }
 
@@ -136,13 +141,10 @@ class _ProfilePictureWindowState extends State<ProfilePictureWindow> with Extens
 
         _showSaveChanges();
       },
+      cooldownWidget: _cooldownWidget,
       children: [
         Column(
           children: [
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: ProfilePictureCooldown(),
-            ),
             
             SizedBox(
               width: MainMenu.getMainWindowWidth(context),
