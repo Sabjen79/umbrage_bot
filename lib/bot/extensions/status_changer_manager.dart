@@ -47,8 +47,6 @@ class StatusChangerManager with JsonSerializable {
           activity = ActivityBuilder(name: randomStatus.substring(1), type: ActivityType.competing);
       }
 
-      print(randomStatus[0]);
-
       if(activity == null) {
         clearStatus();
         return;
