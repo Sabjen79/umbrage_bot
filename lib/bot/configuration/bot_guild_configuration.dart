@@ -7,9 +7,14 @@ class BotGuildConfiguration with JsonSerializable {
   final String guildId;
   late int mainMessageChannelId = 0;
   late int musicChannelId = 0;
+  late int defaultVoiceChannelId = 0;
 
   Future<Channel> get mainMessageChannel async {
     return await Bot().client.channels.get(Snowflake(mainMessageChannelId));
+  }
+
+  Future<Channel> get defaultVoiceChannel async {
+    return await Bot().client.channels.get(Snowflake(defaultVoiceChannelId));
   }
 
 
@@ -30,17 +35,31 @@ class BotGuildConfiguration with JsonSerializable {
     throw Exception("Guild has no text channels.");
   }
 
+  Future<int> _defaultVoiceChannel() async {
+    final guild = Bot().client.guilds[Snowflake(int.parse(guildId))];
+
+    for(final channel in await guild.fetchChannels()) {
+      if(channel is VoiceChannel) {
+        return channel.id.value;
+      }
+    }
+
+    throw Exception("Guild has no voice channels.");
+  }
+
   void reset() async {
     var json = loadFromJson();
 
     mainMessageChannelId = (json['mainMessageChannelId'] ?? await _defaultMainMessageChannel()) as int;
     musicChannelId = (json['musicChannelId'] ?? 0) as int;
+    defaultVoiceChannelId = (json['defaultVoiceChannelId'] ?? await _defaultVoiceChannel()) as int;
   }
 
   @override
   Map<String, dynamic> toJson() => {
     'mainMessageChannelId': mainMessageChannelId,
     'musicChannelId': musicChannelId,
+    'defaultVoiceChannelId': defaultVoiceChannelId
   };
 
   @override

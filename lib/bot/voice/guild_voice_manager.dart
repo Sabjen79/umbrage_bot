@@ -64,15 +64,7 @@ class GuildVoiceManager {
     if(maxpoints < 2) {
       if(Bot().config.autoConnectVoicePersist) {
         var channelId = botState?.channelId;
-        if(channelId == null) {
-          final list = await guild.fetchChannels();
-          for(var c in list) {
-            if(c is GuildVoiceChannel) {
-              channelId = c.id;
-              break;
-            }
-          }
-        }
+        channelId ??= Snowflake(Bot().config[guild.id].defaultVoiceChannelId);
 
         connectTo(channelId, true);
       } else {

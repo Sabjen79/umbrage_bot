@@ -37,6 +37,9 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
   final List<_Channel> _musicChannels = [];
   late _Channel? _musicChannel;
 
+  final List<_Channel> _voiceChannels = [];
+  late _Channel? _voiceChannel;
+
   @override
   void initState() {
     super.initState();
@@ -60,10 +63,13 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
     _textChannels.clear();
     _mainTextChannel = null;
 
+    _voiceChannels.clear();
+    _voiceChannel = null;
+
     widget.guild.fetchChannels().then((v) {
       for(var channel in v) {
+        var mc = _Channel(channel.name, channel.id.value);
         if(channel is TextChannel && channel is! VoiceChannel) {
-          var mc = _Channel(channel.name, channel.id.value);
 
           _musicChannels.add(mc);
           if(config.musicChannelId == mc.id) _musicChannel = mc;
@@ -71,10 +77,15 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
           _textChannels.add(mc);
           if(config.mainMessageChannelId == mc.id) _mainTextChannel = mc;
         }
+        if(channel is VoiceChannel) {
+          _voiceChannels.add(mc);
+          if(config.defaultVoiceChannelId == mc.id) _voiceChannel = mc;
+        }
       }
 
-      _musicChannel ??= _musicChannels[0];
-      _mainTextChannel ??= _textChannels[0];
+      _musicChannel ??= _musicChannels.firstOrNull;
+      _mainTextChannel ??= _textChannels.firstOrNull;
+      _voiceChannel ??= _voiceChannels.firstOrNull;
 
       if(mounted) {
         setState(() {});
@@ -92,7 +103,8 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
     }, () async {
       config
         ..mainMessageChannelId = _mainTextChannel!.id
-        ..musicChannelId = _musicChannel!.id;
+        ..musicChannelId = _musicChannel!.id
+        ..defaultVoiceChannelId = _voiceChannel!.id;
 
       config.saveToJson();
 
@@ -173,6 +185,41 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
 
                   setState(() {
                     if(v != null) _musicChannel = v;
+                  });
+                },
+              ),
+            )
+          )
+        );
+
+        list.addAll(
+          settingsRow(
+            name: "Default Voice Channel",
+            description: "The voice channel that the bot will first connect to if 'Solitude in Voice Channels' is enabled",
+            child: Container(
+              width: 200,
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: DiscordTheme.black,
+                borderRadius: BorderRadius.circular(5)
+              ),
+              child: DropdownButton<_Channel>(
+                items: _voiceChannels.map<DropdownMenuItem<_Channel>>((item) {
+                  return DropdownMenuItem(
+                    value: item,
+                    child: Text(item.name, textAlign: TextAlign.center),
+                  );
+                }).toList(),
+                value: _voiceChannel,
+                underline: Container(),
+                dropdownColor: DiscordTheme.black,
+                isExpanded: true,
+                onChanged: (v) {
+                  if(v != _voiceChannel) _showSaveChanges();
+
+                  setState(() {
+                    if(v != null) _voiceChannel = v;
                   });
                 },
               ),
