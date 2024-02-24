@@ -16,6 +16,7 @@ class GuildVoiceManager {
 
   void handleEvent(VoiceStateUpdateEvent event) async {
     final botState = guild.voiceStates[Bot().user.id];
+    print("OK");
 
     _autoConnect(botState);
   }
@@ -63,10 +64,10 @@ class GuildVoiceManager {
 
     if(maxpoints < 2) {
       if(Bot().config.autoConnectVoicePersist) {
-        var channelId = botState?.channelId;
-        channelId ??= Snowflake(Bot().config[guild.id].defaultVoiceChannelId);
+        final botChannelId = botState?.channelId;
+        final channelId = Snowflake(Bot().config[guild.id].defaultVoiceChannelId);
 
-        connectTo(channelId, true);
+        if(botChannelId != channelId) connectTo(channelId, true);
       } else {
         disconnect();
       }
@@ -74,8 +75,8 @@ class GuildVoiceManager {
       return;
     }
 
-    final channel = await Bot().client.channels.fetch(bestChannel!.id) as GuildVoiceChannel;
+    final channel = await Bot().client.channels.get(bestChannel!.id) as GuildVoiceChannel;
     
-    connectTo(channel.id);
+    if(channel.id != botState?.channelId) connectTo(channel.id);
   }
 }

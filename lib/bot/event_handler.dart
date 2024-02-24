@@ -56,17 +56,17 @@ class EventHandler {
   }
 
   void onVoiceStateUpdate(VoiceStateUpdateEvent event) async {
+    if(event.state.member == null) return;
+
     final oldState = voiceStates[event.state.guildId]?[event.state.userId];
     voiceStates[event.state.guildId!] = Map.from(client.guilds[event.state.guildId!].voiceStates);
+
+    Bot().voiceManager[event.state.guildId!].handleEvent(event);
 
     if(event.state.user == Bot().user) {
       _botStateEvents(event);
       return;
     }
-
-    if(event.state.member == null) return;
-
-    Bot().voiceManager[event.state.guildId!].handleEvent(event);
 
     if(oldState == null) return;
     final newEvent = VoiceStateUpdateEvent(gateway: event.gateway, oldState: oldState, state: event.state);
