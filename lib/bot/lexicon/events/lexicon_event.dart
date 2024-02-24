@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:umbrage_bot/bot/lexicon/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
+import 'package:umbrage_bot/bot/util/bot_timer.dart';
 import 'package:umbrage_bot/bot/util/json_serializable.dart';
 import 'package:umbrage_bot/bot/util/pseudo_random_index.dart';
 
@@ -22,7 +24,9 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   final List<String> _phrases = [];
   final List<LexiconVariable> _variables = [];
   late PseudoRandomIndex pseudoRandomIndex;
-  int _cooldownEnd = 0;
+  final Map<Snowflake, BotTimer> _cooldownEnd = {};
+  final StreamController<void> _cooldownStreamController = StreamController<void>.broadcast();
+  Stream<void> get onCooldownsChanged => _cooldownStreamController.stream;
 
   LexiconEvent(this._lexicon, this.sidebarIcon, this._filename, this._name, this._description) {
     var json = loadFromJson();
@@ -46,10 +50,11 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
     'phrases': _phrases
   };
 
-  Future<bool> handleEvent(DispatchEvent event) async {
-    if(event is! T || !await validateEvent(event) || !canRun) return false;
+  Future<bool> handleEvent(DispatchEvent event, Snowflake guildId) async {
+    if(event is! T || !await validateEvent(event) || !canRun(guildId)) return false;
 
-    _cooldownEnd = DateTime.now().millisecondsSinceEpoch + cooldown*1000;
+    _cooldownEnd[guildId] = BotTimer.delayed(cooldown, () => endCooldown(guildId));
+    _cooldownStreamController.add(null);
 
     var conv = await buildConversation(event);
     _lexicon.conversations[conv.channel.id] = conv
@@ -67,12 +72,16 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   List<String> get phrases => _phrases;
   List<LexiconVariable> get variables => _variables;
 
-  bool get onCooldown => DateTime.now().millisecondsSinceEpoch < _cooldownEnd;
-  int get cooldownLeft => !onCooldown ? 0 : _cooldownEnd - DateTime.now().millisecondsSinceEpoch;
-  bool get canRun => enabled && !onCooldown && Random().nextDouble() <= chance;
+  Map<Snowflake, BotTimer> get cooldowns => _cooldownEnd;
 
-  void endCooldown() {
-    _cooldownEnd = 0;
+  bool canRun(Snowflake id) {
+    final cooldownEnd = _cooldownEnd[id]?.runTime.millisecondsSinceEpoch ?? 0;
+    return enabled && cooldownEnd < DateTime.now().millisecondsSinceEpoch && Random().nextDouble() <= chance;
+  }
+
+  void endCooldown(Snowflake id) {
+    _cooldownEnd.remove(id)?.timer.cancel();
+    _cooldownStreamController.add(null);
   }
 
   String getPhrase() {

@@ -18,7 +18,7 @@ class LexiconAnnounceEvent extends LexiconEvent<AnnounceEvent> {
 
     Timer.periodic(const Duration(minutes: 10), (timer) async {
       for(final g in Bot().guildList) {
-        handleEvent(AnnounceEvent(g.id));
+        handleEvent(AnnounceEvent(g.id), g.id);
       }
     });
   }

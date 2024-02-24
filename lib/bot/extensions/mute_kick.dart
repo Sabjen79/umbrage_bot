@@ -56,6 +56,6 @@ class MuteKick {
       voiceChannelId: null
     ));
 
-    Bot().lexicon.handleEvent(MuteKickEvent(member));
+    Bot().lexicon.handleEvent(MuteKickEvent(member), guild.id);
   }
 }

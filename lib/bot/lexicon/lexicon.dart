@@ -46,9 +46,9 @@ class Lexicon with ChangeNotifier {
   }
   //
 
-  Future<bool> handleEvent(DispatchEvent dispatchEvent) async {
+  Future<bool> handleEvent(DispatchEvent dispatchEvent, Snowflake guildId) async {
     for(var event in _events) {
-      if(await event.handleEvent(dispatchEvent)) {
+      if(await event.handleEvent(dispatchEvent, guildId)) {
         return true;
       }
     }

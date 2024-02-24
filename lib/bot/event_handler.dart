@@ -42,7 +42,7 @@ class EventHandler {
   void onMessageCreate(MessageCreateEvent event) async {
     if(event.member == null || event.message.author is WebhookAuthor) {
       if(event.message.author is User) {
-        Bot().lexicon.handleEvent(PrivateMessageEvent(event.message));
+        Bot().lexicon.handleEvent(PrivateMessageEvent(event.message), event.message.author.id);
       }
       
       return;
@@ -52,7 +52,7 @@ class EventHandler {
 
     if(event.guildId != null && await Bot().voiceManager[event.guildId!].music.handleEvent(event)) return;
 
-    await Bot().lexicon.handleEvent(event);
+    await Bot().lexicon.handleEvent(event, event.guildId!);
   }
 
   void onVoiceStateUpdate(VoiceStateUpdateEvent event) async {
@@ -72,7 +72,7 @@ class EventHandler {
     final newEvent = VoiceStateUpdateEvent(gateway: event.gateway, oldState: oldState, state: event.state);
 
     Bot()
-    ..lexicon.handleEvent(newEvent)
+    ..lexicon.handleEvent(newEvent, event.state.guildId!)
     ..muteKick.handleEvent(newEvent);
   }
   

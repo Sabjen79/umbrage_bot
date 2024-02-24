@@ -1,20 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/lexicon/conversation/conversation_delimiters.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_private_event.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/ui/components/simple_chance_field.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/components/simple_switch.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
+import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_cooldown_button.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_phrase_field.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_status.dart';
-import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_variable_button.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar.dart';
+import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_variable_pill.dart';
+import 'package:umbrage_bot/ui/main_menu/windows/settings/settings_row.dart';
 
 class LexiconEventWindow extends MainWindow {
   final LexiconEvent event;
@@ -30,15 +34,15 @@ class LexiconEventWindow extends MainWindow {
   State<LexiconEventWindow> createState() => _LexiconEventWindowState();
 }
 
-class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProviderStateMixin {
+class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProviderStateMixin, SettingsRow {
   late bool _enabled;
   late double _chance;
   late int _cooldown;
   late List<String> _phrases;
 
   late List<LexiconVariable> _variables;
-  
-  late TextEditingController _cooldownControllerHour, _cooldownControllerMinutes, _cooldownControllerSeconds;
+  late List<LexiconEventCooldownButton> _cooldownButtons;
+  StreamSubscription? _subscription;
 
   void init() {
     _variables = [...widget.event.variables, ...Bot().lexicon.customVariables];
@@ -46,80 +50,20 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
     _chance = widget.event.chance;
     _cooldown = widget.event.cooldown;
     _phrases = widget.event.phrases.toList();
-
-    _cooldownControllerHour = TextEditingController();
-    _cooldownControllerMinutes = TextEditingController();
-    _cooldownControllerSeconds = TextEditingController();
-    _resetCooldownControllers();
+    _resetCooldownButtons();
+    _subscription?.cancel();
+    _subscription = widget.event.onCooldownsChanged.listen((_) {
+      _resetCooldownButtons();
+      if(mounted) setState(() {});
+    });
   }
 
-  void _resetCooldownControllers() {
-    double d = _cooldown + 0.0;
-    _cooldownControllerHour.text = (d ~/ 3600).toString();
-    d = (d / 3600) % 1;
-    _cooldownControllerMinutes.text = (d * 60).toStringAsFixed(0);
-    d = (d * 60) % 1;
-    _cooldownControllerSeconds.text = (d * 60).toStringAsFixed(0);
-  }
-
-  void _setCooldown() {
-    _cooldown = 
-      int.parse('0${_cooldownControllerHour.text}') * 3600 +
-      int.parse('0${_cooldownControllerMinutes.text}') * 60 +
-      int.parse('0${_cooldownControllerSeconds.text}');
-  }
-
-  Widget _getVariableListDivider(String text) {
-    return Container(
-      padding: const EdgeInsets.only(left: 5, top: 20, bottom: 1),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: DiscordTheme.lightGray,
-          fontWeight: FontWeight.w500,
-          fontSize: 10
-        )
-      )
-    );
-  }
-
-  List<Widget> _getVariableList() {
-    var list = <Widget>[];
-
-    list.add(_getVariableListDivider("MESSAGE DELIMITERS"));
-
-    for(var d in ConversationDelimiters.values) {
-      list.add(LexiconEventVariableButton(
-        keyword: d.delimiter,
-        name: d.name,
-        description: d.description,
-        color: DiscordTheme.white2
-      ));
-    }
-
-    list.add(_getVariableListDivider("EVENT VARIABLES"));
-
-    for(var v in widget.event.variables) {
-      list.add(LexiconEventVariableButton(
-        keyword: "\$${v.keyword}\$",
-        name: v.name,
-        description: v.description,
-        color: v.color
-      ));
-    }
-
-    if(Bot().lexicon.customVariables.isNotEmpty) list.add(_getVariableListDivider("CUSTOM VARIABLES"));
-
-    for(var v in Bot().lexicon.customVariables) {
-      list.add(LexiconEventVariableButton(
-        keyword: "\$${v.keyword}\$",
-        name: v.name,
-        description: v.description,
-        color: v.color
-      ));
-    }
-
-    return list;
+  void _resetCooldownButtons() {
+    _cooldownButtons = widget.event.cooldowns.keys
+    .map((e) => LexiconEventCooldownButton(
+      event: widget.event,
+      id: e
+    )).toList();
   }
 
   @override
@@ -174,91 +118,37 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
     });
   }
 
-  List<Widget> _cooldownInput(TextEditingController controller, String regex, String text) {
-    return [
-      SizedBox(
-        width: 34,
-        child: TextField(
-          maxLength: 2,
-          textAlign: TextAlign.end,
-          controller: controller,
-          decoration: const InputDecoration(
-            contentPadding: EdgeInsets.symmetric(vertical: 7, horizontal: 4),
-            counter: SizedBox(),
-          ),
-          inputFormatters: <TextInputFormatter>[
-            FilteringTextInputFormatter.allow(RegExp(regex), replacementString: "er"),
-          ],
-          onChanged: (v) {
-            if(v == "er") {
-              _resetCooldownControllers();
-              return;
-            }
+  List<Widget> _getVariableList() {
+    var list = <Widget>[];
 
-            setState(() {
-              _setCooldown();
-            });
+    for(var d in ConversationDelimiters.values) {
+      list.add(LexiconEventVariablePill(
+        keyword: d.delimiter,
+        name: d.name,
+        description: d.description,
+        color: DiscordTheme.white2
+      ));
+    }
 
-            _showSaveChanges();
-          },
-        ),
-      ),
+    for(var v in widget.event.variables) {
+      list.add(LexiconEventVariablePill(
+        keyword: "\$${v.keyword}\$",
+        name: v.name,
+        description: v.description,
+        color: v.color
+      ));
+    }
 
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10, left: 4, right: 7),
-        child: Text(text, style: const TextStyle(fontWeight: FontWeight.w500),),
-      )
-    ];
-  }
+    for(var v in Bot().lexicon.customVariables) {
+      list.add(LexiconEventVariablePill(
+        keyword: "\$${v.keyword}\$",
+        name: v.name,
+        description: v.description,
+        color: v.color
+      ));
+    }
 
-  List<Widget> _settingRow({required String name, required String description, required Widget child}) {
-    return [
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      color: DiscordTheme.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500
-                    )
-                  ),
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      color: DiscordTheme.white2,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w400
-                    )
-                  )
-                ],
-              ),
-            ),
-
-            Align(
-              alignment: Alignment.centerRight,
-              child: child,
-            )
-          ],
-        )
-      ),
-      Container(
-        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
-        width: double.infinity, 
-        height: 1, 
-        color: DiscordTheme.gray
-      )
-    ];
+    return list;
   }
 
   List<Widget> _phraseFields() {
@@ -366,7 +256,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                 padding: const EdgeInsets.only(top: 120),
                 child: ListView(
                   children: [
-                    ..._settingRow(
+                    ...settingsRow(
                       name: "Enabled",
                       description: "Enables/Disables this event from running.",
                       child: SimpleSwitch(
@@ -381,61 +271,82 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                       )
                     ),
 
-                    ...(!_enabled ? [] : _settingRow(
-                      name: "Chance",
-                      description: "The chance that the bot will respond when the event is triggered.",
-                      child: SimpleChanceField(
-                        chance: _chance,
-                        onChanged: (v) {
-                          setState(() {
-                            _chance = v;
-                          });
+                    ...(!_enabled ? [] : [
+                      ...settingsRow(
+                        name: "Chance",
+                        description: "The chance that the bot will respond when the event is triggered.",
+                        child: SimpleChanceField(
+                          chance: _chance,
+                          onChanged: (v) {
+                            setState(() {
+                              _chance = v;
+                            });
 
-                          _showSaveChanges();
-                        },
-                      )
-                    )),
-
-                    ...(!_enabled ? [] : _settingRow(
-                      name: "Cooldown",
-                      description: "If the bot responds to the event, it will not be able to respond again for some time.",
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            ..._cooldownInput(_cooldownControllerHour, r'^\d?\d?$', "Hours"),
-                            ..._cooldownInput(_cooldownControllerMinutes, r'^[0-5]?\d?$', "Minutes"),
-                            ..._cooldownInput(_cooldownControllerSeconds, r'^[0-5]?\d?$', "Seconds"),
-                          ],
+                            _showSaveChanges();
+                          },
                         )
-                      )
-                    )),
-                    
-                    !_enabled ? Container() : Container(
-                      clipBehavior: Clip.hardEdge,
-                      margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
-                      decoration: BoxDecoration(
-                        color: DiscordTheme.backgroundColorDarkest,
-                        borderRadius: BorderRadius.circular(5)
                       ),
-                      width: double.infinity,
-                      child: Column(
-                        children: [
-                          ..._phraseFields(),
-                          _AddPhraseWidget(
-                            onTap: () {
+
+                      ...settingsRow(
+                        name: "Cooldown",
+                        description: "If the bot responds to the event, it will not be able to respond again for some time.",
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Slider(
+                            divisions: 36,
+                            min: 0,
+                            max: 10800000,
+                            label: "${(_cooldown/60000).toStringAsFixed(0)} minutes",
+                            value: _cooldown.toDouble(),
+                            onChanged: (v) {
                               setState(() {
-                                _phrases.add("");
+                                _cooldown = v.toInt();
                               });
 
                               _showSaveChanges();
-                            },
+                            }
                           )
-                        ],
+                        )
                       ),
-                    )
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
+                        child: Column(
+                          children: [
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              children: _getVariableList()
+                            ),
+
+                            const SizedBox(height: 5),
+                            
+                            Container(
+                              clipBehavior: Clip.hardEdge,
+                              decoration: BoxDecoration(
+                                color: DiscordTheme.backgroundColorDarkest,
+                                borderRadius: BorderRadius.circular(5)
+                              ),
+                              width: double.infinity,
+                              child: Column(
+                                children: [
+                                  ..._phraseFields(),
+                                  _AddPhraseWidget(
+                                    onTap: () {
+                                      setState(() {
+                                        _phrases.add("");
+                                      });
+
+                                      _showSaveChanges();
+                                    },
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    ]),
+
                   ],
                 ),
               )
@@ -449,13 +360,19 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
           child: ListView(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
             children: [
-              const Text(
-                "Press on variables to copy their keyword to clipboard",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: DiscordTheme.lightGray),
+              Container(
+                padding: const EdgeInsets.only(left: 5, top: 20, bottom: 1),
+                child: Text(
+                  widget.event is LexiconPrivateEvent ? "USER COOLDOWNS" : "GUILD COOLDOWNS",
+                  style: const TextStyle(
+                    color: DiscordTheme.lightGray,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 10
+                  )
+                )
               ),
 
-              ..._getVariableList(),
+              ..._cooldownButtons,
             ],
           ),
         )

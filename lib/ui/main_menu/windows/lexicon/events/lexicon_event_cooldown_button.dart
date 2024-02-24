@@ -1,39 +1,41 @@
-import 'dart:math';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import 'package:nyxx/nyxx.dart';
+import 'package:umbrage_bot/bot/bot.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
+import 'package:umbrage_bot/bot/lexicon/events/lexicon_private_event.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 import 'package:umbrage_bot/ui/main_menu/secondary_side_bar/secondary_side_bar.dart';
 
-class LexiconEventVariableButton extends StatefulWidget {
-  final String keyword;
-  final String name;
-  final String description;
-  final Color color;
+class LexiconEventCooldownButton extends StatefulWidget {
+  final LexiconEvent event;
+  final Snowflake id;
 
-  const LexiconEventVariableButton({
-    required this.keyword,
-    required this.name,
-    required this.description,
-    required this.color,
+  const LexiconEventCooldownButton({
+    required this.event,
+    required this.id,
     super.key
   });
 
   @override
-  State<LexiconEventVariableButton> createState() => _LexiconEventVariableButtonState();
+  State<LexiconEventCooldownButton> createState() => _LexiconEventCooldownButtonState();
 }
 
-class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton> with TickerProviderStateMixin {
+class _LexiconEventCooldownButtonState extends State<LexiconEventCooldownButton> with TickerProviderStateMixin {
+  String? _name;
+  String? _photoUrl;
+
   late AnimationController _hoverController;
   late Animation _hoverAnimation;
-
-  late AnimationController _tapController;
-  late Animation _tapAnimation;
+  late Timer _timer;
 
   bool _hover = false;
 
   @override
   void initState() {
+    super.initState();
+
     _hoverController = AnimationController(
       duration: const Duration(milliseconds: 150),
       vsync: this,
@@ -44,40 +46,37 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
       setState(() {});
     });
 
-    _tapController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
+    init();
 
-    _tapAnimation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _tapController, curve: Curves.ease, reverseCurve: Curves.easeIn));
-    _tapController.addListener(() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {});
     });
+  }
 
-    super.initState();
+  @override
+  void didUpdateWidget(covariant LexiconEventCooldownButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    init();
+  }
+
+  void init() {
+    if(widget.event is LexiconPrivateEvent) {
+      Bot().client.users.get(widget.id).then((value) {
+        _name = value.username;
+        _photoUrl = value.avatar.url.toString();
+      });
+    } else {
+      final guild = Bot().guildList.firstWhere((element) => element.id == widget.id);
+      _name = guild.name;
+      _photoUrl = guild.icon?.url.toString();
+    }
   }
 
   @override
   void dispose() {
     _hoverController.dispose();
-    _tapController.dispose();
+    _timer.cancel();
     super.dispose();
-  }
-
-  double _getIconOpacity() {
-    var value = _tapAnimation.value;
-
-    if(value <= 0.1) return value/0.1;
-    if(value >= 0.8) return (1-value)/0.2;
-    return 1.0;
-  }
-
-  double _getIconRotation() {
-    var value = _tapAnimation.value;
-
-    if(value > 0.7) return 0.0;
-
-    return 0.5*(1-_tapAnimation.value/0.7)*sin(_tapAnimation.value*25);
   }
 
   @override
@@ -90,10 +89,8 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
           b ? _hoverController.forward() : _hoverController.reverse();
         });
       },
-      onTap: () async {
-        await Clipboard.setData(ClipboardData(text: widget.keyword));
-        
-        _tapController..reset()..forward();
+      onTap: () {
+        widget.event.endCooldown(widget.id);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -101,6 +98,7 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
           borderRadius: BorderRadius.circular(4)
         ),
         padding: const EdgeInsets.symmetric(horizontal: 3),
+        margin: const EdgeInsets.symmetric(vertical: 2),
         width: SecondarySideBar.size,
         height: 35,
         child: Stack(
@@ -114,24 +112,15 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                   margin: const EdgeInsets.all(5).add(const EdgeInsets.only(right: 3)),
                   width: 22,
                   height: 22,
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: widget.color,
+                    color: Colors.grey,
                     borderRadius: BorderRadius.circular(22)
                   ),
-                  child: Transform.rotate(
-                    angle: _getIconRotation(),
-                    child: Opacity(
-                      opacity: _getIconOpacity(),
-                      child: const Icon(
-                        Symbols.inventory,
-                        weight: 300,
-                        opticalSize: 20,
-                        size: 17,
-                        color: DiscordTheme.white,
-                        shadows: [Shadow(color: Color(0xAA000000), blurRadius: 3)],
-                      )
-                    )
-                  )
+                  child: _photoUrl == null ? const SizedBox.shrink() : Image.network(
+                    _photoUrl!,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 
                 Container(
@@ -144,17 +133,17 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.name, 
-                        style: TextStyle(
+                        _name ?? "...", 
+                        style: const TextStyle(
                           overflow: TextOverflow.ellipsis,
-                          color: widget.color,
+                          color: DiscordTheme.white2,
                           fontSize: 12,
                           fontWeight: FontWeight.w500
                         ),
                       ),
                       
                       Text(
-                        widget.keyword, 
+                        "Cooldown Left: ${Duration(milliseconds: widget.event.cooldowns[widget.id]!.runTime.millisecondsSinceEpoch - DateTime.now().millisecondsSinceEpoch).toString().substring(0, 7)}", 
                         style: const TextStyle(
                           overflow: TextOverflow.ellipsis,
                           color: DiscordTheme.lightGray,
@@ -181,11 +170,11 @@ class _LexiconEventVariableButtonState extends State<LexiconEventVariableButton>
                 ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 200),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                     child: Text(
-                      widget.description.isNotEmpty ? widget.description : "No Description.",
-                      style: const TextStyle(
+                      "Click to cancel cooldown",
+                      style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 12
                       ),
