@@ -108,7 +108,7 @@ class _SideBarButtonState extends State<SideBarButton> with TickerProviderStateM
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: Color.lerp(DiscordTheme.backgroundColorDark, DiscordTheme.primaryColor, _pairedAnimationValue()),
+                color: widget.icon == null ? DiscordTheme.backgroundColorDark : Color.lerp(DiscordTheme.backgroundColorDark, DiscordTheme.primaryColor, _pairedAnimationValue()),
                 borderRadius: BorderRadius.all(Radius.circular(20 - 5 * _pairedAnimationValue()))
               ),
               child: Center(
