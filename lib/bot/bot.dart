@@ -12,7 +12,6 @@ import 'package:umbrage_bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/profile/bot_profile_list.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
 import 'package:umbrage_bot/bot/voice/bot_voice_manager.dart';
-import 'package:umbrage_bot/ui/main_menu/windows/console/console_window.dart';
 
 class Bot {
   late final NyxxGateway client; // Discord Client
@@ -40,12 +39,6 @@ class Bot {
   //==============================================================================
 
   static Future<void> create(BotProfile profile) async {
-    // Console Output
-    ConsoleWindow.buffer = StringBuffer();
-    logging.logger.onRecord.listen((event) {
-      ConsoleWindow.buffer.writeln("[${event.time.toString()}] ${event.toString()}");
-    });
-    
     _instance.client = await Nyxx.connectGateway(
       profile.getToken(),
       GatewayIntents.all,
