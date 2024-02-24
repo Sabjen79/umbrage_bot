@@ -16,7 +16,6 @@ class GuildVoiceManager {
 
   void handleEvent(VoiceStateUpdateEvent event) async {
     final botState = guild.voiceStates[Bot().user.id];
-    print("OK");
 
     _autoConnect(botState);
   }
