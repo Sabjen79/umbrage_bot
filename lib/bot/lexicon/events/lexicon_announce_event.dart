@@ -31,7 +31,7 @@ class LexiconAnnounceEvent extends LexiconEvent<AnnounceEvent> {
   @override
   Future<Conversation> buildConversation(AnnounceEvent event) async {
     return Conversation(
-      content: getPhrase(),
+      messages: getRandomMessageList(),
       channel: await Bot().config[event.guildId].mainMessageChannel as PartialTextChannel,
     );
   }

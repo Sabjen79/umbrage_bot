@@ -28,7 +28,7 @@ class LexiconMuteKickEvent extends LexiconEvent<MuteKickEvent> {
   @override
   Future<Conversation> buildConversation(MuteKickEvent event) async {
     return Conversation(
-      content: getPhrase(),
+      messages: getRandomMessageList(),
       channel: await Bot().config[event.guildId].mainMessageChannel as PartialTextChannel,
       user: event.member.user!
     );

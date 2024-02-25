@@ -34,7 +34,7 @@ class LexiconVoiceJoinEvent extends LexiconEvent<VoiceStateUpdateEvent> {
   @override
   Future<Conversation> buildConversation(VoiceStateUpdateEvent event) async {
     return Conversation(
-      content: getPhrase(),
+      messages: getRandomMessageList(),
       channel: await Bot().config[event.state.guildId!].mainMessageChannel as PartialTextChannel,
       user: (await event.state.member!.get()).user
     );

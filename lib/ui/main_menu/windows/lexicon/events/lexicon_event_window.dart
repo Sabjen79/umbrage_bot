@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
-import 'package:umbrage_bot/bot/lexicon/conversation/conversation_delimiters.dart';
+import 'package:umbrage_bot/bot/lexicon/conversation/conversation_message.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_private_event.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
@@ -11,8 +10,10 @@ import 'package:umbrage_bot/ui/components/simple_chance_field.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/components/simple_switch.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
+import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_add_conversation_widget.dart';
+import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_add_message_widget.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_cooldown_button.dart';
-import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_phrase_field.dart';
+import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_message_field.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/lexicon/events/lexicon_event_status.dart';
 import 'package:umbrage_bot/ui/main_menu/main_window.dart';
 import 'package:umbrage_bot/ui/main_menu/router/main_menu_router.dart';
@@ -38,7 +39,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
   late bool _enabled;
   late double _chance;
   late int _cooldown;
-  late List<String> _phrases;
+  late List<List<ConversationMessage>> _messagesLists;
 
   late List<LexiconVariable> _variables;
   late List<LexiconEventCooldownButton> _cooldownButtons;
@@ -49,7 +50,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
     _enabled = widget.event.enabled;
     _chance = widget.event.chance;
     _cooldown = widget.event.cooldown;
-    _phrases = widget.event.phrases.toList();
+    _messagesLists = widget.event.messagesLists.map((e) => e.toList()).toList();
     _resetCooldownButtons();
     _subscription?.cancel();
     _subscription = widget.event.onCooldownsChanged.listen((_) {
@@ -88,7 +89,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
 
       MainMenuRouter().unblock();
     }, () async {
-      var result = Bot().lexicon.updateLexiconEvent(widget.event.filename, _enabled, _chance, _cooldown, _phrases);
+      var result = Bot().lexicon.updateLexiconEvent(widget.event.filename, _enabled, _chance, _cooldown, _messagesLists);
 
       if(!result.isSuccess) {
         showDialog(
@@ -121,15 +122,6 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
   List<Widget> _getVariableList() {
     var list = <Widget>[];
 
-    for(var d in ConversationDelimiters.values) {
-      list.add(LexiconEventVariablePill(
-        keyword: d.delimiter,
-        name: d.name,
-        description: d.description,
-        color: DiscordTheme.white2
-      ));
-    }
-
     for(var v in widget.event.variables) {
       list.add(LexiconEventVariablePill(
         keyword: "\$${v.keyword}\$",
@@ -151,25 +143,48 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
     return list;
   }
 
-  List<Widget> _phraseFields() {
+  List<Widget> _messagesFields() {
     var list = <Widget>[];
 
-    for(int i = 0; i < _phrases.length; i++) {
-      list.add(
-        LexiconEventPhraseField(
-          initialText: _phrases[i],
-          variables: _variables,
-          onChanged: (value) {
-            if(value == _phrases[i]) return;
+    for(int i = 0; i < _messagesLists.length; i++) {
 
-            _phrases[i] = value;
+      for(int j = 0; j < _messagesLists[i].length; j++) {
+        list.add(
+          LexiconEventMessageField(
+            message: _messagesLists[i][j],
+            variables: _variables,
+            onChanged: (type, text) {
+              if(type == _messagesLists[i][j].type && text == _messagesLists[i][j].message) return;
+
+              _messagesLists[i][j].type = type;
+              _messagesLists[i][j].message = text;
+
+              _showSaveChanges();
+            },
+            onDelete: () {
+              setState(() {
+                _messagesLists[i].removeAt(j);
+                if(_messagesLists[i].isEmpty) _messagesLists.removeAt(i);
+              });
+
+              _showSaveChanges();
+            },
+          )
+        );
+      }
+
+      list.add(
+        LexiconEventAddMessageWidget(
+          onTap: () {
+            setState(() {
+              _messagesLists[i].add(ConversationMessage(0, ""));
+            });
 
             _showSaveChanges();
           },
           onDelete: () {
-
             setState(() {
-              _phrases.removeAt(i);
+              _messagesLists.removeAt(i);
             });
 
             _showSaveChanges();
@@ -179,6 +194,18 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
 
       list.add(Container(color: DiscordTheme.gray, width: double.infinity, height: 1));
     }
+
+    list.add(
+      LexiconEventAddConversationWidget(
+        onTap: () {
+          setState(() {
+            _messagesLists.add([ConversationMessage(0, "")]);
+          });
+
+          _showSaveChanges();
+        },
+      )
+    );
 
     return list;
   }
@@ -310,7 +337,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                       ),
 
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
+                        padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 30).add(const EdgeInsets.only(bottom: 50)),
                         child: Column(
                           children: [
                             Wrap(
@@ -328,18 +355,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
                               ),
                               width: double.infinity,
                               child: Column(
-                                children: [
-                                  ..._phraseFields(),
-                                  _AddPhraseWidget(
-                                    onTap: () {
-                                      setState(() {
-                                        _phrases.add("");
-                                      });
-
-                                      _showSaveChanges();
-                                    },
-                                  )
-                                ],
+                                children: _messagesFields()
                               ),
                             )
                           ],
@@ -378,60 +394,5 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
         )
       ],
     );
-  }
-}
-
-class _AddPhraseWidget extends StatefulWidget {
-  final VoidCallback onTap;
-
-  const _AddPhraseWidget({required this.onTap});
-
-  @override
-  State<_AddPhraseWidget> createState() => _AddPhraseWidgetState();
-}
-
-class _AddPhraseWidgetState extends State<_AddPhraseWidget> {
-  bool _hover = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-    onTap: widget.onTap,
-    onHover: (b) {
-      setState(() {
-        _hover = b;
-      });
-    },
-    child: Container(
-      color: _hover ? DiscordTheme.backgroundColorDarker : DiscordTheme.backgroundColorDarkest,
-      height: 40,
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(left: 10, right: 3),
-            child: Icon(
-              Symbols.add,
-              size: 25,
-              opticalSize: 20,
-              color: DiscordTheme.lightGray,
-            )
-          ),
-
-          Padding(
-            padding: EdgeInsets.only(bottom: 1),
-            child: Text(
-              "Add New Phrase", 
-              style: TextStyle(
-                color: DiscordTheme.lightGray,
-                fontWeight: FontWeight.w500
-              ),
-            ),
-          )
-        ],
-      ),
-    ),
-  );
   }
 }

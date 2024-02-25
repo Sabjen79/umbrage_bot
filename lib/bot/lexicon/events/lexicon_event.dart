@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/lexicon/conversation/conversation.dart';
+import 'package:umbrage_bot/bot/lexicon/conversation/conversation_message.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/bot/util/bot_files.dart';
@@ -21,9 +21,10 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   int cooldown = 600;
   double chance = 0.5;
 
-  final List<String> _phrases = [];
+  final List<List<ConversationMessage>> _messagesLists = [];
   final List<LexiconVariable> _variables = [];
   late PseudoRandomIndex pseudoRandomIndex;
+
   final Map<Snowflake, BotTimer> _cooldownEnd = {};
   final StreamController<void> _cooldownStreamController = StreamController<void>.broadcast();
   Stream<void> get onCooldownsChanged => _cooldownStreamController.stream;
@@ -34,9 +35,14 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
     enabled = (json['enabled'] ?? false) as bool;
     cooldown = (json['cooldown'] ?? 600) as int;
     chance = (json['chance'] ?? 0.5) as double;
-    _phrases..clear()..addAll(List<String>.from(json['phrases'] ?? []));
+    
+    if(json['messagesLists'] != null) {
+      for(List<dynamic> list in json['messagesLists']) {
+        _messagesLists.add(list.map((e) => ConversationMessage(e['type'] as int, e['message'] as String)).toList());
+      }
+    }
 
-    pseudoRandomIndex = PseudoRandomIndex(_phrases.length);
+    pseudoRandomIndex = PseudoRandomIndex(_messagesLists.length);
   }
 
   @override
@@ -47,7 +53,7 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
     'enabled': enabled,
     'cooldown': cooldown,
     'chance': chance,
-    'phrases': _phrases
+    'messagesLists': _messagesLists
   };
 
   Future<bool> handleEvent(DispatchEvent event, Snowflake guildId) async {
@@ -69,8 +75,8 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   String get filename => _filename;
   String get name => _name;
   String get description => _description;
-  List<String> get phrases => _phrases;
   List<LexiconVariable> get variables => _variables;
+  List<List<ConversationMessage>> get messagesLists => _messagesLists;
 
   Map<Snowflake, BotTimer> get cooldowns => _cooldownEnd;
 
@@ -84,27 +90,31 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
     _cooldownStreamController.add(null);
   }
 
-  String getPhrase() {
-    if(_phrases.isEmpty) return "";
+  List<ConversationMessage> getRandomMessageList() {
+    if(_messagesLists.isEmpty) return [];
 
-    String phrase = _phrases[pseudoRandomIndex.getNextIndex()].replaceAll("\\n", Platform.lineTerminator);
+    List<ConversationMessage> list = _messagesLists[pseudoRandomIndex.getNextIndex()];
 
-    for(var v in _variables) {
-      phrase = phrase.replaceAll("\$${v.keyword}\$", v.getValue());
-    }
+    for(var message in list) {
+      if(message.type != 0) continue;
 
-    for(var v in _lexicon.customVariables) {
-      Set<String> usedValues = {};
-      while(phrase.contains(v.keyword)) {
-        var value = v.getValue();
+      for(final v in _variables) {
+        if(message.type == 0) message.message = message.message.replaceAll("\$${v.keyword}\$", v.getValue());
+      }
 
-        if(usedValues.contains(value) && usedValues.length != v.words.length) continue;
-        usedValues.add(value);
+      for(var v in _lexicon.customVariables) {
+        Set<String> usedValues = {};
+        while(message.message.contains(v.keyword)) {
+          var value = v.getValue();
 
-        phrase = phrase.replaceFirst("\$${v.keyword}\$", value);
+          if(usedValues.contains(value) && usedValues.length < v.words.length) continue;
+          usedValues.add(value);
+
+          message.message = message.message.replaceFirst("\$${v.keyword}\$", value);
+        }
       }
     }
 
-    return phrase;
+    return list;
   }
 }

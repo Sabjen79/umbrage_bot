@@ -29,7 +29,7 @@ class LexiconPrivateEvent extends LexiconEvent<PrivateMessageEvent> {
   @override
   Future<Conversation> buildConversation(PrivateMessageEvent event) async {
     return Conversation(
-      content: getPhrase(),
+      messages: getRandomMessageList(),
       channel: event.message.channel,
       replyMessage: event.message,
       user: event.message.author as User,

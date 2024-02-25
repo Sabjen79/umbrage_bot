@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/lexicon/conversation/conversation.dart';
-import 'package:umbrage_bot/bot/lexicon/conversation/conversation_delimiters.dart';
+import 'package:umbrage_bot/bot/lexicon/conversation/conversation_message.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_announce_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_everyone_event.dart';
@@ -81,11 +81,22 @@ class Lexicon with ChangeNotifier {
     throw Exception("Event does not exist.");
   }
 
-  Result<LexiconEvent> updateLexiconEvent(String filename, bool enabled, double chance, int cooldown, List<String> phrases) {
+  Result<LexiconEvent> updateLexiconEvent(String filename, bool enabled, double chance, int cooldown, List<List<ConversationMessage>> messagesLists) {
     if(enabled && chance == 0) return Result.failure("Chance is 0. Disable the event instead.");
 
-    for(var p in phrases) {
-      if(p.replaceAll(" ", "").isEmpty) return Result.failure("One or more phrases are empty.");
+    for(final list in messagesLists) {
+      if(list.isEmpty) return Result.failure("One or more message lists are empty.");
+      if(list.first.type == 1) return Result.failure("'Wait for Response' messages cannot be first in the list.");
+      for(final message in list) {
+        switch(message.type) {
+          case 0:
+            if(message.message.replaceAll(" ", "").isEmpty) return Result.failure("One or more messages are empty.");
+            break;
+          case 2:
+            if(message.message.replaceAll(" ", "").isEmpty) return Result.failure("One or more reactions are empty.");
+            break;
+        }
+      }
     }
 
     for(var event in _events) {
@@ -93,8 +104,8 @@ class Lexicon with ChangeNotifier {
         event.enabled = enabled;
         event.cooldown = cooldown;
         event.chance = chance;
-        event.phrases..clear()..addAll(phrases);
-        event.pseudoRandomIndex = PseudoRandomIndex(event.phrases.length);
+        event.messagesLists..clear()..addAll(messagesLists);
+        event.pseudoRandomIndex = PseudoRandomIndex(event.messagesLists.length);
 
         event.saveToJson();
 
@@ -151,10 +162,6 @@ class Lexicon with ChangeNotifier {
 
     for(var w in MainMenuRouter().getActiveMainRoute().getWindows()) {
       if(w is! LexiconVariableWindow && (keyword == "add_variable" || keyword == w.route)) return Result.failure("'$keyword' is a restricted keyword used by the application, using it will cause errors!");
-    }
-
-    for(var d in ConversationDelimiters.values) {
-      if(d.delimiter == keyword) return Result.failure("'$keyword' is a restricted keyword used by the application, using it will cause errors!");
     }
 
     for(var event in _events) {

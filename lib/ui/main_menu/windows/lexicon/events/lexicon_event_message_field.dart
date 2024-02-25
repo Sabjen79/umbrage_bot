@@ -2,32 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:rich_text_controller/rich_text_controller.dart';
-import 'package:umbrage_bot/bot/lexicon/conversation/conversation_delimiters.dart';
+import 'package:umbrage_bot/bot/lexicon/conversation/conversation_message.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/lexicon_variable.dart';
 import 'package:umbrage_bot/ui/discord_theme.dart';
 
-class LexiconEventPhraseField extends StatefulWidget {
+class LexiconEventMessageField extends StatefulWidget {
   final List<LexiconVariable> variables;
-  final String initialText;
-  final Function(String) onChanged;
+  final ConversationMessage message;
+  final Function(int, String) onChanged;
   final VoidCallback onDelete;
   
-  const LexiconEventPhraseField({
+  const LexiconEventMessageField({
     required this.variables,
     required this.onChanged,
     required this.onDelete,
-    this.initialText = "",
+    required this.message,
     super.key
   });
 
   @override
-  State<LexiconEventPhraseField> createState() => _LexiconEventPhraseFieldState();
+  State<LexiconEventMessageField> createState() => _LexiconEventMessageFieldState();
 }
 
-class _LexiconEventPhraseFieldState extends State<LexiconEventPhraseField> with TickerProviderStateMixin {
+class _LexiconEventMessageFieldState extends State<LexiconEventMessageField> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation _animation;
   late RichTextController _textController;
+  late _Type _type;
   late Widget _textField;
 
   void init() {
@@ -37,43 +38,34 @@ class _LexiconEventPhraseFieldState extends State<LexiconEventPhraseField> with 
       matches[RegExp("\\\$${v.keyword}\\\$")] = TextStyle(color: v.color, fontWeight: FontWeight.w500);
     }
 
-    var style = const TextStyle(color: DiscordTheme.white, fontWeight: FontWeight.w500, shadows: [Shadow(color: DiscordTheme.white, blurRadius: 3)]);
-
-    for(var d in ConversationDelimiters.values) {
-      switch(d) {
-        case ConversationDelimiters.chain:
-          matches[RegExp(r"==>")] = style;
-          break;
-        case ConversationDelimiters.wait:
-          matches[RegExp(r"==\?")] = style;
-          break;
-        case ConversationDelimiters.reaction:
-          matches[RegExp(r"h([^\w\d\s]{2})".replaceAll("h", ConversationDelimiters.reaction.delimiter))] = style;
-          break;
-      } 
-        
-
-    }
-
     _textController = RichTextController(
       onMatch: (l) {},
       patternMatchMap: matches,
       deleteOnBack: false,
-      text: widget.initialText
+      text: widget.message.message
     );
 
+    _type = _Type.values.firstWhere((element) => element.value == widget.message.type);
+
+    initTextField();
+  }
+
+  void initTextField() {
     _textField = TextField(
       controller: _textController,
       minLines: 1,
       maxLines: 5,
       inputFormatters: [
+        LengthLimitingTextInputFormatter(_type.value == 2 ? 2 : -1),
         FilteringTextInputFormatter.deny(RegExp(r"\n"))
       ],
-      decoration: const InputDecoration(
-        hintText: "Phrase"
+      decoration: InputDecoration(
+        hintText: widget.message.type == 0 ? "Message" : "Emoji"
       ),
       style: const TextStyle(fontSize: 14),
-      onChanged: widget.onChanged,
+      onChanged: (value) {
+        widget.onChanged(_type.value, value);
+      },
     );
   }
 
@@ -92,7 +84,7 @@ class _LexiconEventPhraseFieldState extends State<LexiconEventPhraseField> with 
   }
 
   @override
-  void didUpdateWidget(covariant LexiconEventPhraseField oldWidget) {
+  void didUpdateWidget(covariant LexiconEventMessageField oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     init();
@@ -142,8 +134,45 @@ class _LexiconEventPhraseFieldState extends State<LexiconEventPhraseField> with 
                 ),
               )
             ),
+
+            Transform.translate(
+              offset: Offset(-10.0 + _animation.value * 20.0, 0),
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(color: DiscordTheme.backgroundColorLight)
+                ),
+                child: DropdownButton<_Type>(
+                  icon: const SizedBox.shrink(),
+                  underline: const SizedBox.shrink(),
+                  alignment: Alignment.center,
+                  isDense: true,
+                  value: _type,
+                  onChanged: (v) {
+                    setState(() {
+                      _type = v!;
+                      widget.onChanged(_type.value, _textController.text);
+                      initTextField();
+                      _textController.text = "";
+                    });
+                  },
+                  items: _Type.values.map((e) => DropdownMenuItem(
+                    value: e, 
+                    child: Text(
+                      e.name,
+                      style: const TextStyle(
+                        color: DiscordTheme.white2,
+                        fontSize: 14
+                      ),
+                    )
+                  )).toList(),
+                )
+              )
+            ),
             
-            Expanded(
+            _type.value == 1 ? const SizedBox.shrink() : Expanded(
               child: Transform.translate(
                 offset: Offset(-10.0 + _animation.value * 20.0, 0),
                 child: Padding(
@@ -158,4 +187,15 @@ class _LexiconEventPhraseFieldState extends State<LexiconEventPhraseField> with 
       
     );
   }
+}
+
+enum _Type {
+  message(0, "Message"),
+  wait(1, "Wait for Response"),
+  reaction(2, "Reaction");
+
+  const _Type(this.value, this.name);
+
+  final int value;
+  final String name;
 }
