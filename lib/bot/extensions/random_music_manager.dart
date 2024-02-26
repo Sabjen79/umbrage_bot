@@ -20,7 +20,7 @@ class RandomMusicManager with JsonSerializable {
     _loadSongs();
 
     _queue.onTrackQueued.listen((track) {
-      _addToList(track);
+      if(!track.hidden) _addToList(track);
     });
 
     timer = BotTimer.periodic(() => Bot().config.randomMusicCooldown, () async {
