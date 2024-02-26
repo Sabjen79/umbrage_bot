@@ -54,6 +54,7 @@ class Conversation {
 
     ConversationMessage message;
     do {
+      if(messages.isEmpty) return;
       message = messages.removeAt(0);
 
       if(message.type == 0) { // Message

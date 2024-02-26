@@ -54,12 +54,12 @@ class Lexicon with ChangeNotifier {
     }
 
     if(dispatchEvent is MessageCreateEvent) {
-      conversations[dispatchEvent.message.channelId]?.advance(dispatchEvent);
+      await conversations[dispatchEvent.message.channelId]?.advance(dispatchEvent);
       return true;
     }
 
     if(dispatchEvent is PrivateMessageEvent) {
-      conversations[dispatchEvent.message.channelId]?.advancePrivate(dispatchEvent);
+      await conversations[dispatchEvent.message.channelId]?.advancePrivate(dispatchEvent);
       return true;
     }
 
