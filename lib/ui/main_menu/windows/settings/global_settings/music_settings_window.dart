@@ -15,14 +15,12 @@ class MusicSettingsWindow extends MainWindow {
     sideBarIcon: Symbols.music_note
   );
 
-
   @override
   State<MusicSettingsWindow> createState() => _MusicSettingsWindowState();
 }
 
 class _MusicSettingsWindowState extends State<MusicSettingsWindow> with SettingsRow {
   final BotConfiguration config = Bot().config;
-  late TextEditingController _ytApiKeyController;
   late TextEditingController _ytNotFoundMessageController;
   late bool _restrictMusicChannel;
   late TextEditingController _restrictMusicChannelTextController;
@@ -52,7 +50,6 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
   }
 
   void reset() {
-    _ytApiKeyController = TextEditingController(text: config.ytApiKey);
     _ytNotFoundMessageController = TextEditingController(text: config.ytNotFoundMessage);
     _restrictMusicChannel = config.restrictMusicChannel;
     _restrictMusicChannelTextController = TextEditingController(text: config.restrictMusicChannelMessage);
@@ -85,7 +82,6 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
       MainMenuRouter().unblock();
     }, () async {
       config
-        ..ytApiKey = _ytApiKeyController.text
         ..ytNotFoundMessage = _ytNotFoundMessageController.text
         ..restrictMusicChannel = _restrictMusicChannel
         ..restrictMusicChannelMessage = _restrictMusicChannelTextController.text
@@ -123,20 +119,6 @@ class _MusicSettingsWindowState extends State<MusicSettingsWindow> with Settings
 
         // YOUTUBE
         list.add(titleRow("Youtube Search", false));
-
-        list.addAll(
-          settingsRow(
-            first: true,
-            name: "Youtube API Key",
-            description: "Your youtube api key to enable the play command to search for songs on yt.\nDirect links will work otherwise. Leave empty to disable the feature",
-            child: TextField(
-              controller: _ytApiKeyController,
-              onChanged: (v) {
-                _showSaveChanges();
-              },
-            )
-          )
-        );
 
         list.addAll(
           settingsRow(

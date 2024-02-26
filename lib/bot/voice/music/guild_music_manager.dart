@@ -1,5 +1,6 @@
 import 'package:nyxx/nyxx.dart';
 import 'package:umbrage_bot/bot/bot.dart';
+import 'package:umbrage_bot/bot/extensions/random_sounds_manager.dart';
 import 'package:umbrage_bot/bot/util/chat_alert.dart';
 import 'package:umbrage_bot/bot/extensions/random_music_manager.dart';
 import 'package:umbrage_bot/bot/extensions/volume_boost_manager.dart';
@@ -21,10 +22,12 @@ class GuildMusicManager {
   ];
   late final RandomMusicManager randomMusicManager;
   late final VolumeBoostManager volumeBoostManager;
+  late final RandomSoundsManager randomSoundsManager;
 
   GuildMusicManager(this.guild) : _musicQueue = MusicQueue(guild.id) {
     randomMusicManager = RandomMusicManager(_musicQueue);
     volumeBoostManager = VolumeBoostManager(_musicQueue);
+    randomSoundsManager = RandomSoundsManager(_musicQueue);
   }
 
   void replayCurrentTrack() {

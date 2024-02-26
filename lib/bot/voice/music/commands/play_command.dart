@@ -5,7 +5,6 @@ import 'package:umbrage_bot/bot/util/chat_alert.dart';
 import 'package:umbrage_bot/bot/voice/music/commands/music_command.dart';
 import 'package:umbrage_bot/bot/voice/music/music_queue.dart';
 import 'package:umbrage_bot/bot/voice/music/music_track.dart';
-import 'package:umbrage_bot/bot/voice/music/util/youtube_search.dart';
 
 class PlayCommand extends MusicCommand {
   String? url = "";
@@ -18,8 +17,8 @@ class PlayCommand extends MusicCommand {
 
     url = event.message.content.substring(event.message.content.indexOf(" ") + 1).trim();
 
-    if(!url!.startsWith('http') && Bot().config.ytApiKey.trim().isNotEmpty) {
-      url = await YoutubeSearch.searchUrl(url!);
+    if(!url!.startsWith('http')) {
+      url = "ytsearch:$url";
     }
 
     return true;
@@ -43,6 +42,9 @@ class PlayCommand extends MusicCommand {
       var result = await queue.lavalinkClient.loadTrack(url!);
       if(result is TrackLoadResult) {
         track = result.data;
+      } else if(result is SearchLoadResult) {
+        if(result.data.isEmpty) throw Exception("Not found!");
+        track = result.data.first;
       } else if(result is PlaylistLoadResult) {
         var index = result.data.info.selectedTrack;
         if(index == -1) index = 0;

@@ -32,6 +32,13 @@ class GuildVoiceManager {
       isMuted: muted, 
       isDeafened: false
     ));
+
+    Future.delayed(const Duration(milliseconds: 500)).then((_) {
+      if(Bot().config.randomSoundsPlayOnJoin) {
+        music.randomSoundsManager.timer.runEarly();
+      }
+    });
+    
   }
 
   void disconnect() async {

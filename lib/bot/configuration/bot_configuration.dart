@@ -14,7 +14,6 @@ class BotConfiguration with JsonSerializable {
   late int reactionSpeedMax;
   int get randomReactionSpeed => Random().randomCooldown(reactionSpeedMin, reactionSpeedMax);
 
-  late String ytApiKey;
   late String ytNotFoundMessage;
 
   late bool restrictMusicChannel;
@@ -64,6 +63,12 @@ class BotConfiguration with JsonSerializable {
   late int profilePictureMaxCooldown;
   int get profilePictureCooldown => Random().randomCooldown(profilePictureMinCooldown, profilePictureMaxCooldown);
 
+  late bool randomSoundsEnable;
+  late bool randomSoundsPlayOnJoin;
+  late int randomSoundsMinCooldown;
+  late int randomSoundsMaxCooldown;
+  
+
   BotConfiguration(List<PartialGuild> guilds) {
     for(var g in guilds) {
       _guilds[g.id.toString()] = BotGuildConfiguration(g.id.toString());
@@ -78,7 +83,6 @@ class BotConfiguration with JsonSerializable {
 
   void reset() {
     var json = loadFromJson();
-    ytApiKey = (json['ytApiKey'] ?? "") as String;
     ytNotFoundMessage = (json['ytNotFoundMessage'] ?? "I couldn't find any video") as String;
 
     typingSpeed = (json['typingSpeed'] ?? 30) as int;
@@ -125,11 +129,15 @@ class BotConfiguration with JsonSerializable {
     profilePictureEnable = (json['profilePictureEnable'] ?? false) as bool;
     profilePictureMinCooldown = (json['profilePictureMinCooldown'] ?? 1800000) as int;
     profilePictureMaxCooldown = (json['profilePictureMaxCooldown'] ?? 3600000) as int;
+
+    randomSoundsEnable = (json['randomSoundsEnable'] ?? false) as bool;
+    randomSoundsPlayOnJoin = (json['randomSoundsPlayOnJoin'] ?? false) as bool;
+    randomSoundsMinCooldown = (json['randomSoundsMinCooldown'] ?? 600000) as int;
+    randomSoundsMaxCooldown = (json['randomSoundsMaxCooldown'] ?? 1200000) as int;
   }
 
   @override
   Map<String, dynamic> toJson() => {
-    'ytApiKey': ytApiKey,
     'ytNotFoundMessage': ytNotFoundMessage,
     'typingSpeed': typingSpeed,
     'reactionSpeedMin': reactionSpeedMin,
@@ -168,7 +176,11 @@ class BotConfiguration with JsonSerializable {
     'muteKickDuration': muteKickDuration,
     'profilePictureEnable': profilePictureEnable,
     'profilePictureMinCooldown': profilePictureMinCooldown,
-    'profilePictureMaxCooldown': profilePictureMaxCooldown
+    'profilePictureMaxCooldown': profilePictureMaxCooldown,
+    'randomSoundsEnable': randomSoundsEnable,
+    'randomSoundsPlayOnJoin': randomSoundsPlayOnJoin,
+    'randomSoundsMinCooldown': randomSoundsMinCooldown,
+    'randomSoundsMaxCooldown': randomSoundsMaxCooldown
   };
 
   @override

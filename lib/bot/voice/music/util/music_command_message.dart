@@ -28,6 +28,8 @@ class MusicCommandMessage {
   }
 
   void _playCommandMessage(MusicTrack musicTrack) async {
+    if(musicTrack.hidden) return;
+    
     var track = musicTrack.track;
     var channel = await _getChannel(guildId);
     channel.sendMessage(MessageBuilder(embeds: [

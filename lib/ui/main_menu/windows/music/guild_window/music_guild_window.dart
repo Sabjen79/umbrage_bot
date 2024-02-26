@@ -44,6 +44,15 @@ class _MusicGuildWindowState extends State<MusicGuildWindow> {
         ),
       );
     }
+
+    if(Bot().config.randomSoundsEnable) {
+      list.add(
+        MusicTimerWidget(
+          name: "Random Sounds",
+          timer: Bot().voiceManager[widget.guild.id].music.randomSoundsManager.timer
+        ),
+      );
+    }
     
     if(Bot().config.volumeBoostEnable) {
       list.add(
