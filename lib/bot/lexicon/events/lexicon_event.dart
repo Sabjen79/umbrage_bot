@@ -104,7 +104,7 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
 
       for(var v in _lexicon.customVariables) {
         Set<String> usedValues = {};
-        while(message.message.contains(v.keyword)) {
+        while(message.message.contains("\$${v.keyword}\$")) {
           var value = v.getValue();
 
           if(usedValues.contains(value) && usedValues.length < v.words.length) continue;
