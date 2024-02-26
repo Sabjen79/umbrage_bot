@@ -4,14 +4,17 @@ import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/lexicon/conversation/conversation.dart';
 import 'package:umbrage_bot/bot/lexicon/events/lexicon_event.dart';
 import 'package:umbrage_bot/bot/lexicon/lexicon.dart';
+import 'package:umbrage_bot/bot/lexicon/variables/predefined/lexicon_member_name_variable.dart';
 import 'package:umbrage_bot/bot/lexicon/variables/predefined/lexicon_mention_variable.dart';
 
 class LexiconPrivateEvent extends LexiconEvent<PrivateMessageEvent> {
+  LexiconMemberNameVariable memberNameVariable = LexiconMemberNameVariable("Gets the name of the user that sent the message.");
   LexiconMentionVariable mentionVariable = LexiconMentionVariable("Mentions the user that sent the message.");
 
   LexiconPrivateEvent(Lexicon l) :
   super(l, Symbols.lock, "private", "Private Message Event", "When someone sends a private message to the bot, it will respond.") {
     variables.addAll([
+      memberNameVariable,
       mentionVariable,
     ]);
   }
@@ -21,6 +24,7 @@ class LexiconPrivateEvent extends LexiconEvent<PrivateMessageEvent> {
     var user = event.message.author as User;
     if(user.id == Bot().user.id) return false;
       
+    memberNameVariable.setSecondaryValue(user.globalName == null ? user.username : user.globalName!);
     mentionVariable.setSecondaryValue(user.id);
 
     return true;

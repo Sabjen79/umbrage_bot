@@ -52,10 +52,10 @@ class MuteKick {
     // Disables the future voice leave event that the disconnection will trigger
     voiceLeaveEvent.disableFutureEvent = true;
 
-    member.update(MemberUpdateBuilder(
+    Bot().lexicon.handleEvent(MuteKickEvent(member, voiceState.channelId!), guild.id);
+
+    await member.update(MemberUpdateBuilder(
       voiceChannelId: null
     ));
-
-    Bot().lexicon.handleEvent(MuteKickEvent(member), guild.id);
   }
 }

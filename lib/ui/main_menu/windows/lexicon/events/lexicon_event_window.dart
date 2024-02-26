@@ -50,7 +50,7 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
     _enabled = widget.event.enabled;
     _chance = widget.event.chance;
     _cooldown = widget.event.cooldown;
-    _messagesLists = widget.event.messagesLists.map((e) => e.toList()).toList();
+    _messagesLists = widget.event.messagesLists.map((e1) => e1.map((e2) => ConversationMessage(e2.type, e2.message)).toList()).toList();
     _resetCooldownButtons();
     _subscription?.cancel();
     _subscription = widget.event.onCooldownsChanged.listen((_) {
@@ -112,6 +112,8 @@ class _LexiconEventWindowState extends State<LexiconEventWindow> with TickerProv
         );
         return;
       }
+      
+      init();
 
       setState(() {});
 

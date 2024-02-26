@@ -93,7 +93,7 @@ abstract class LexiconEvent<T extends DispatchEvent> with JsonSerializable {
   List<ConversationMessage> getRandomMessageList() {
     if(_messagesLists.isEmpty) return [];
 
-    List<ConversationMessage> list = _messagesLists[pseudoRandomIndex.getNextIndex()];
+    List<ConversationMessage> list = _messagesLists[pseudoRandomIndex.getNextIndex()].map((e) => ConversationMessage(e.type, e.message)).toList();
 
     for(var message in list) {
       if(message.type != 0) continue;
