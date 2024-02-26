@@ -33,7 +33,7 @@ class GuildVoiceManager {
       isDeafened: false
     ));
 
-    Future.delayed(const Duration(milliseconds: 500)).then((_) {
+    Future.delayed(const Duration(seconds: 1)).then((_) {
       if(Bot().config.randomSoundsPlayOnJoin) {
         music.randomSoundsManager.timer.runEarly();
       }
