@@ -33,8 +33,11 @@ class ProfilePictureManager {
       }
 
       if(image != null) {
-        Bot().client.user.manager.updateCurrentUser(UserUpdateBuilder(avatar: image));
-        logging.logger.info("Bot updated his profile picture.");
+        Bot().client.user.manager.updateCurrentUser(UserUpdateBuilder(avatar: image)).then((value) {
+          logging.logger.info("Bot updated his profile picture.");
+        }, onError: (e, s) {
+          logging.logger.warning("You are changing the bot's avatar too fast. Try again later...");
+        });
       }
     });
   }

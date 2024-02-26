@@ -40,7 +40,6 @@ class _ProfilePictureWindowState extends State<ProfilePictureWindow> with Extens
     super.initState();
     _cooldownWidget = ExtensionCooldownWidget(
       timer: Bot().profilePictureManager.timer,
-      canTimerRunEarly: false,
     );
     reset();
   }
