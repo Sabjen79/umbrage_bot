@@ -1,8 +1,12 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/profile/bot_profile.dart';
 import 'package:umbrage_bot/profile/bot_profile_list.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_button.dart';
+import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/bot_profile/bot_profile_route.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/console/console_route.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/extensions_route.dart';
@@ -33,48 +37,75 @@ class _StartMenuState extends State<StartMenu> {
     super.initState();
 
     BotProfileList().loadProfiles().then((value) {
+      profiles = value;
+
+      for(var p in profiles) {
+        profileWidgets.add(ProfileWidget(p, connectBot, deleteProfile));
+      }
+
       setState(() {
         _loaded = true;
-        profiles = value;
-
-        for(var p in profiles) {
-          profileWidgets.add(ProfileWidget(p, connectBot, deleteProfile));
-        }
       });
     });
   }
 
-  void connectBot(BotProfile profile) {
+  void connectBot(BotProfile profile) async {
     setState(() {
       _botName = profile.getUsername();
       _connecting = true;
     });
 
-    Bot.create(profile).then((_) async {
-
-      var router = MainMenuRouter();
-      router.addRoute(BotProfileRoute());
-      router.addRoute(ConsoleRoute());
-      router.addRoute(MusicRoute());
-      router.addRoute(LexiconRoute());
-      router.addRoute(ExtensionsRoute());
-      router.addRoute(SettingsRoute());
-
-      for(final route in router.getMainRoutes()) {
-        route.refreshWindows();
+    Timer(const Duration(seconds: 10), () {
+      if(_connecting) {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return SimpleDiscordDialog(
+              cancelText: "",
+              submitText: "Exit App",
+              onSubmit: () async => {
+                exit(0)
+              },
+              content: const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: SizedBox(
+                  width: 300,
+                  child: Text(
+                    "The bot takes too much time to wake up. Make sure the Lavalink server is opened and try again!",
+                    textAlign: TextAlign.center,
+                  )
+                )
+              ),
+            );
+          }
+        );
       }
+    });
 
-    }).then((_) {
-      Navigator.pushReplacement(
-        context, 
-        MaterialPageRoute(
-          builder: (context) => const MainMenu(),
-        )
-      );
+    await Bot.create(profile);
+    
+    var router = MainMenuRouter();
+    router.addRoute(BotProfileRoute());
+    router.addRoute(ConsoleRoute());
+    router.addRoute(MusicRoute());
+    router.addRoute(LexiconRoute());
+    router.addRoute(ExtensionsRoute());
+    router.addRoute(SettingsRoute());
 
-      setState(() {
-        _connecting = false;
-      });
+    for(final route in router.getMainRoutes()) {
+      route.refreshWindows();
+    }
+
+    Navigator.pushReplacement(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => const MainMenu(),
+      )
+    );
+
+    setState(() {
+      _connecting = false;
     });
   }
 

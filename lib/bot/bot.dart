@@ -38,7 +38,8 @@ class Bot {
   
   //==============================================================================
 
-  static Future<void> create(BotProfile profile) async {
+
+  static Future<bool> create(BotProfile profile) async {
     _instance.client = await Nyxx.connectGateway(
       profile.getToken(),
       GatewayIntents.all,
@@ -70,6 +71,8 @@ class Bot {
       ..muteKick = MuteKick()
       ..profilePictureManager = ProfilePictureManager()
       ..statusChangerManager = StatusChangerManager();
+    
+    return true;
   }
 
   //==============================================================================
