@@ -44,7 +44,7 @@ class RandomSoundsManager {
     _musicQueue.onTrackQueued.listen((track) {
       if(Bot().config.randomSoundsLoop) {
         Timer(const Duration(milliseconds: 500), () async {
-          if(!_musicQueue.loop) {
+          if(!_musicQueue.loop && _musicQueue.currentTrack != null && _musicQueue.currentTrack!.hidden) {
             _musicQueue.toggleLoop(await Bot().getBotMember(_guildId));
           }
         });
