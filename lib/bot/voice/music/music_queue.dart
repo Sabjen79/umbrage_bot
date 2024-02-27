@@ -117,7 +117,7 @@ class MusicQueue {
 
   void _nextTrack([bool forced = false]) {
     if(_loop && !forced) {
-      player.playEncoded(currentTrack!.track.encoded);
+      if(currentTrack != null) player.playEncoded(currentTrack!.track.encoded);
       return;
     }
 

@@ -6,6 +6,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:umbrage_bot/bot/bot.dart';
 import 'package:umbrage_bot/bot/configuration/bot_configuration.dart';
 import 'package:umbrage_bot/bot/extensions/random_sounds_manager.dart';
+import 'package:umbrage_bot/ui/components/simple_chance_field.dart';
 import 'package:umbrage_bot/ui/components/simple_discord_dialog.dart';
 import 'package:umbrage_bot/ui/components/simple_switch.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/extension_cover.dart';
@@ -35,6 +36,7 @@ class _RandomSoundsWindowState extends State<RandomSoundsWindow> with ExtensionC
   late bool _randomSoundsPlayOnJoin;
   late int _randomSoundsMinCooldown;
   late int _randomSoundsMaxCooldown;
+  late double _randomSoundsLoopChance;
 
   @override
   void initState() {
@@ -50,6 +52,7 @@ class _RandomSoundsWindowState extends State<RandomSoundsWindow> with ExtensionC
     _randomSoundsPlayOnJoin = config.randomSoundsPlayOnJoin;
     _randomSoundsMinCooldown = config.randomSoundsMinCooldown;
     _randomSoundsMaxCooldown = config.randomSoundsMaxCooldown;
+    _randomSoundsLoopChance = config.randomSoundsLoopChance;
   }
 
   void _showSaveChanges() {
@@ -67,7 +70,8 @@ class _RandomSoundsWindowState extends State<RandomSoundsWindow> with ExtensionC
         ..randomSoundsEnable = _randomSoundsEnable
         ..randomSoundsPlayOnJoin = _randomSoundsPlayOnJoin
         ..randomSoundsMinCooldown = _randomSoundsMinCooldown
-        ..randomSoundsMaxCooldown = _randomSoundsMaxCooldown;
+        ..randomSoundsMaxCooldown = _randomSoundsMaxCooldown
+        ..randomSoundsLoopChance = _randomSoundsLoopChance;
 
       config.saveToJson();
 
@@ -220,6 +224,23 @@ class _RandomSoundsWindowState extends State<RandomSoundsWindow> with ExtensionC
                       setState(() {
                         _randomSoundsMinCooldown = v.start.toInt();
                         _randomSoundsMaxCooldown = v.end.toInt();
+                      });
+
+                      _showSaveChanges();
+                    }
+                  )
+                )
+              );
+
+              list.addAll(
+                settingsRow(
+                  name: "Random Sounds Loop Chance",
+                  description: "If the bot queues a sound, there is a chance that he will also toggle loop on.",
+                  child: SimpleChanceField(
+                    chance: _randomSoundsLoopChance,
+                    onChanged: (v) {
+                      setState(() {
+                        _randomSoundsLoopChance = v;
                       });
 
                       _showSaveChanges();

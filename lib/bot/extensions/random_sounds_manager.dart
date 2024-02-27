@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -37,6 +38,16 @@ class RandomSoundsManager {
       final result = await _musicQueue.lavalinkClient.loadTrack(file.absolute.path);
       if(result is TrackLoadResult) {
         _queueTrack(result.data);
+      }
+    });
+
+    _musicQueue.onTrackQueued.listen((track) {
+      if(Bot().config.randomSoundsLoop) {
+        Timer(const Duration(milliseconds: 500), () async {
+          if(!_musicQueue.loop) {
+            _musicQueue.toggleLoop(await Bot().getBotMember(_guildId));
+          }
+        });
       }
     });
   }

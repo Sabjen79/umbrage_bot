@@ -67,7 +67,8 @@ class BotConfiguration with JsonSerializable {
   late bool randomSoundsPlayOnJoin;
   late int randomSoundsMinCooldown;
   late int randomSoundsMaxCooldown;
-  
+  late double randomSoundsLoopChance;
+  bool get randomSoundsLoop => randomSoundsEnable && Random().nextDouble() < randomSoundsLoopChance;
 
   BotConfiguration(List<PartialGuild> guilds) {
     for(var g in guilds) {
@@ -134,6 +135,7 @@ class BotConfiguration with JsonSerializable {
     randomSoundsPlayOnJoin = (json['randomSoundsPlayOnJoin'] ?? false) as bool;
     randomSoundsMinCooldown = (json['randomSoundsMinCooldown'] ?? 600000) as int;
     randomSoundsMaxCooldown = (json['randomSoundsMaxCooldown'] ?? 1200000) as int;
+    randomSoundsLoopChance = (json['randomSoundsLoopChance'] ?? 0.0) as double;
   }
 
   @override
@@ -180,7 +182,8 @@ class BotConfiguration with JsonSerializable {
     'randomSoundsEnable': randomSoundsEnable,
     'randomSoundsPlayOnJoin': randomSoundsPlayOnJoin,
     'randomSoundsMinCooldown': randomSoundsMinCooldown,
-    'randomSoundsMaxCooldown': randomSoundsMaxCooldown
+    'randomSoundsMaxCooldown': randomSoundsMaxCooldown,
+    'randomSoundsLoopChance': randomSoundsLoopChance
   };
 
   @override
