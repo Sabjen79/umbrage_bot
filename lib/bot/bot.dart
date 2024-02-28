@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_lavalink/nyxx_lavalink.dart';
@@ -51,9 +52,16 @@ class Bot {
           cliIntegration
         ]
       ),
-    //The bot is set on 'Do Not Disturb' and cannot be changed because he is too exalted to be perturbed by commoners.
-    )..updatePresence(PresenceBuilder(status: CurrentUserStatus.dnd, isAfk: false));
+    );
+
+    // Console Errors
+    PlatformDispatcher.instance.onError = (object, stack) {
+      logging.logger.severe("${object.toString()}:\n${stack.toString()}");
+      return true;
+    };
     
+    //The bot is set on 'Do Not Disturb' and cannot be changed because he is too exalted to be perturbed by commoners.
+    _instance.client.updatePresence(PresenceBuilder(status: CurrentUserStatus.dnd, isAfk: false));
     _instance.user = await _instance.client.user.manager.fetchCurrentUser();
 
     // Updates the username and avatar

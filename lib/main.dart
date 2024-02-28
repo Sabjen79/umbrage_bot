@@ -23,11 +23,6 @@ void main() async {
   logging.logger.onRecord.listen((event) {
     ConsoleWindow.buffer.writeln("[${event.time.toString()}] ${event.toString()}");
   });
-
-  PlatformDispatcher.instance.onError = (object, stack) {
-    logging.logger.severe("${object.toString()}:\n${stack.toString()}");
-    return true;
-  };
   
   runApp(const App());
 }
