@@ -73,7 +73,7 @@ class GuildVoiceManager {
         final botChannelId = botState?.channelId;
         final channelId = Snowflake(Bot().config[guild.id].defaultVoiceChannelId);
 
-        if(botChannelId != channelId) connectTo(channelId, true);
+        if(botChannelId != channelId || (botState != null && !botState.isSelfMuted)) connectTo(channelId, true);
       } else {
         disconnect();
       }
@@ -83,6 +83,6 @@ class GuildVoiceManager {
 
     final channel = await Bot().client.channels.get(bestChannel!.id) as GuildVoiceChannel;
     
-    if(channel.id != botState?.channelId) connectTo(channel.id);
+    if(channel.id != botState?.channelId || (botState != null && botState.isSelfMuted)) connectTo(channel.id);
   }
 }

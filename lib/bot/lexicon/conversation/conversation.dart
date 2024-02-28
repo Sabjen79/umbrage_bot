@@ -12,6 +12,7 @@ class Conversation {
   PartialMessage? replyMessage;
   bool isReply;
   PartialUser? user;
+  bool _blocked = false;
 
   Conversation({
     required List<ConversationMessage> messages,
@@ -26,22 +27,32 @@ class Conversation {
   }
 
   Future<void> advance(MessageCreateEvent event) async {
+    if(_blocked) return;
     var eventUser = (await event.member!.get()).user!;
     if(user != null && eventUser != user) return;
 
     user ??= eventUser;
     replyMessage = event.message;
 
-    sendMessage();
+    try {
+      sendMessage();
+    } catch(e) {
+      _blocked = false;
+    }
   }
 
   Future<void> advancePrivate(PrivateMessageEvent event) async {
+    if(_blocked) return;
     if(event.message.author is! User || user?.id != event.message.author.id) return;
 
     user ??= event.message.author as User;
     replyMessage = event.message;
 
-    sendMessage();
+    try {
+      sendMessage();
+    } catch(e) {
+      _blocked = false;
+    }
   }
 
   void sendMessage() async {
@@ -49,6 +60,8 @@ class Conversation {
       cancel();
       return;
     }
+
+    _blocked = true;
 
     await Future.delayed(Duration(milliseconds: Bot().config.randomReactionSpeed));
 
@@ -82,6 +95,8 @@ class Conversation {
         }
       }
     } while(messages.isNotEmpty && message.type != 1); // If wait for response or end of messages
+
+    _blocked = false;
   }
 
   void cancel() {
