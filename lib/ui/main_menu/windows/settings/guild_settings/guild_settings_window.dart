@@ -30,7 +30,7 @@ class _Channel {
 }
 
 class _GuildSettingsWindowState extends State<GuildSettingsWindow> with SettingsRow {
-  late final BotGuildConfiguration config;
+  late BotGuildConfiguration config;
   final List<_Channel> _textChannels = [];
   late _Channel? _mainTextChannel;
 
@@ -52,6 +52,8 @@ class _GuildSettingsWindowState extends State<GuildSettingsWindow> with Settings
   @override
   void didUpdateWidget(covariant GuildSettingsWindow oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    config = Bot().config[widget.guild.id];
 
     reset();
   }

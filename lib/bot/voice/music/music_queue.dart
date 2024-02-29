@@ -50,6 +50,7 @@ class MusicQueue {
     });
 
     Bot().client.onVoiceStateUpdate.listen((event) {
+      if(event.state.guildId! != guildId) return;
       //Ensures that the bot will not play music while there is nobody to hear it
       final botState = event.state.guild?.voiceStates[Bot().user.id];
       if(botState == null || currentTrack == null) return;

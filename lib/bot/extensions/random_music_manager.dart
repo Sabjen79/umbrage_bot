@@ -36,9 +36,11 @@ class RandomMusicManager with JsonSerializable {
             _queueTrack(result);
             return;
           } else {
+            logging.logger.warning("[Random Music] $url didn't work");
             url = "";
           }
         } on LavalinkException {
+          logging.logger.warning("[Random Music] $url didn't work");
           url = "";
         }
 

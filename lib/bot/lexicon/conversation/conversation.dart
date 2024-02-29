@@ -29,7 +29,7 @@ class Conversation {
   Future<void> advance(MessageCreateEvent event) async {
     if(_blocked) return;
     var eventUser = (await event.member!.get()).user!;
-    if(user != null && eventUser != user) return;
+    if(user != null && eventUser.id != user?.id) return;
 
     user ??= eventUser;
     replyMessage = event.message;
