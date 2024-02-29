@@ -25,7 +25,8 @@ class RandomMusicManager with JsonSerializable {
 
     timer = BotTimer.periodic(() => Bot().config.randomMusicCooldown, () async {
       String url = "";
-      while(url.isEmpty && _songList.isNotEmpty && Bot().config.randomMusicEnable) {
+      int tries = 0;
+      while(url.isEmpty && tries < _songList.length && Bot().config.randomMusicEnable) {
         if(!Bot().voiceManager[guildId].isBotReadyForAudio) return;
         url = _songList[Random().nextInt(_songList.length)];
 
@@ -33,14 +34,19 @@ class RandomMusicManager with JsonSerializable {
           var result = await _queue.lavalinkClient.loadTrack(url);
           if(result is TrackLoadResult) {
             _queueTrack(result);
+            return;
           } else {
-            _removeFromList(url);
             url = "";
           }
         } on LavalinkException {
-          _removeFromList(url);
           url = "";
         }
+
+        tries++;
+      }
+
+      if(tries == _songList.length) {
+        logging.logger.warning("[Random Music] Could not find a valid song to queue");
       }
     });
   }
@@ -83,14 +89,6 @@ class RandomMusicManager with JsonSerializable {
 
     if(!_songList.contains(url)) {
       _songList.add(url);
-      saveToJson();
-    }
-  }
-
-  void _removeFromList(String url) {
-    if(_songList.contains(url)) {
-      logging.logger.warning("Removed $url from Saved Music List since it is not working anymore.");
-      _songList.remove(url);
       saveToJson();
     }
   }
