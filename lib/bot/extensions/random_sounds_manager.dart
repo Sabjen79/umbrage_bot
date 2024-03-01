@@ -14,8 +14,10 @@ import 'package:umbrage_bot/bot/voice/music/music_track.dart';
 
 class RandomSoundsManager {
   static final List<File> _sounds = [];
+  static final Map<String, String> _soundUrls = {};
   static late PseudoRandomIndex _pseudoRandomIndex;
   static final _directory = BotFiles().getDir("random_sounds");
+
 
   late final BotTimer timer;
   final Snowflake _guildId;
@@ -34,10 +36,23 @@ class RandomSoundsManager {
       if(botVoiceState == null || botVoiceState.channel == null || botVoiceState.isMuted) return; // Don't queue music if alone
 
       final file = _sounds[_pseudoRandomIndex.getNextIndex()];
+      final filename = file.path.split("\\").last;
       
-      final result = await _musicQueue.lavalinkClient.loadTrack(file.absolute.path);
+      // Sends the file to a personal throwaway discord account to save the file and play it.
+      if(!_soundUrls.containsKey(filename)) {
+        final dm = await Bot().client.users.createDm(const Snowflake(1062072022500397106));
+        final message = await dm.sendMessage(MessageBuilder(attachments: [
+          AttachmentBuilder(data: file.readAsBytesSync(), fileName: filename)
+        ]));
+        _soundUrls[filename] = message.attachments.first.url.toString();
+      }
+
+      await _musicQueue.initializePlayer();
+      final result = await _musicQueue.lavalinkClient!.loadTrack(_soundUrls[filename]!);
       if(result is TrackLoadResult) {
         _queueTrack(result.data);
+      } else {
+        logging.logger.warning("NOT OK!");
       }
     });
 
@@ -65,6 +80,7 @@ class RandomSoundsManager {
 
   static void loadSounds() {
     _sounds.clear();
+    _soundUrls.clear();
 
     for(final file in _directory.listSync()) {
       final filename = file.path.split(r'\').last;

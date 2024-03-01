@@ -16,6 +16,8 @@ class VolumeBoostManager {
     timer = BotTimer.periodic(() => Bot().config.volumeBoostCooldown, () async {
       if(!Bot().config.volumeBoostEnable || !Bot().voiceManager[_guildId].isBotReadyForAudio) return;
 
+      await _queue.initializePlayer();
+
       _ascendVolume();
       
       Timer(const Duration(seconds: 4), () {
@@ -27,14 +29,14 @@ class VolumeBoostManager {
   Future<void> _ascendVolume() async {
     for(double i = 0; i <= 1; i += 0.1) {
       await Future.delayed(const Duration(milliseconds: 50));
-      _queue.player.setVolume(100 + (i * (Bot().config.volumeBoostAmplitude - 100)).toInt());
+      _queue.player!.setVolume(100 + (i * (Bot().config.volumeBoostAmplitude - 100)).toInt());
     }
   }
 
   Future<void> _descendVolume() async {
     for(double i = 1; i >= 0; i -= 0.1) {
       await Future.delayed(const Duration(milliseconds: 50));
-      _queue.player.setVolume(100 + (i * (Bot().config.volumeBoostAmplitude - 100)).toInt());
+      _queue.player!.setVolume(100 + (i * (Bot().config.volumeBoostAmplitude - 100)).toInt());
     }
   }
 }

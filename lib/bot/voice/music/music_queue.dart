@@ -11,7 +11,7 @@ import 'package:umbrage_bot/bot/voice/music/music_track.dart';
 
 class MusicQueue {
   final Snowflake guildId;
-  late final LavalinkPlayer player;
+  LavalinkPlayer? player;
   final Queue<MusicTrack> _queue = Queue();
   BotTimer? unskipTimer;
   MusicTrack? currentTrack;
@@ -33,36 +33,43 @@ class MusicQueue {
   Stream<MusicTrack?> get onCurrentTrackChanged => _currentTrackChangedStream.stream.asBroadcastStream();
   //
 
-  LavalinkClient get lavalinkClient => player.lavalinkClient;
+  LavalinkClient? get lavalinkClient => player?.lavalinkClient;
   List<MusicTrack> get list => _queue.toList();
   bool get loop => _loop;
 
   MusicQueue(this.guildId) {
-    var plugin = Bot().client.options.plugins.firstWhere((element) => element is LavalinkPlugin) as LavalinkPlugin;
-    plugin.onPlayerConnected.firstWhere((p) => p.guildId == guildId).then((p) {
-      player = p;
-
-      player.onTrackEnd.listen((e) {
-        if(e.reason == "finished") _nextTrack();
-      });
-      player.onTrackStuck.listen((e) {_nextTrack();});
-      player.onTrackException.listen(_trackException);
-    });
+    initializePlayer();
 
     Bot().client.onVoiceStateUpdate.listen((event) {
       if(event.state.guildId! != guildId) return;
+
       //Ensures that the bot will not play music while there is nobody to hear it
       final botState = event.state.guild?.voiceStates[Bot().user.id];
       if(botState == null || currentTrack == null) return;
 
       if(botState.channel == null || botState.isMuted) {
-        player.pause();
+        player!.pause();
       } else {
-        player.resume();
+        player!.resume();
       }
     });
 
     MusicCommandMessage(this); // Music messages
+  }
+
+  Future<void> initializePlayer() async {
+    if(player != null) return;
+
+    final plugin = Bot().client.options.plugins.firstWhere((element) => element is LavalinkPlugin) as LavalinkPlugin;
+    final p = await plugin.onPlayerConnected.firstWhere((p) => p.guildId == guildId);
+
+    player = p;
+
+    player!.onTrackEnd.listen((e) {
+      if(e.reason == "finished") _nextTrack();
+    });
+    player!.onTrackStuck.listen((e) {_nextTrack(true);});
+    player!.onTrackException.listen(_trackException);
   }
 
   bool containsTrack(MusicTrack track) {
@@ -118,7 +125,7 @@ class MusicQueue {
 
   void _nextTrack([bool forced = false]) {
     if(_loop && !forced) {
-      if(currentTrack != null) player.playEncoded(currentTrack!.track.encoded);
+      if(currentTrack != null) player!.playEncoded(currentTrack!.track.encoded);
       return;
     }
 
@@ -127,7 +134,7 @@ class MusicQueue {
 
     if(_queue.isNotEmpty) {
       currentTrack = _queue.removeFirst();
-      player.playEncoded(currentTrack!.track.encoded);
+      player!.playEncoded(currentTrack!.track.encoded);
 
       _queueChangedStream.add(null);
 
@@ -138,20 +145,21 @@ class MusicQueue {
         });
       }
     } else {
-      player.stopPlaying();
+      player?.stopPlaying();
     }
 
     _currentTrackChangedStream.add(currentTrack);
   }
 
   void replayCurrentTrack() {
-    if(currentTrack == null || player.currentTrack != null) return;
+    if(currentTrack == null || player?.currentTrack != null) return;
 
-    player.playEncoded(currentTrack!.track.encoded);
-    player.seekTo(player.state.position);
+    player?.playEncoded(currentTrack!.track.encoded);
+    player?.seekTo(player!.state.position);
   }
   
   void _trackException(TrackExceptionEvent event) {
     logging.logger.severe("[${event.exception.severity}] [${event.exception.cause}] Error on track ${event.track.info.title}: ${event.exception.message}");
+    _nextTrack(true);
   }
 }

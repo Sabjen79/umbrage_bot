@@ -72,7 +72,7 @@ class _StartMenuState extends State<StartMenu> {
                 child: SizedBox(
                   width: 300,
                   child: Text(
-                    "The bot takes too much time to wake up. Make sure the Lavalink server is opened and try again!",
+                    "The bot takes too much time to wake up. Contact the project owner to check on the Lavalink channel",
                     textAlign: TextAlign.center,
                   )
                 )

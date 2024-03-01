@@ -31,7 +31,8 @@ class RandomMusicManager with JsonSerializable {
         url = _songList[Random().nextInt(_songList.length)];
 
         try {
-          var result = await _queue.lavalinkClient.loadTrack(url);
+          await _queue.initializePlayer();
+          var result = await _queue.lavalinkClient!.loadTrack(url);
           if(result is TrackLoadResult) {
             _queueTrack(result);
             return;

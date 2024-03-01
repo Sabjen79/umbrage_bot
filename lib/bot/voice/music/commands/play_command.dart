@@ -39,7 +39,8 @@ class PlayCommand extends MusicCommand {
     }
 
     try {
-      var result = await queue.lavalinkClient.loadTrack(url!);
+      await queue.initializePlayer();
+      var result = await queue.lavalinkClient!.loadTrack(url!);
       if(result is TrackLoadResult) {
         track = result.data;
       } else if(result is SearchLoadResult) {
