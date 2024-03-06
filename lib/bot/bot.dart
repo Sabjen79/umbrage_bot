@@ -47,7 +47,7 @@ class Bot {
       options: GatewayClientOptions(
         loggerName: 'Umbrage',
         plugins: [
-          LavalinkPlugin(base: Uri.http("lavalink-v4.teramont.net:25569"), password: "eHKuFcz67k4lBS64"),
+          LavalinkPlugin(base: Uri.http("lavalink.jirayu.pw:2333"), password: "youshallnotpass"),
           logging, 
           cliIntegration
         ]
