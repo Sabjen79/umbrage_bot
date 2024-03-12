@@ -31,8 +31,8 @@ class MuteKick {
   // 1 for mute
   int _getStatus(VoiceState state, VoiceState oldState) {
     final onlyMute = Bot().config.muteKickOnlyMute;
-    final isMuted = onlyMute ? state.isSelfMuted && !state.isSelfDeafened : state.isSelfMuted;
-    final wasMuted = onlyMute ? oldState.isSelfMuted && !oldState.isSelfDeafened : oldState.isSelfMuted;
+    final isMuted = onlyMute ? state.isMuted && !state.isDeafened : state.isMuted;
+    final wasMuted = onlyMute ? oldState.isMuted && !oldState.isDeafened : oldState.isMuted;
 
     if(isMuted && !wasMuted) return 1;
     if(isMuted && oldState.channel == null) return 1; // Special case: When someone joins a voice channel already muted
