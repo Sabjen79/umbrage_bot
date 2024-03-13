@@ -5,6 +5,7 @@ import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_lavalink/nyxx_lavalink.dart';
 import 'package:umbrage_bot/bot/event_handler.dart';
 import 'package:umbrage_bot/bot/configuration/bot_configuration.dart';
+import 'package:umbrage_bot/bot/extensions/loop_count.dart';
 import 'package:umbrage_bot/bot/extensions/mute_kick.dart';
 import 'package:umbrage_bot/bot/extensions/profile_picture_manager.dart';
 import 'package:umbrage_bot/bot/extensions/status_changer_manager.dart';
@@ -24,6 +25,7 @@ class Bot {
   late final MuteKick muteKick;
   late final ProfilePictureManager profilePictureManager;
   late final StatusChangerManager statusChangerManager;
+  late final LoopCount loopCount;
 
   final List<Guild> _guildList = [];
   List<Guild> get guildList => _guildList;
@@ -78,7 +80,8 @@ class Bot {
       ..voiceManager = BotVoiceManager(_instance._guildList)
       ..muteKick = MuteKick()
       ..profilePictureManager = ProfilePictureManager()
-      ..statusChangerManager = StatusChangerManager();
+      ..statusChangerManager = StatusChangerManager()
+      ..loopCount = LoopCount(_instance._guildList);
     
     return true;
   }

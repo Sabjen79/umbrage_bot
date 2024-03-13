@@ -1,4 +1,5 @@
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:umbrage_bot/ui/main_menu/windows/extensions/loop_count/loop_count_window.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/mute_kick_window.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/profile_picture/profile_picture_window.dart';
 import 'package:umbrage_bot/ui/main_menu/windows/extensions/random_music_window.dart';
@@ -19,6 +20,7 @@ class ExtensionsRoute extends MainRoute {
       ProfilePictureWindow(),
       StatusChangerWindow(),
       MuteKickWindow(),
+      LoopCountWindow(),
       RandomMusicWindow(),
       RandomSoundsWindow(),
       VolumeBoosterWindow()
