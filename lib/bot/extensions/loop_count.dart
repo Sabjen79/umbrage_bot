@@ -34,8 +34,8 @@ class LoopCount with JsonSerializable {
     if(!enable || (track != null && track.hidden)) return;
     final currentRepeat = _currentRepeats[guildId]!;
 
-    if(currentRepeat.track != track) {
-      if(messageOnEnd && currentRepeat.count >= triggerStart) {
+    if(currentRepeat.track?.track != track?.track) {
+      if(messageOnEnd && currentRepeat.count >= triggerStart && currentRepeat.track != null && currentRepeat.track!.track.info.length > const Duration(minutes: 1)) {
         final channel = await Bot().client.channels.get(Snowflake(Bot().config[guildId].musicChannelId)) as TextChannel;
         await currentRepeat.message?.delete();
 
@@ -59,7 +59,7 @@ class LoopCount with JsonSerializable {
       currentRepeat.count++;
 
       final count = currentRepeat.count;
-      if(count < triggerStart || count % triggerMultiple != 0) return;
+      if(count < triggerStart || count % triggerMultiple != 0 || currentRepeat.track!.track.info.length < const Duration(minutes: 1)) return;
 
       final channel = await Bot().client.channels.get(Snowflake(Bot().config[guildId].musicChannelId)) as TextChannel;
       await currentRepeat.message?.delete();
